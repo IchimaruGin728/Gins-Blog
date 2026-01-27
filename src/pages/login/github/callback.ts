@@ -21,14 +21,15 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 	try {
         console.log("Validating GitHub code...");
 		const tokens: OAuth2Tokens = await getGithub(locals.runtime.env).validateAuthorizationCode(code);
-        console.log("Tokens received:", tokens.accessToken ? "Present" : "Missing");
+        const accessToken = tokens.accessToken();
+        console.log("Tokens received:", accessToken ? "Present" : "Missing");
 
         let githubUser: GitHubUser;
         try {
             console.log("Fetching GitHub user...");
             const githubUserResponse = await fetch('https://api.github.com/user', {
                 headers: {
-                    Authorization: `Bearer ${tokens.accessToken}`
+                    Authorization: `Bearer ${accessToken.trim()}`
                 }
             });
             githubUser = await githubUserResponse.json();

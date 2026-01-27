@@ -2,7 +2,7 @@ import { getGoogle } from '../../../lib/auth';
 import { generateState, generateCodeVerifier } from 'arctic';
 import type { APIRoute } from 'astro';
 
-export const GET: APIRoute = async ({ cookies, redirect, locals }) => {
+export const GET: APIRoute = async ({ cookies, redirect, locals, request }) => {
 	const state = generateState();
     const codeVerifier = generateCodeVerifier();
 	const url = getGoogle(locals.runtime.env).createAuthorizationURL(state, codeVerifier, ['profile', 'email']);

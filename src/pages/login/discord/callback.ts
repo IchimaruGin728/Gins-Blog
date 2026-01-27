@@ -22,14 +22,15 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 	try {
         console.log("Validating Discord code...");
 		const tokens: OAuth2Tokens = await getDiscord(locals.runtime.env).validateAuthorizationCode(code, codeVerifier);
-        console.log("Tokens received:", tokens.accessToken ? "Present" : "Missing");
+        const accessToken = tokens.accessToken();
+        console.log("Tokens received:", accessToken ? "Present" : "Missing");
 
         let discordUser: DiscordUser;
         try {
             console.log("Fetching Discord user...");
             const discordUserResponse = await fetch('https://discord.com/api/users/@me', {
                 headers: {
-                    Authorization: `Bearer ${tokens.accessToken}`
+                    Authorization: `Bearer ${accessToken.trim()}`
                 }
             });
             discordUser = await discordUserResponse.json();

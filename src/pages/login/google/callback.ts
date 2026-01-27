@@ -22,14 +22,15 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 	try {
         console.log("Validating Google code...");
 		const tokens: OAuth2Tokens = await getGoogle(locals.runtime.env).validateAuthorizationCode(code, codeVerifier);
-        console.log("Tokens received:", tokens.accessToken ? "Present" : "Missing");
+        const accessToken = tokens.accessToken();
+        console.log("Tokens received:", accessToken ? "Present" : "Missing");
 
         let googleUser: GoogleUser;
         try {
             console.log("Fetching Google user...");
             const googleUserResponse = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
                 headers: {
-                    Authorization: `Bearer ${tokens.accessToken}`
+                    Authorization: `Bearer ${accessToken.trim()}`
                 }
             });
             googleUser = await googleUserResponse.json();
