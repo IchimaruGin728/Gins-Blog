@@ -1,5 +1,5 @@
 import { getDiscord } from '../../../lib/auth';
-import { createSession, generateSessionToken } from '../../../lib/session';
+import { createSession, generateSessionToken, validateSessionToken } from '../../../lib/session';
 import { getDb } from '../../../lib/db';
 import { users } from '../../../../db/schema';
 import { eq } from 'drizzle-orm';
@@ -41,21 +41,54 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 
 		const db = getDb(locals.runtime.env);
 
+		// Check if user is already logged in (linking a new provider)
+		const existingSessionToken = cookies.get('session')?.value;
+		let currentUserId: string | null = null;
+		
+		if (existingSessionToken) {
+			const sessionResult = await validateSessionToken(existingSessionToken, db, locals.runtime.env);
+			if (sessionResult.session && sessionResult.user) {
+				currentUserId = sessionResult.user.id;
+				console.log("User is already logged in, linking Discord account to user:", currentUserId);
+			}
+		}
+
+		// Check if this Discord account is already linked to a user
 		const existingUser = await db.select().from(users).where(eq(users.discordId, discordUser.id)).get();
 
 		let userId = "";
 
-		if (existingUser) {
+		if (currentUserId) {
+			// User is logged in - link Discord to their current account
+			if (existingUser && existingUser.id !== currentUserId) {
+				throw new Error("This Discord account is already linked to another user account.");
+			}
+			
+			// Update current user with Discord ID
+			await db.update(users)
+				.set({ 
+					discordId: discordUser.id,
+					username: discordUser.username,
+					avatar: `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`,
+				})
+				.where(eq(users.id, currentUserId));
+			
+			userId = currentUserId;
+			console.log("Discord account linked to existing user:", userId);
+		} else if (existingUser) {
+			// Not logged in, but Discord account exists - log in as that user
 			userId = existingUser.id;
+			console.log("Logging in as existing Discord user:", userId);
 		} else {
-            // Create user
-            userId = crypto.randomUUID();
-            await db.insert(users).values({
-                id: userId,
-                discordId: discordUser.id,
-                username: discordUser.username,
-                avatar: `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`,
-            });
+			// Not logged in, no existing account - create new user
+			userId = crypto.randomUUID();
+			await db.insert(users).values({
+				id: userId,
+				discordId: discordUser.id,
+				username: discordUser.username,
+				avatar: `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`,
+			});
+			console.log("Created new user with Discord:", userId);
 		}
 
 		console.log("Creating session, userId:", userId);

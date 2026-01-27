@@ -1,5 +1,5 @@
 import { getGithub } from '../../../lib/auth';
-import { createSession, generateSessionToken } from '../../../lib/session';
+import { createSession, generateSessionToken, validateSessionToken } from '../../../lib/session';
 import { getDb } from '../../../lib/db';
 import { users } from '../../../../db/schema';
 import { eq } from 'drizzle-orm';
@@ -47,20 +47,52 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 
 		const db = getDb(locals.runtime.env);
 
+		// Check if user is already logged in (linking a new provider)
+		const existingSessionToken = cookies.get('session')?.value;
+		let currentUserId: string | null = null;
+		
+		if (existingSessionToken) {
+			const sessionResult = await validateSessionToken(existingSessionToken, db, locals.runtime.env);
+			if (sessionResult.session && sessionResult.user) {
+				currentUserId = sessionResult.user.id;
+				console.log("User is already logged in, linking GitHub account to user:", currentUserId);
+			}
+		}
+
+		// Check if this GitHub account is already linked to a user
 		const existingUser = await db.select().from(users).where(eq(users.githubId, githubUser.id)).get();
 
 		let userId = "";
 
-		if (existingUser) {
+		if (currentUserId) {
+			// User is logged in - link GitHub to their current account
+			if (existingUser && existingUser.id !== currentUserId) {
+				throw new Error("This GitHub account is already linked to another user account.");
+			}
+			
+			// Update current user with GitHub ID
+			await db.update(users)
+				.set({ 
+					githubId: githubUser.id,
+					username: githubUser.login, // Update username if linking
+				})
+				.where(eq(users.id, currentUserId));
+			
+			userId = currentUserId;
+			console.log("GitHub account linked to existing user:", userId);
+		} else if (existingUser) {
+			// Not logged in, but GitHub account exists - log in as that user
 			userId = existingUser.id;
+			console.log("Logging in as existing GitHub user:", userId);
 		} else {
-            // Create user
-            userId = crypto.randomUUID();
-            await db.insert(users).values({
-                id: userId,
-                githubId: githubUser.id,
-                username: githubUser.login
-            });
+			// Not logged in, no existing account - create new user
+			userId = crypto.randomUUID();
+			await db.insert(users).values({
+				id: userId,
+				githubId: githubUser.id,
+				username: githubUser.login
+			});
+			console.log("Created new user with GitHub:", userId);
 		}
 
 	

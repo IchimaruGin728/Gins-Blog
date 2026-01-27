@@ -1,5 +1,5 @@
 import { getGoogle } from '../../../lib/auth';
-import { createSession, generateSessionToken } from '../../../lib/session';
+import { createSession, generateSessionToken, validateSessionToken } from '../../../lib/session';
 import { getDb } from '../../../lib/db';
 import { users } from '../../../../db/schema';
 import { eq } from 'drizzle-orm';
@@ -41,21 +41,54 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 
 		const db = getDb(locals.runtime.env);
 
+		// Check if user is already logged in (linking a new provider)
+		const existingSessionToken = cookies.get('session')?.value;
+		let currentUserId: string | null = null;
+		
+		if (existingSessionToken) {
+			const sessionResult = await validateSessionToken(existingSessionToken, db, locals.runtime.env);
+			if (sessionResult.session && sessionResult.user) {
+				currentUserId = sessionResult.user.id;
+				console.log("User is already logged in, linking Google account to user:", currentUserId);
+			}
+		}
+
+		// Check if this Google account is already linked to a user
 		const existingUser = await db.select().from(users).where(eq(users.googleId, googleUser.sub)).get();
 
 		let userId = "";
 
-		if (existingUser) {
+		if (currentUserId) {
+			// User is logged in - link Google to their current account
+			if (existingUser && existingUser.id !== currentUserId) {
+				throw new Error("This Google account is already linked to another user account.");
+			}
+			
+			// Update current user with Google ID
+			await db.update(users)
+				.set({ 
+					googleId: googleUser.sub,
+					username: googleUser.name,
+					avatar: googleUser.picture,
+				})
+				.where(eq(users.id, currentUserId));
+			
+			userId = currentUserId;
+			console.log("Google account linked to existing user:", userId);
+		} else if (existingUser) {
+			// Not logged in, but Google account exists - log in as that user
 			userId = existingUser.id;
+			console.log("Logging in as existing Google user:", userId);
 		} else {
-            // Create user
-            userId = crypto.randomUUID();
-            await db.insert(users).values({
-                id: userId,
-                googleId: googleUser.sub,
-                username: googleUser.name,
-                avatar: googleUser.picture,
-            });
+			// Not logged in, no existing account - create new user
+			userId = crypto.randomUUID();
+			await db.insert(users).values({
+				id: userId,
+				googleId: googleUser.sub,
+				username: googleUser.name,
+				avatar: googleUser.picture,
+			});
+			console.log("Created new user with Google:", userId);
 		}
 
 		console.log("Creating session, userId:", userId);
