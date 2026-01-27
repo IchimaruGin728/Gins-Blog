@@ -2,76 +2,110 @@
   <div
     class="max-w-7xl mx-auto glass-panel rounded-full px-6 py-3 flex justify-between items-center"
   >
+    <!-- Left: Logo -->
     <a
       href="/"
-      class="text-xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-primary"
+      class="text-xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-primary z-50 relative"
     >
       Gin's Blog
     </a>
 
-    <div class="flex items-center gap-6 text-sm font-medium text-gray-300">
-      <a href="/" class="hover:text-white transition-colors">Home</a>
-      <a href="/blog" class="hover:text-white transition-colors">Blog</a>
-      <a href="/about" class="hover:text-white transition-colors">About</a>
+    <!-- Center: Dynamic Dock (Navigation + Search) -->
+    <div
+      class="absolute left-1/2 -translate-x-1/2 flex items-center gap-1 p-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-3xl shadow-lg hover:border-white/20 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group/dock"
+    >
+      <!-- Nav Links -->
+      <nav
+        class="flex items-center gap-1 px-2 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/search:opacity-50 group-hover/search:scale-95 group-hover/search:blur-[1px]"
+      >
+        <a
+          href="/"
+          class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all"
+          >Home</a
+        >
+        <a
+          href="/blog"
+          class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all"
+          >Blog</a
+        >
+        <a
+          href="/about"
+          class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all"
+          >About</a
+        >
+      </nav>
+
+      <!-- Divider -->
+      <div
+        class="w-px h-4 bg-white/10 mx-1 group-hover/search:opacity-0 transition-opacity"
+      >
+      </div>
+
+      <!-- Morphing Search Trigger -->
+      <button
+        id="search-trigger-btn"
+        class="group/search relative flex items-center justify-center h-9 w-9 bg-white/5 hover:bg-brand-primary/10 hover:w-48 border border-transparent hover:border-brand-primary/20 rounded-full transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden cursor-text"
+      >
+        <!-- Icon -->
+        <span
+          class="absolute left-2.5 i-heroicons-magnifying-glass text-gray-400 group-hover/search:text-brand-primary transition-colors z-10"
+        ></span>
+
+        <!-- Text Label (Reveals on Hover) -->
+        <div
+          class="flex items-center gap-2 pl-8 opacity-0 group-hover/search:opacity-100 translate-x-4 group-hover/search:translate-x-0 transition-all duration-500 delay-75 whitespace-nowrap"
+        >
+          <span class="text-xs text-gray-300">Search...</span>
+          <kbd
+            class="px-1.5 py-0.5 text-[10px] text-brand-primary/80 bg-brand-primary/10 border border-brand-primary/20 rounded font-mono"
+            >⌘K</kbd
+          >
+        </div>
+      </button>
     </div>
 
-    <!-- Search Trigger (Fake Input) -->
-    <button
-      id="search-trigger-btn"
-      class="relative group flex items-center bg-black/20 border border-white/10 rounded-full px-4 py-1.5 w-32 hover:w-48 hover:bg-white/5 transition-all outline-none text-left cursor-text"
-    >
-      <span class="i-heroicons-magnifying-glass text-gray-400 text-xs mr-2"
-      ></span>
-      <span
-        class="text-gray-500 text-xs group-hover:text-gray-300 transition-colors"
-        >Search...</span
-      >
-      <kbd
-        class="hidden md:inline-block absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] text-gray-500 bg-white/5 border border-white/10 rounded font-mono"
-      >
-        ⌘K
-      </kbd>
-    </button>
-
-    {
-      Astro.locals.user ? (
-        <a
-          href="/profile"
-          class="flex items-center gap-3 hover:opacity-80 transition-opacity"
-        >
-          <span class="text-xs font-mono hidden md:block">
-            {Astro.locals.user.username}
-          </span>
-          <img
-            src={
-              Astro.locals.user.avatar ||
-              `https://ui-avatars.com/api/?name=${Astro.locals.user.username}`
-            }
-            class="w-8 h-8 rounded-full border border-white/10"
-            alt="Avatar"
-          />
-        </a>
-      ) : (
-        <a
-          href="/login"
-          class="px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-xs font-bold transition-colors border border-white/10"
-        >
-          LOGIN
-        </a>
-      )
-    }
+    <!-- Right: Auth/Profile -->
+    <div class="z-50 relative">
+      {
+        Astro.locals.user ? (
+          <a
+            href="/profile"
+            class="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
+            <span class="text-xs font-mono hidden md:block text-gray-300">
+              {Astro.locals.user.username}
+            </span>
+            <img
+              src={
+                Astro.locals.user.avatar ||
+                `https://ui-avatars.com/api/?name=${Astro.locals.user.username}`
+              }
+              class="w-8 h-8 rounded-full border border-white/10 shadow-sm"
+              alt="Avatar"
+            />
+          </a>
+        ) : (
+          <a
+            href="/login"
+            class="px-5 py-2 rounded-full bg-white/5 hover:bg-white/10 text-xs font-bold tracking-wide transition-all border border-white/10 hover:border-white/20 hover:scale-105 active:scale-95"
+          >
+            LOGIN
+          </a>
+        )
+      }
+    </div>
   </div>
-</nav>
 
-<script>
-  // Dispatch custom event or toggle state
-  const btn = document.getElementById("search-trigger-btn");
-  if (btn) {
-    btn.addEventListener("click", () => {
-      // Simulate Cmd+K or expose a global function
-      window.dispatchEvent(
-        new KeyboardEvent("keydown", { key: "k", metaKey: true }),
-      );
-    });
-  }
-</script>
+  <script>
+    // Dispatch custom event or toggle state
+    const btn = document.getElementById("search-trigger-btn");
+    if (btn) {
+      btn.addEventListener("click", () => {
+        // Simulate Cmd+K or expose a global function
+        window.dispatchEvent(
+          new KeyboardEvent("keydown", { key: "k", metaKey: true }),
+        );
+      });
+    }
+  </script>
+</nav>
