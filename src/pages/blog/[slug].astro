@@ -1,0 +1,63 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getDb } from "../../lib/db";
+import { posts } from "../../../db/schema";
+import { eq } from "drizzle-orm";
+import Comments from "../../components/Comments";
+import { marked } from "marked";
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect("/404");
+}
+
+const { env } = Astro.locals.runtime;
+const db = getDb(env);
+const result = await db.select().from(posts).where(eq(posts.slug, slug)).get();
+
+if (!result) {
+  return Astro.redirect("/404");
+}
+---
+
+<Layout title={`${result.title} - Gin's Blog`}>
+  <article class="max-w-3xl mx-auto">
+    <header class="mb-12 text-center">
+      <div
+        class="inline-block px-4 py-1 rounded-full bg-brand-primary/10 text-brand-accent font-mono text-sm mb-6 border border-brand-primary/20"
+      >
+        {new Date(result.publishedAt || result.createdAt).toLocaleDateString()}
+      </div>
+      <h1 class="text-5xl font-display font-bold mb-6 leading-tight">
+        {result.title}
+      </h1>
+    </header>
+
+    <div
+      class="glass-panel rounded-3xl p-8 md:p-12 prose prose-invert prose-lg max-w-none text-gray-300"
+    >
+      <!-- Assuming content is just text for now, in Future: Markdown/MDX -->
+      <div
+        class="whitespace-pre-wrap"
+        set:html={marked.parse(result.content)}
+      />
+    </div>
+
+    <Comments
+      client:visible
+      postId={result.id}
+      currentUser={Astro.locals.user || undefined}
+    />
+
+    <div class="mt-12 text-center">
+      <a
+        href="/blog"
+        class="inline-flex items-center gap-2 text-brand-accent hover:text-white transition-colors"
+      >
+        <span class="i-heroicons-arrow-left"></span>
+        Back to Overview
+      </a>
+    </div>
+  </article>
+</Layout>

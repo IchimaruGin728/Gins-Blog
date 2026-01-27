@@ -1,0 +1,363 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+
+// Auth Check handled by Middleware (Zero Trust)
+// const user = Astro.locals.user;
+// if (!user) return Astro.redirect('/login');
+---
+
+<Layout title="Music Manager - Ichimaru Gin">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <header class="mb-12 flex justify-between items-center">
+      <div>
+        <h1
+          class="text-4xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600"
+        >
+          Music Manager
+        </h1>
+        <p class="text-purple-300/60 mt-2">
+          Curate the sonic atmosphere of your digital space.
+        </p>
+      </div>
+
+      <a
+        href="/IchimaruGin728/admin"
+        class="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-sm flex items-center gap-2"
+      >
+        <span class="i-heroicons-arrow-left"></span>
+        Back to Dashboard
+      </a>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Upload Column -->
+      <div
+        class="lg:col-span-2 glass-panel p-8 rounded-3xl border border-white/5"
+      >
+        <div class="flex items-center gap-3 mb-6">
+          <div
+            class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400"
+          >
+            <span class="i-heroicons-plus text-lg"></span>
+          </div>
+          <h2 class="text-xl font-bold text-white">New Track Upload</h2>
+        </div>
+
+        <form id="music-upload-form" class="space-y-6">
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label
+                class="block text-xs font-bold text-purple-300/50 mb-2 uppercase tracking-widest"
+                >Track Title</label
+              >
+              <input
+                type="text"
+                name="title"
+                placeholder="e.g. Neon Nights"
+                required
+                class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors text-white"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-bold text-purple-300/50 mb-2 uppercase tracking-widest"
+                >Artist</label
+              >
+              <input
+                type="text"
+                name="artist"
+                placeholder="e.g. Synthwave Boy"
+                required
+                class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500 transition-colors text-white"
+              />
+            </div>
+          </div>
+
+          <!-- Audio Dropzone -->
+          <div>
+            <label
+              class="block text-xs font-bold text-purple-300/50 mb-2 uppercase tracking-widest"
+              >Audio File (MP3, WAV, FLAC, AAC, Dolby)</label
+            >
+            <div
+              id="audio-dropzone"
+              class="border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center gap-4 hover:border-purple-500/50 hover:bg-white/5 transition-all cursor-pointer group h-40"
+            >
+              <input
+                type="file"
+                name="audio"
+                id="audio-input"
+                accept="audio/*, .flac, .wav, .aac, .alac, .m4a, .ac3, .ec3, .mp3"
+                class="hidden"
+                required
+              />
+              <div
+                class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform"
+              >
+                <span
+                  class="i-heroicons-musical-note text-2xl text-gray-400 group-hover:text-purple-400"
+                ></span>
+              </div>
+              <p
+                class="text-sm text-gray-400 group-hover:text-white transition-colors"
+              >
+                Drag & Drop or Click to Select MP3
+              </p>
+              <p
+                id="audio-filename"
+                class="text-xs text-purple-400 font-mono hidden"
+              >
+              </p>
+            </div>
+          </div>
+
+          <!-- Cover Art -->
+          <div>
+            <label
+              class="block text-xs font-bold text-purple-300/50 mb-2 uppercase tracking-widest"
+              >Cover Art (Optional)</label
+            >
+            <div
+              id="cover-dropzone"
+              class="border border-white/10 rounded-xl p-4 flex items-center gap-4 hover:bg-white/5 transition-colors cursor-pointer"
+            >
+              <input
+                type="file"
+                name="cover"
+                id="cover-input"
+                accept="image/*"
+                class="hidden"
+              />
+              <div
+                class="w-12 h-12 rounded-lg bg-black/50 border border-white/10 flex items-center justify-center overflow-hidden"
+              >
+                <span class="i-heroicons-photo text-gray-400" id="cover-icon"
+                ></span>
+                <img
+                  id="cover-preview"
+                  class="w-full h-full object-cover hidden"
+                />
+              </div>
+              <span class="text-sm text-gray-400" id="cover-text"
+                >Select cover image...</span
+              >
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button
+            type="submit"
+            id="submit-btn"
+            class="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white font-bold tracking-wider transition-all shadow-lg shadow-purple-900/20 flex items-center justify-center gap-2"
+          >
+            <span class="i-heroicons-arrow-up-tray"></span>
+            Upload to Global Playlist
+          </button>
+
+          <div id="status" class="hidden p-3 rounded-lg text-center text-sm">
+          </div>
+        </form>
+      </div>
+
+      <!-- Playlist Column (Live) -->
+      <div
+        class="glass-panel p-6 rounded-3xl border border-white/5 flex flex-col h-full min-h-[400px]"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"
+            ></span>
+            <h2 class="text-lg font-bold text-white">Live Playlist</h2>
+          </div>
+          <button
+            id="refresh-btn"
+            class="text-gray-400 hover:text-white transition-colors"
+          >
+            <span class="i-heroicons-arrow-path"></span>
+          </button>
+        </div>
+
+        <!-- Track List -->
+        <div id="track-list" class="flex-1 overflow-y-auto space-y-3 pr-2">
+          <div
+            class="h-full flex flex-col items-center justify-center text-gray-500/50 gap-4"
+          >
+            <div
+              class="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin"
+            >
+            </div>
+            <span class="text-xs tracking-widest uppercase">Syncing...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const form = document.getElementById("music-upload-form") as HTMLFormElement;
+  const audioInput = document.getElementById("audio-input") as HTMLInputElement;
+  const coverInput = document.getElementById("cover-input") as HTMLInputElement;
+  const audioDropzone = document.getElementById("audio-dropzone");
+  const coverDropzone = document.getElementById("cover-dropzone");
+  const submitBtn = document.getElementById("submit-btn");
+  const status = document.getElementById("status");
+  const trackList = document.getElementById("track-list");
+  const refreshBtn = document.getElementById("refresh-btn");
+
+  // --- UI Logic ---
+
+  // Audio Input Change
+  audioDropzone?.addEventListener("click", () => audioInput.click());
+  audioInput.addEventListener("change", (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      document.getElementById("audio-filename")!.innerText = file.name;
+      document.getElementById("audio-filename")!.classList.remove("hidden");
+    }
+  });
+
+  // Cover Input Change
+  coverDropzone?.addEventListener("click", () => coverInput.click());
+  coverInput.addEventListener("change", (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = document.getElementById(
+          "cover-preview",
+        ) as HTMLImageElement;
+        img.src = ev.target?.result as string;
+        img.classList.remove("hidden");
+        document.getElementById("cover-icon")!.classList.add("hidden");
+        document.getElementById("cover-text")!.innerText = file.name;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // --- Upload Logic ---
+
+  async function uploadFile(file: File): Promise<string> {
+    const res = await fetch(
+      `/api/upload?filename=${encodeURIComponent(file.name)}`,
+      {
+        method: "PUT",
+        body: file,
+      },
+    );
+    if (!res.ok) throw new Error("Upload failed");
+    const data = (await res.json()) as any;
+    return data.url;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const title = formData.get("title") as string;
+    const artist = formData.get("artist") as string;
+    const audioFile = audioInput.files?.[0];
+    const coverFile = coverInput.files?.[0];
+
+    if (!audioFile) {
+      alert("Please select an audio file.");
+      return;
+    }
+
+    submitBtn!.innerHTML =
+      '<span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Uploading...';
+    submitBtn!.setAttribute("disabled", "true");
+    status!.classList.add("hidden");
+
+    try {
+      // 1. Upload Files
+      const audioUrl = await uploadFile(audioFile);
+      let coverUrl;
+      if (coverFile) {
+        coverUrl = await uploadFile(coverFile);
+      }
+
+      // 2. Submit Logic using manual fetch to /api/music to avoid Client Type issues for now
+      // or use simple form submission payload since we validated Schema.
+      // Using standard fetch to our RPC endpoint (or manually constructed one)
+
+      const payload = new FormData();
+      payload.append("title", title);
+      payload.append("artist", artist);
+      payload.append("url", audioUrl);
+      if (coverUrl) payload.append("cover", coverUrl);
+
+      const res = await fetch("/api/music", {
+        method: "POST",
+        headers: {},
+        body: payload,
+      });
+
+      if (res.ok) {
+        status!.innerText = "Upload Successful!";
+        status!.className =
+          "block p-3 rounded-lg text-center text-sm bg-green-500/20 text-green-300";
+        form.reset();
+        document.getElementById("audio-filename")!.classList.add("hidden");
+        document.getElementById("cover-preview")!.classList.add("hidden");
+        document.getElementById("cover-icon")!.classList.remove("hidden");
+        document.getElementById("cover-text")!.innerText =
+          "Select cover image...";
+        loadTracks();
+      } else {
+        throw new Error("API submission failed");
+      }
+    } catch (err) {
+      console.error(err);
+      status!.innerText = "Upload Failed. Check console.";
+      status!.className =
+        "block p-3 rounded-lg text-center text-sm bg-red-500/20 text-red-300";
+    } finally {
+      submitBtn!.innerHTML =
+        '<span class="i-heroicons-arrow-up-tray"></span> Upload to Global Playlist';
+      submitBtn!.removeAttribute("disabled");
+    }
+  });
+
+  // --- Playlist Logic ---
+
+  async function loadTracks() {
+    try {
+      const res = await fetch("/api/music");
+      const tracks = (await res.json()) as any[];
+
+      if (tracks.length === 0) {
+        trackList!.innerHTML =
+          '<div class="text-center text-gray-500 text-sm mt-10">No tracks available.</div>';
+        return;
+      }
+
+      trackList!.innerHTML = tracks
+        .map(
+          (track: any) => `
+                <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group">
+                    <div class="w-10 h-10 rounded-lg bg-black/50 border border-white/10 overflow-hidden shrink-0">
+                         ${track.cover ? `<img src="${track.cover}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-gray-600"><span class="i-heroicons-musical-note"></span></div>`}
+                    </div>
+                    <div class="overflow-hidden flex-1">
+                        <div class="text-sm font-bold text-white truncate group-hover:text-purple-400 transition-colors">${track.title}</div>
+                        <div class="text-xs text-gray-400 truncate">${track.artist}</div>
+                    </div>
+                    <a href="${track.url}" target="_blank" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-purple-500 hover:text-white transition-colors">
+                        <span class="i-heroicons-play text-xs"></span>
+                    </a>
+                </div>
+            `,
+        )
+        .join("");
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  refreshBtn?.addEventListener("click", loadTracks);
+
+  // Init
+  loadTracks();
+</script>

@@ -1,0 +1,17 @@
+# System Files
+.DS_Store
+node_modules/
+dist/
+.wrangler/
+.env
+
+# Astro
+.astro/
+
+# Drizzle
+drizzle/meta/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -1,0 +1,47 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="Login - Gin's Blog">
+  <div class="flex flex-col items-center justify-center min-h-[50vh]">
+    <div class="glass-panel p-8 rounded-3xl w-full max-w-md text-center">
+      <h1 class="text-3xl font-display font-bold mb-2">Welcome Back</h1>
+      <p class="text-gray-400 mb-8">Sign in to access the bleeding edge.</p>
+
+      <a
+        href="/login/github"
+        class="flex items-center justify-center gap-3 w-full py-3 rounded-full bg-[#24292e] text-white font-bold hover:bg-[#2b3137] transition-colors border border-white/10 group"
+      >
+        <span
+          class="i-simple-icons-github text-xl w-5 h-5 group-hover:scale-110 transition-transform"
+        ></span>
+        <span>Continue with GitHub</span>
+      </a>
+
+      <a
+        href="/login/google"
+        class="flex items-center justify-center gap-3 w-full py-3 rounded-full bg-white text-gray-900 font-bold hover:bg-gray-100 transition-colors mt-3 group"
+      >
+        <span
+          class="i-logos-google-icon text-xl w-5 h-5 group-hover:scale-110 transition-transform"
+        ></span>
+        <span>Continue with Google</span>
+      </a>
+
+      <a
+        href="/login/discord"
+        class="flex items-center justify-center gap-3 w-full py-3 rounded-full bg-[#5865F2] text-white font-bold hover:bg-[#4752c4] transition-colors mt-3 group"
+      >
+        <span
+          class="i-simple-icons-discord text-xl w-5 h-5 group-hover:scale-110 transition-transform"
+        ></span>
+        <span>Continue with Discord</span>
+      </a>
+
+      <p class="mt-6 text-xs text-gray-500">
+        By clicking continue, you agree to our Terms of Service and Privacy
+        Policy.
+      </p>
+    </div>
+  </div>
+</Layout>

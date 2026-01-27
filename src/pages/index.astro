@@ -1,0 +1,153 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getDb } from "../lib/db";
+import { posts } from "../../db/schema";
+import { desc } from "drizzle-orm";
+
+const { env } = Astro.locals.runtime;
+const db = getDb(env);
+
+// Fetch recent posts for the "Recent Posts" card
+const recentPosts = await db
+	.select()
+	.from(posts)
+	.orderBy(desc(posts.publishedAt))
+	.limit(3);
+---
+
+<Layout title="Gin's Blog">
+	<!-- Top Banner / Header already in Layout, but we might want a specific layout adjustment or spacer -->
+	<div
+		class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(180px,auto)] mb-12"
+	>
+		<!-- The Crystal Logic Hero (2x1) -->
+		<div
+			class="md:col-span-2 glass-panel p-10 flex flex-col justify-center rounded-3xl relative overflow-hidden group"
+		>
+			<div
+				class="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+			>
+			</div>
+			<div class="relative z-10">
+				<h1 class="text-5xl font-display font-bold mb-4 tracking-tight">
+					The Crystal Logic.
+				</h1>
+				<p class="text-gray-400 text-lg mb-2">
+					Exploring the intersection of high-performance architecture and
+					neo-aesthetic design.
+				</p>
+			</div>
+		</div>
+
+		<!-- System Status (1x1) -->
+		<div
+			class="glass-panel p-8 flex flex-col justify-between rounded-3xl relative overflow-hidden"
+		>
+			<div>
+				<div
+					class="font-mono text-xs text-brand-accent mb-4 tracking-widest uppercase"
+				>
+					System Status
+				</div>
+				<div class="text-3xl font-display font-bold">Operational</div>
+			</div>
+			<div class="flex items-center gap-2">
+				<div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+				<span class="text-xs text-gray-500 font-mono">All Systems Normal</span>
+			</div>
+		</div>
+
+		<!-- Recent Posts (1x2 Vertical) -->
+		<div
+			class="glass-panel p-8 rounded-3xl flex flex-col justify-between relative overflow-hidden group md:row-span-2 max-h-[500px]"
+		>
+			<h2 class="text-xl font-bold mb-6">Recent Posts</h2>
+
+			<div class="flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
+				{
+					recentPosts.length > 0 ? (
+						recentPosts.map((post) => (
+							<a
+								href={`/blog/${post.slug}`}
+								class="block group/item hover:bg-white/5 p-4 rounded-xl transition-colors border border-transparent hover:border-white/5"
+							>
+								<h3 class="font-bold text-sm text-gray-200 group-hover/item:text-brand-accent transition-colors line-clamp-2">
+									{post.title}
+								</h3>
+								<span class="text-xs text-gray-500 mt-2 block font-mono">
+									{new Date(
+										post.publishedAt || post.createdAt,
+									).toLocaleDateString()}
+								</span>
+							</a>
+						))
+					) : (
+						<div class="text-gray-500 text-sm italic">
+							No signals detected yet.
+						</div>
+					)
+				}
+			</div>
+
+			<div class="mt-4 pt-4 border-t border-white/5">
+				<a
+					href="/blog"
+					class="text-xs text-gray-400 hover:text-white flex items-center gap-2 transition-colors"
+				>
+					View Archive <span class="i-heroicons-arrow-right text-xs"></span>
+				</a>
+			</div>
+		</div>
+
+		<!-- Gallery (1x1) -->
+		<a
+			href="/gallery"
+			class="glass-panel p-8 flex flex-col justify-between rounded-3xl group hover:bg-white/5 transition-colors relative overflow-hidden"
+		>
+			<div
+				class="absolute -right-4 -bottom-4 text-9xl text-white/5 i-heroicons-photo rotate-12 group-hover:rotate-6 transition-transform duration-500"
+			>
+			</div>
+			<div class="mt-auto relative z-10">
+				<h2 class="text-xl font-bold">Gallery</h2>
+			</div>
+		</a>
+
+		<!-- Projects (1x1) -->
+		<a
+			href="/projects"
+			class="glass-panel p-8 flex flex-col justify-between rounded-3xl group hover:bg-white/5 transition-colors relative overflow-hidden"
+		>
+			<div
+				class="absolute -right-4 -bottom-4 text-9xl text-white/5 i-heroicons-beaker rotate-12 group-hover:rotate-6 transition-transform duration-500"
+			>
+			</div>
+			<div class="mt-auto relative z-10">
+				<h2 class="text-xl font-bold">Projects</h2>
+			</div>
+		</a>
+
+		<!-- Bottom Spacer / Infinite Scroll Placeholder -->
+		<div
+			class="md:col-span-3 h-32 flex items-center justify-center opacity-30 mt-8"
+		>
+			<span class="i-heroicons-chevron-down text-3xl animate-bounce"></span>
+		</div>
+	</div>
+</Layout>
+
+<style>
+	.custom-scrollbar::-webkit-scrollbar {
+		width: 4px;
+	}
+	.custom-scrollbar::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	.custom-scrollbar::-webkit-scrollbar-thumb {
+		background: rgba(255, 255, 255, 0.1);
+		border-radius: 10px;
+	}
+	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+		background: rgba(255, 255, 255, 0.2);
+	}
+</style>

@@ -1,0 +1,83 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import SearchModal from "../components/SearchModal";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Gin's bleeding edge blog." } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en-SG" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#8b5cf6" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="GinBlog" />
+    <link rel="apple-touch-icon" href="/pwa-192x192.png" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content={new URL(
+        Astro.url.pathname.startsWith("/blog/")
+          ? `/og${Astro.url.pathname.replace("/blog", "")}.png`
+          : "/og-default.png",
+        Astro.site || Astro.url.origin,
+      )}
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:image"
+      content={new URL(
+        Astro.url.pathname.startsWith("/blog/")
+          ? `/og${Astro.url.pathname.replace("/blog", "")}.png`
+          : "/og-default.png",
+        Astro.site || Astro.url.origin,
+      )}
+    />
+    <title>{title}</title>
+  </head>
+  <body class="bg-[#050505] text-white min-h-screen font-sans flex flex-col">
+    <!-- Background Elements -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      <div
+        class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-brand-primary/10 rounded-full blur-[120px]"
+      >
+      </div>
+      <div
+        class="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-brand-accent/5 rounded-full blur-[120px]"
+      >
+      </div>
+    </div>
+
+    <Header />
+
+    <main class="relative z-10 pt-32 px-6 max-w-6xl mx-auto w-full flex-grow">
+      <slot />
+    </main>
+
+    <div class="hidden">
+      <!-- Hidden hydration trigger for Islands if needed -->
+    </div>
+    <Footer />
+
+    <SearchModal client:idle />
+  </body>
+</html>

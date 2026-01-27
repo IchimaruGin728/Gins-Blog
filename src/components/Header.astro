@@ -1,0 +1,77 @@
+<nav class="fixed top-0 w-full z-50 px-6 py-4">
+  <div
+    class="max-w-6xl mx-auto glass-panel rounded-full px-6 py-3 flex justify-between items-center"
+  >
+    <a
+      href="/"
+      class="text-xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-primary"
+    >
+      Gin's Blog
+    </a>
+
+    <div class="flex items-center gap-6 text-sm font-medium text-gray-300">
+      <a href="/" class="hover:text-white transition-colors">Home</a>
+      <a href="/blog" class="hover:text-white transition-colors">Blog</a>
+      <a href="/about" class="hover:text-white transition-colors">About</a>
+    </div>
+
+    <!-- Search Trigger (Fake Input) -->
+    <button
+      id="search-trigger-btn"
+      class="relative group flex items-center bg-black/20 border border-white/10 rounded-full px-4 py-1.5 w-32 hover:w-48 hover:bg-white/5 transition-all outline-none text-left cursor-text"
+    >
+      <span class="i-heroicons-magnifying-glass text-gray-400 text-xs mr-2"
+      ></span>
+      <span
+        class="text-gray-500 text-xs group-hover:text-gray-300 transition-colors"
+        >Search...</span
+      >
+      <kbd
+        class="hidden md:inline-block absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] text-gray-500 bg-white/5 border border-white/10 rounded font-mono"
+      >
+        ⌘K
+      </kbd>
+    </button>
+
+    {
+      Astro.locals.user ? (
+        <a
+          href="/profile"
+          class="flex items-center gap-3 hover:opacity-80 transition-opacity"
+        >
+          <span class="text-xs font-mono hidden md:block">
+            {Astro.locals.user.username}
+          </span>
+          <img
+            src={
+              Astro.locals.user.avatar ||
+              `https://ui-avatars.com/api/?name=${Astro.locals.user.username}`
+            }
+            class="w-8 h-8 rounded-full border border-white/10"
+            alt="Avatar"
+          />
+        </a>
+      ) : (
+        <a
+          href="/login"
+          class="px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-xs font-bold transition-colors border border-white/10"
+        >
+          LOGIN
+        </a>
+      )
+    }
+  </div>
+</nav>
+
+<script>
+  // Dispatch custom event or toggle state
+  const btn = document.getElementById("search-trigger-btn");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      // Simulate Cmd+K or expose a global function
+      window.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "k", metaKey: true }),
+      );
+    });
+  }
+</script>

@@ -1,0 +1,294 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect("/login");
+
+// Fetch extended user details if needed (middleware usually gets basic info)
+// But middleware might not fetch bio/socials.
+// We should probably rely on the user object being complete or fetch fresh here.
+// For now, let's assume we fetch fresh data to be safe.
+const env = Astro.locals.runtime.env;
+import { getDb } from "../lib/db";
+import { users } from "../../db/schema";
+import { eq } from "drizzle-orm";
+
+const db = getDb(env);
+const userProfile = await db
+  .select()
+  .from(users)
+  .where(eq(users.id, user.id))
+  .get();
+
+const socialLinks = userProfile?.socialLinks
+  ? JSON.parse(userProfile.socialLinks as string)
+  : {};
+---
+
+<Layout title="Profile">
+  <div class="max-w-2xl mx-auto py-12 px-4">
+    <h1
+      class="text-3xl font-bold font-display mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-purple-400"
+    >
+      Your Profile
+    </h1>
+
+    <div class="glass-panel p-8 rounded-3xl">
+      <form id="profile-form" class="space-y-6">
+        <!-- Avatar Section -->
+        <div class="flex flex-col items-center gap-4 mb-8">
+          <div class="relative group">
+            <img
+              src={userProfile?.avatar ||
+                `https://ui-avatars.com/api/?name=${userProfile?.username}&background=random`}
+              alt="Avatar"
+              id="avatar-preview"
+              class="w-24 h-24 rounded-full border-2 border-white/10 object-cover"
+            />
+            <button
+              type="button"
+              id="change-avatar-btn"
+              class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold text-white"
+            >
+              Change
+            </button>
+            <input
+              type="file"
+              id="avatar-input"
+              name="avatar_file"
+              accept="image/*"
+              class="hidden"
+            />
+          </div>
+          <p class="text-xs text-gray-500">Click to upload new avatar</p>
+        </div>
+
+        <div>
+          <label
+            class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2"
+            >Username</label
+          >
+          <input
+            type="text"
+            name="username"
+            value={userProfile?.username}
+            required
+            class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent text-white transition-colors"
+          />
+        </div>
+
+        <div>
+          <label
+            class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2"
+            >Bio</label
+          >
+          <textarea
+            name="bio"
+            rows="3"
+            class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent text-white transition-colors resize-none"
+            placeholder="Tell us about yourself...">{userProfile?.bio}</textarea
+          >
+        </div>
+
+        <div class="border-t border-white/10 pt-6">
+          <h3 class="text-lg font-bold mb-4">Social Links</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label
+                class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2"
+                >Twitter / X</label
+              >
+              <input
+                type="text"
+                name="twitter"
+                value={socialLinks.twitter || ""}
+                placeholder="@username"
+                class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent text-white transition-colors"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2"
+                >GitHub</label
+              >
+              <input
+                type="text"
+                name="github"
+                value={socialLinks.github || ""}
+                placeholder="username"
+                class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent text-white transition-colors"
+              />
+            </div>
+            <!-- Additional fields can be added here -->
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          id="save-btn"
+          class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-primary to-brand-accent text-white font-bold hover:opacity-90 transition-opacity"
+        >
+          Save Changes
+        </button>
+
+        <p id="status" class="text-center text-sm hidden"></p>
+      </form>
+
+      <div class="mt-8 text-center border-t border-white/10 pt-6">
+        <h3 class="text-sm font-bold text-gray-500 uppercase mb-4">
+          Linked Accounts
+        </h3>
+        <div class="flex justify-center gap-4">
+          {
+            userProfile?.githubId ? (
+              <span class="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full text-xs text-green-400 border border-green-500/20">
+                <span class="i-simple-icons-github" /> GitHub Connected
+              </span>
+            ) : (
+              <a
+                href="/login/github"
+                class="text-xs text-gray-500 hover:text-white transition-colors"
+              >
+                Connect GitHub
+              </a>
+            )
+          }
+
+          {
+            userProfile?.googleId ? (
+              <span class="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full text-xs text-green-400 border border-green-500/20">
+                <span class="i-simple-icons-google" /> Google Connected
+              </span>
+            ) : (
+              <a
+                href="/login/google"
+                class="text-xs text-gray-500 hover:text-white transition-colors"
+              >
+                Connect Google
+              </a>
+            )
+          }
+
+          {
+            userProfile?.discordId ? (
+              <span class="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full text-xs text-green-400 border border-green-500/20">
+                <span class="i-simple-icons-discord" /> Discord Connected
+              </span>
+            ) : (
+              <a
+                href="/login/discord"
+                class="text-xs text-gray-500 hover:text-white transition-colors"
+              >
+                Connect Discord
+              </a>
+            )
+          }
+        </div>
+      </div>
+
+      <div class="mt-8 flex justify-center">
+        <form method="POST" action="/logout">
+          <button
+            class="text-red-400 hover:text-red-300 text-sm font-bold transition-colors"
+            >Sign Out</button
+          >
+        </form>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const form = document.getElementById("profile-form") as HTMLFormElement;
+  const avatarInput = document.getElementById(
+    "avatar-input",
+  ) as HTMLInputElement;
+  const changeAvatarBtn = document.getElementById("change-avatar-btn");
+  const avatarPreview = document.getElementById(
+    "avatar-preview",
+  ) as HTMLImageElement;
+  const status = document.getElementById("status");
+  const saveBtn = document.getElementById("save-btn") as HTMLButtonElement;
+
+  changeAvatarBtn?.addEventListener("click", () => avatarInput.click());
+
+  avatarInput.addEventListener("change", async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    // Preview
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      avatarPreview.src = ev.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+
+    // Upload immediately (or could wait for save)
+    // Let's upload immediately to get URL
+    const uploadStatus = document.createElement("span");
+    uploadStatus.innerText = " Uploading...";
+    changeAvatarBtn?.appendChild(uploadStatus);
+
+    try {
+      const res = await fetch(
+        `/api/upload?filename=${encodeURIComponent(file.name)}`,
+        {
+          method: "PUT",
+          body: file,
+        },
+      );
+      if (res.ok) {
+        const data = (await res.json()) as any;
+        // Store the URL in a hidden input or just update the DB on Save.
+        // We'll add a hidden input to the form to submit the URL
+        let urlInput = form.querySelector(
+          'input[name="avatar_url"]',
+        ) as HTMLInputElement;
+        if (!urlInput) {
+          urlInput = document.createElement("input");
+          urlInput.type = "hidden";
+          urlInput.name = "avatar_url";
+          form.appendChild(urlInput);
+        }
+        urlInput.value = data.url;
+        uploadStatus.remove();
+      }
+    } catch (err) {
+      console.error(err);
+      uploadStatus.innerText = " Failed";
+    }
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    saveBtn.disabled = true;
+    saveBtn.innerText = "Saving...";
+
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+
+    try {
+      const res = await fetch("/api/profile", {
+        method: "POST", // or PATCH
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        status!.innerText = "Profile Updated!";
+        status!.className = "text-center text-sm text-green-400 mt-4 block";
+        setTimeout(() => status!.classList.add("hidden"), 3000);
+      } else {
+        status!.innerText = "Update Failed.";
+        status!.className = "text-center text-sm text-red-400 mt-4 block";
+      }
+    } catch (err) {
+      console.error(err);
+      status!.innerText = "Network Error.";
+      status!.className = "text-center text-sm text-red-400 mt-4 block";
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.innerText = "Save Changes";
+    }
+  });
+</script>

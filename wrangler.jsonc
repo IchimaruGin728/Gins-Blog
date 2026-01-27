@@ -1,0 +1,51 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gins-blog",
+  "account_id": "cd4ce461acea5097153abf9e2deb26ec",
+  "main": "./dist/_worker.js/index.js",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "GIN_KV",
+      "id": "d749e0c6642747248d4db6d3393573db",
+      "preview_id": "171ef5dabf7e4c83ad560b8cd85cacb9"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "gins-blog-db",
+      "database_id": "1a05c007-b063-416f-b589-e8f9c5c079e8"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "gins-media"
+    }
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "MY_QUEUE",
+        "queue": "gins-queue"
+      }
+    ]
+  },
+  "vectorize": [
+    {
+      "binding": "VECTOR_INDEX",
+      "index_name": "gins-vector"
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  }
+}
