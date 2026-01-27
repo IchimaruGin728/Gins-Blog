@@ -32,6 +32,13 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
                     Authorization: `Bearer ${accessToken.trim()}`
                 }
             });
+            
+            if (!githubUserResponse.ok) {
+                const errorText = await githubUserResponse.text();
+                console.error("GitHub API error:", githubUserResponse.status, errorText);
+                throw new Error(`GitHub API returned ${githubUserResponse.status}: ${errorText.slice(0, 200)}`);
+            }
+            
             githubUser = await githubUserResponse.json();
             console.log("GitHub User fetched:", githubUser.login);
         } catch (fetchError: any) {
