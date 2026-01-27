@@ -118,138 +118,189 @@ Astro.response.headers.set("Expires", "0");
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Editor Section -->
-    <div class="glass-panel p-8 rounded-3xl">
-      <h2 class="text-2xl font-bold mb-6">Transmission Uplink</h2>
-
-      <form id="create-post-form" class="space-y-6">
-        <input type="hidden" name="id" id="post-id" />
-        <div class="grid grid-cols-3 gap-6">
-          <div>
-            <label class="block text-sm text-gray-400 mb-2 font-mono"
-              >SIGNAL_TITLE</label
-            >
-            <input
-              type="text"
-              name="title"
-              id="title-input"
-              required
-              class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent transition-colors text-white"
-            />
-          </div>
-          <div>
-            <label class="block text-sm text-gray-400 mb-2 font-mono"
-              >SIGNAL_SLUG</label
-            >
-            <input
-              type="text"
-              name="slug"
-              id="slug-input"
-              required
-              class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent transition-colors text-white"
-            />
-          </div>
-          <div>
-            <label class="block text-sm text-gray-400 mb-2 font-mono"
-              >PUBLISHED_AT</label
-            >
-            <input
-              type="datetime-local"
-              name="publishedAt"
-              id="published-at-input"
-              class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent transition-colors text-white calendar-picker-indicator:invert"
-            />
-            <p class="text-xs text-gray-500 mt-1">
-              Set a past or future date to override publication time
-            </p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-6">
-          <div>
-            <label class="block text-sm text-gray-400 mb-2 font-mono"
-              >UPDATED_AT</label
-            >
-            <div class="flex items-center gap-4">
-              <input
-                type="datetime-local"
-                name="updatedAt"
-                id="updated-at-input"
-                class="flex-grow bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent transition-colors text-white disabled:opacity-50"
-                disabled
-              />
-              <label class="flex items-center gap-2 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  id="auto-update-toggle"
-                  checked
-                  class="w-5 h-5 rounded border-white/20 bg-white/5 text-brand-accent focus:ring-brand-accent focus:ring-offset-0 transition-all"
-                />
-                <span
-                  class="text-xs text-gray-400 group-hover:text-gray-200 transition-colors"
-                  >Auto-Update</span
-                >
-              </label>
-            </div>
-            <p class="text-xs text-gray-500 mt-1">
-              Manually override modification time or keep it automatic
-            </p>
-          </div>
-        </div>
-      </form>
-
-      <!-- Markdown Editor with Toolbar -->
-      <div
-        class="border border-white/10 rounded-xl overflow-hidden bg-black/20"
-      >
-        <div
-          class="flex items-center gap-2 p-2 border-b border-white/10 bg-white/5"
-        >
-          <button
-            type="button"
-            class="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
-            title="Bold">B</button
+  <!-- Recent Signals List -->
+  <div class="glass-panel p-8 rounded-3xl mb-12">
+    <h2 class="text-2xl font-bold mb-6">Recent Transmissions</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr
+            class="text-gray-400 border-b border-white/10 text-xs uppercase tracking-wider font-mono"
           >
-          <button
-            type="button"
-            class="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
-            title="Italic">I</button
+            <th class="py-4 font-normal">Status</th>
+            <th class="py-4 font-normal">Title</th>
+            <th class="py-4 font-normal">Published</th>
+            <th class="py-4 font-normal text-right">Action</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          {
+            (
+              await env.DB.prepare(
+                "SELECT * FROM posts ORDER BY publishedAt DESC LIMIT 10",
+              ).all()
+            ).results.map((post: any) => {
+              const isPublished = Date.now() >= post.publishedAt;
+              return (
+                <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                  <td class="py-4">
+                    <span
+                      class={`inline-block w-2 h-2 rounded-full ${isPublished ? "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]" : "bg-yellow-400"}`}
+                    />
+                  </td>
+                  <td class="py-4 font-medium text-white">{post.title}</td>
+                  <td class="py-4 text-gray-400 font-mono text-xs">
+                    {new Date(
+                      post.publishedAt || post.createdAt,
+                    ).toLocaleDateString()}
+                  </td>
+                  <td class="py-4 text-right">
+                    <button
+                      class="edit-post-btn px-3 py-1 rounded-lg bg-white/5 hover:bg-brand-primary/20 text-gray-300 hover:text-brand-accent border border-white/10 hover:border-brand-primary/50 transition-all text-xs"
+                      data-slug={post.slug}
+                    >
+                      Edit Signal
+                    </button>
+                  </td>
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Editor Section -->
+  <div class="glass-panel p-8 rounded-3xl">
+    <h2 class="text-2xl font-bold mb-6">Transmission Uplink</h2>
+
+    <form id="create-post-form" class="space-y-6">
+      <input type="hidden" name="id" id="post-id" />
+      <div class="grid grid-cols-3 gap-6">
+        <div>
+          <label class="block text-sm text-gray-400 mb-2 font-mono"
+            >SIGNAL_TITLE</label
           >
-          <div class="w-px h-6 bg-white/10 mx-2"></div>
-          <button
-            type="button"
-            id="upload-btn"
-            class="flex items-center gap-2 px-3 py-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors text-sm"
-          >
-            <span class="i-heroicons-photo"></span>
-            Upload Media
-          </button>
           <input
-            type="file"
-            id="file-input"
-            class="hidden"
-            accept="image/*, .gif, .ppt, .pptx, .doc, .docx, .xls, .xlsx, .csv"
+            type="text"
+            name="title"
+            id="title-input"
+            required
+            class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent transition-colors text-white"
           />
         </div>
-        <textarea
-          id="content-area"
-          name="content"
-          rows="15"
-          required
-          class="w-full bg-transparent p-4 focus:outline-none font-mono text-sm leading-relaxed resize-y"
-          placeholder="Initiate transmission..."></textarea>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2 font-mono"
+            >SIGNAL_SLUG</label
+          >
+          <input
+            type="text"
+            name="slug"
+            id="slug-input"
+            required
+            class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent transition-colors text-white"
+          />
+        </div>
+        <div>
+          <label class="block text-sm text-gray-400 mb-2 font-mono"
+            >PUBLISHED_AT</label
+          >
+          <input
+            type="datetime-local"
+            name="publishedAt"
+            id="published-at-input"
+            class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent transition-colors text-white calendar-picker-indicator:invert"
+          />
+          <p class="text-xs text-gray-500 mt-1">
+            Set a past or future date to override publication time
+          </p>
+        </div>
       </div>
 
-      <button
-        type="submit"
-        class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-primary to-brand-accent hover:opacity-90 text-white font-bold tracking-wider transition-opacity"
-      >
-        BROADCAST SIGNAL
-      </button>
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm text-gray-400 mb-2 font-mono"
+            >UPDATED_AT</label
+          >
+          <div class="flex items-center gap-4">
+            <input
+              type="datetime-local"
+              name="updatedAt"
+              id="updated-at-input"
+              class="flex-grow bg-black/40 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-accent transition-colors text-white disabled:opacity-50"
+              disabled
+            />
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input
+                type="checkbox"
+                id="auto-update-toggle"
+                checked
+                class="w-5 h-5 rounded border-white/20 bg-white/5 text-brand-accent focus:ring-brand-accent focus:ring-offset-0 transition-all"
+              />
+              <span
+                class="text-xs text-gray-400 group-hover:text-gray-200 transition-colors"
+                >Auto-Update</span
+              >
+            </label>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">
+            Manually override modification time or keep it automatic
+          </p>
+        </div>
+      </div>
+    </form>
 
-      <div id="status" class="hidden p-4 rounded-xl text-center text-sm"></div>
+    <!-- Markdown Editor with Toolbar -->
+    <div class="border border-white/10 rounded-xl overflow-hidden bg-black/20">
+      <div
+        class="flex items-center gap-2 p-2 border-b border-white/10 bg-white/5"
+      >
+        <button
+          type="button"
+          class="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
+          title="Bold">B</button
+        >
+        <button
+          type="button"
+          class="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
+          title="Italic">I</button
+        >
+        <div class="w-px h-6 bg-white/10 mx-2"></div>
+        <button
+          type="button"
+          id="upload-btn"
+          class="flex items-center gap-2 px-3 py-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors text-sm"
+        >
+          <span class="i-heroicons-photo"></span>
+          Upload Media
+        </button>
+        <input
+          type="file"
+          id="file-input"
+          class="hidden"
+          accept="image/*, .gif, .ppt, .pptx, .doc, .docx, .xls, .xlsx, .csv"
+        />
+      </div>
+      <textarea
+        id="content-area"
+        name="content"
+        rows="15"
+        required
+        class="w-full bg-transparent p-4 focus:outline-none font-mono text-sm leading-relaxed resize-y"
+        placeholder="Initiate transmission..."></textarea>
     </div>
+
+    <button
+      type="submit"
+      class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-primary to-brand-accent hover:opacity-90 text-white font-bold tracking-wider transition-opacity"
+    >
+      BROADCAST SIGNAL
+    </button>
+
+    <div id="status" class="hidden p-4 rounded-xl text-center text-sm"></div>
   </div>
 </Layout>
 
@@ -259,6 +310,17 @@ Astro.response.headers.set("Expires", "0");
 
   const client = hc<AppType>(window.location.origin);
   const form = document.getElementById("create-post-form") as HTMLFormElement;
+
+  // Bind Edit Buttons (Recent List)
+  document.querySelectorAll(".edit-post-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const slug = (e.currentTarget as HTMLElement).dataset.slug;
+      if (slug) {
+        console.log("Editing from list:", slug);
+        loadPostForEdit(slug);
+      }
+    });
+  });
 
   // Ensure fresh state on navigation (fix BFCache)
   window.addEventListener("pageshow", () => {
@@ -383,6 +445,63 @@ Astro.response.headers.set("Expires", "0");
   const resultsContainer = document.getElementById("admin-search-results");
   let debounceTimer: ReturnType<typeof setTimeout>;
 
+  async function loadPostForEdit(slug: string) {
+    try {
+      const res = await fetch(`/api/posts/${slug}`);
+      if (res.ok) {
+        const post = (await res.json()) as any;
+        // Populate Form
+        (document.getElementById("post-id") as HTMLInputElement).value =
+          post.id;
+        (document.getElementById("title-input") as HTMLInputElement).value =
+          post.title;
+        (document.getElementById("slug-input") as HTMLInputElement).value =
+          post.slug;
+        (document.getElementById("content-area") as HTMLTextAreaElement).value =
+          post.content;
+
+        if (post.publishedAt) {
+          const date = new Date(post.publishedAt);
+          const iso = new Date(
+            date.getTime() - date.getTimezoneOffset() * 60000,
+          )
+            .toISOString()
+            .slice(0, 16);
+          (
+            document.getElementById("published-at-input") as HTMLInputElement
+          ).value = iso;
+        }
+
+        if (post.updatedAt) {
+          const date = new Date(post.updatedAt);
+          const iso = new Date(
+            date.getTime() - date.getTimezoneOffset() * 60000,
+          )
+            .toISOString()
+            .slice(0, 16);
+          updatedAtInput.value = iso;
+          autoUpdateToggle.checked = false;
+          updatedAtInput.disabled = false;
+        } else {
+          updatedAtInput.value = "";
+          autoUpdateToggle.checked = true;
+          updatedAtInput.disabled = true;
+        }
+
+        // Scroll to editor
+        document
+          .getElementById("create-post-form")
+          ?.scrollIntoView({ behavior: "smooth" });
+
+        // Update Button Text
+        const btn = document.querySelector('button[type="submit"]');
+        if (btn) btn.innerHTML = "UPDATE SIGNAL";
+      }
+    } catch (e) {
+      console.error("Failed to load post", e);
+    }
+  }
+
   if (searchInput && resultsContainer) {
     searchInput.addEventListener("input", (e) => {
       const query = (e.target as HTMLInputElement).value;
@@ -430,64 +549,6 @@ Astro.response.headers.set("Expires", "0");
         }
       }, 300);
     });
-
-    async function loadPostForEdit(slug: string) {
-      try {
-        const res = await fetch(`/api/posts/${slug}`);
-        if (res.ok) {
-          const post = (await res.json()) as any;
-          // Populate Form
-          (document.getElementById("post-id") as HTMLInputElement).value =
-            post.id;
-          (document.getElementById("title-input") as HTMLInputElement).value =
-            post.title;
-          (document.getElementById("slug-input") as HTMLInputElement).value =
-            post.slug;
-          (
-            document.getElementById("content-area") as HTMLTextAreaElement
-          ).value = post.content;
-
-          if (post.publishedAt) {
-            const date = new Date(post.publishedAt);
-            const iso = new Date(
-              date.getTime() - date.getTimezoneOffset() * 60000,
-            )
-              .toISOString()
-              .slice(0, 16);
-            (
-              document.getElementById("published-at-input") as HTMLInputElement
-            ).value = iso;
-          }
-
-          if (post.updatedAt) {
-            const date = new Date(post.updatedAt);
-            const iso = new Date(
-              date.getTime() - date.getTimezoneOffset() * 60000,
-            )
-              .toISOString()
-              .slice(0, 16);
-            updatedAtInput.value = iso;
-            autoUpdateToggle.checked = false;
-            updatedAtInput.disabled = false;
-          } else {
-            updatedAtInput.value = "";
-            autoUpdateToggle.checked = true;
-            updatedAtInput.disabled = true;
-          }
-
-          // Scroll to editor
-          document
-            .getElementById("create-post-form")
-            ?.scrollIntoView({ behavior: "smooth" });
-
-          // Update Button Text
-          const btn = document.querySelector('button[type="submit"]');
-          if (btn) btn.innerHTML = "UPDATE SIGNAL";
-        }
-      } catch (e) {
-        console.error("Failed to load post", e);
-      }
-    }
 
     // Hide on click outside
     document.addEventListener("click", (e) => {

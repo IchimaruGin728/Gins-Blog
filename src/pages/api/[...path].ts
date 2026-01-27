@@ -103,8 +103,42 @@ const route = app.post(
     }
     
     return c.json({ success: true, id });
+// ... (existing POST /posts)
   }
 );
+
+// Get Single Post (for Admin Editor)
+const getPostRoute = app.get('/posts/:slug', async (c) => {
+    // @ts-ignore
+    const db = getDb(c.env);
+    const slug = c.req.param('slug');
+    // @ts-ignore
+    const post = await db.select().from(posts).where(schema.eq(posts.slug, slug)).get();
+    
+    if (!post) return c.json({ error: 'Post not found' }, 404);
+    return c.json(post);
+});
+
+// Get Recent Posts (for Admin List)
+const listPostsRoute = app.get('/posts', async (c) => {
+    // @ts-ignore
+    const db = getDb(c.env);
+    // @ts-ignore
+    const allPosts = await db.select({
+        id: posts.id,
+        title: posts.title,
+        slug: posts.slug,
+        publishedAt: posts.publishedAt,
+        updatedAt: posts.updatedAt
+    })
+    .from(posts)
+    // @ts-ignore
+    .orderBy(schema.desc(posts.publishedAt))
+    .limit(20)
+    .all();
+    
+    return c.json(allPosts);
+});
   
 app.post('/music', zValidator('form', z.object({
     title: z.string(),

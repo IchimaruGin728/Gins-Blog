@@ -2,9 +2,10 @@
 import Layout from "../../layouts/Layout.astro";
 import { getDb } from "../../lib/db";
 import { posts } from "../../../db/schema";
-import { eq, and, lte } from "drizzle-orm";
+import { eq, and, lte, gt, lt, desc } from "drizzle-orm";
 import Comments from "../../components/Comments";
-import { marked } from "marked";
+import { Markdown } from "astro-remote";
+import MarkdownImage from "../../components/MarkdownImage.astro";
 import ShareButtons from "../../components/ShareButtons.astro";
 
 const { slug } = Astro.params;
@@ -53,6 +54,38 @@ if (!result) {
 if (!result) {
   return Astro.redirect("/404");
 }
+
+// Fetch Next & Previous Posts
+
+const db = getDb(env);
+const currentPublishedAt = result.publishedAt || 0;
+
+const prevPost = await db
+  .select({ title: posts.title, slug: posts.slug })
+  .from(posts)
+  .where(
+    and(
+      lt(posts.publishedAt, currentPublishedAt),
+      lte(posts.publishedAt, Date.now()),
+    ),
+  )
+  .orderBy(desc(posts.publishedAt))
+  .limit(1)
+  .get();
+
+const nextPost = await db
+  .select({ title: posts.title, slug: posts.slug })
+  .from(posts)
+  .where(
+    and(
+      gt(posts.publishedAt, currentPublishedAt),
+      lte(posts.publishedAt, Date.now()),
+    ),
+  )
+  .orderBy(posts.publishedAt)
+  .limit(1)
+  .get();
+
 // Extract description from content (first 160 chars)
 const contentPreview =
   result.content
@@ -89,6 +122,15 @@ const structuredData = {
     "@id": `https://blog.ichimarugin728.com/blog/${slug}`,
   },
 };
+
+// Smart Caching Strategy (Stale-While-Revalidate)
+// max-age=0: Browser always revalidates
+// s-maxage=60: Cloudflare caches for 60s
+// stale-while-revalidate=600: Serving stale content for up to 10 mins while background updating
+Astro.response.headers.set(
+  "Cache-Control",
+  "public, max-age=0, s-maxage=60, stale-while-revalidate=600",
+);
 ---
 
 <Layout
@@ -112,18 +154,70 @@ const structuredData = {
     <div
       class="glass-panel rounded-3xl p-8 md:p-12 prose prose-invert prose-lg max-w-none text-gray-300"
     >
-      <!-- Assuming content is just text for now, in Future: Markdown/MDX -->
-      <div
-        class="whitespace-pre-wrap"
-        set:html={marked.parse(result.content)}
+      <Markdown
+        content={result.content}
+        components={{
+          img: MarkdownImage,
+        }}
       />
     </div>
 
-    <Comments
-      client:visible
-      postId={result.id}
-      currentUser={Astro.locals.user || undefined}
-    />
+    <!-- Share Buttons -->
+    <div class="mt-8">
+      <ShareButtons
+        url={Astro.url.href}
+        title={result.title}
+        description={result.content.substring(0, 160)}
+      />
+    </div>
+
+    <!-- Post Navigation -->
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+      {
+        prevPost ? (
+          <a
+            href={`/blog/${prevPost.slug}`}
+            class="group glass-panel p-6 rounded-2xl border border-white/5 hover:border-white/20 transition-all text-left"
+          >
+            <div class="text-xs font-mono text-gray-500 mb-2 group-hover:text-brand-accent transition-colors">
+              ← Previous Post
+            </div>
+            <div class="font-bold text-lg leading-tight group-hover:text-white transition-colors line-clamp-2">
+              {prevPost.title}
+            </div>
+          </a>
+        ) : (
+          <div />
+        )
+      }
+
+      {
+        nextPost ? (
+          <a
+            href={`/blog/${nextPost.slug}`}
+            class="group glass-panel p-6 rounded-2xl border border-white/5 hover:border-white/20 transition-all text-right"
+          >
+            <div class="text-xs font-mono text-gray-500 mb-2 group-hover:text-brand-accent transition-colors">
+              Next Post →
+            </div>
+            <div class="font-bold text-lg leading-tight group-hover:text-white transition-colors line-clamp-2">
+              {nextPost.title}
+            </div>
+          </a>
+        ) : (
+          <div />
+        )
+      }
+    </div>
+
+    <!-- Comments Section -->
+    <div class="mt-16">
+      <Comments
+        client:visible
+        postId={result.id}
+        currentUser={Astro.locals.user || undefined}
+      />
+    </div>
 
     <div class="mt-12 text-center">
       <a
@@ -141,22 +235,4 @@ const structuredData = {
     type="application/ld+json"
     set:html={JSON.stringify(structuredData)}
   />
-
-  <!-- Share Buttons -->
-  <div class="max-w-3xl mx-auto mt-8">
-    <ShareButtons
-      url={Astro.url.href}
-      title={result.title}
-      description={result.content.substring(0, 160)}
-    />
-  </div>
-
-  <!-- Comments Section -->
-  <div class="max-w-3xl mx-auto mt-16">
-    <Comments
-      client:visible
-      postId={result.id}
-      currentUser={Astro.locals.user || undefined}
-    />
-  </div>
 </Layout>

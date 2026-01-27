@@ -5,6 +5,7 @@ import unocss from 'unocss/astro';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://blog.ichimarugin728.com',
   output: 'server',
   adapter: cloudflare({
     imageService: 'compile',

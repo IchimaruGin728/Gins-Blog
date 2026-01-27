@@ -36,6 +36,10 @@ export const GET: APIRoute = async ({ params, locals }) => {
     const fontData = await fetch('https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-700-normal.woff').then(res => res.arrayBuffer());
     const fontDataRegular = await fetch('https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-400-normal.woff').then(res => res.arrayBuffer());
 
+    // Calculate Reading Time
+    const wordCount = post.content.replace(/<[^>]*>/g, '').split(/\s+/).length;
+    const readTime = Math.ceil(wordCount / 200);
+
     const svg = await satori(
         {
             type: 'div',
@@ -45,84 +49,156 @@ export const GET: APIRoute = async ({ params, locals }) => {
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
                     backgroundColor: '#050505',
-                    backgroundImage: 'radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.2) 2%, transparent 0%), radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.2) 2%, transparent 0%)',
+                    backgroundImage: 'radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.05) 2%, transparent 0%), radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.05) 2%, transparent 0%)',
                     backgroundSize: '100px 100px',
-                    color: 'white',
                     fontFamily: 'Inter',
+                    color: 'white',
+                    padding: '80px',
+                    position: 'relative',
+                    overflow: 'hidden',
                 },
                 children: [
+                     // Background Glows
                     {
                         type: 'div',
                         props: {
-                            style: {
+                             style: {
                                 position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%',
-                                background: 'linear-gradient(to bottom right, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1))',
-                            }
+                                top: '-20%',
+                                right: '-10%',
+                                width: '600px',
+                                height: '600px',
+                                background: 'rgba(139, 92, 246, 0.15)', // brand-primary
+                                filter: 'blur(100px)',
+                                borderRadius: '50%',
+                             }
                         }
                     },
-                     {
+                    {
+                        type: 'div',
+                        props: {
+                             style: {
+                                position: 'absolute',
+                                bottom: '-20%',
+                                left: '-10%',
+                                width: '500px',
+                                height: '500px',
+                                background: 'rgba(236, 72, 153, 0.15)', // brand-accent
+                                filter: 'blur(100px)',
+                                borderRadius: '50%',
+                             }
+                        }
+                    },
+
+                     // Main Content Container
+                    {
                         type: 'div',
                         props: {
                             style: {
                                 display: 'flex',
                                 flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '32px',
-                                padding: '60px 80px',
-                                background: 'rgba(0,0,0,0.4)',
-                                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-                                maxWidth: '900px',
-                                textAlign: 'center'
+                                height: '100%',
+                                justifyContent: 'space-between',
+                                zIndex: 10,
                             },
-                            children: [
+                             children: [
+                                // Header: Blog Name
                                 {
                                     type: 'div',
                                     props: {
                                         style: {
-                                            fontSize: '24px',
-                                            color: '#d8b4fe',
-                                            marginBottom: '20px',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '4px',
-                                        },
-                                        children: "Ichimaru Gin's Blog"
-                                    }
-                                },
-                                {
-                                    type: 'div',
-                                    props: {
-                                        style: {
-                                            fontSize: '64px',
+                                            fontSize: '32px',
                                             fontWeight: 700,
-                                            background: 'linear-gradient(to right, #c084fc, #f472b6)',
-                                            backgroundClip: 'text',
-                                            color: 'transparent',
-                                            marginBottom: '30px',
-                                            lineHeight: 1.2,
+                                            color: '#d8b4fe', // light purple
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '12px',
                                         },
-                                        children: post.title
+                                        children: [
+                                            {
+                                                type: 'div',
+                                                props: {
+                                                    style: { width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7, #ec4899)' }
+                                                }
+                                            },
+                                            "Gin's Blog"
+                                        ]
                                     }
                                 },
+
+                                // Title
                                 {
                                     type: 'div',
                                     props: {
                                         style: {
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '16px',
+                                        },
+                                        children: [
+                                             {
+                                                type: 'div',
+                                                props: {
+                                                    style: {
+                                                        fontSize: '72px',
+                                                        fontWeight: 700,
+                                                        lineHeight: 1.1,
+                                                        background: 'linear-gradient(to right, #e9d5ff, #fbcfe8)', // light text gradient
+                                                        backgroundClip: 'text',
+                                                        color: 'transparent',
+                                                        textShadow: '0 4px 20px rgba(0,0,0,0.5)',
+                                                    },
+                                                    children: post.title.length > 50 ? post.title.substring(0, 50) + '...' : post.title
+                                                }
+                                            },
+                                            // Description / Excerpt (optional, using date for now)
+                                        ]
+                                    }
+                                },
+
+                                // Footer: Metadata
+                                {
+                                    type: 'div',
+                                    props: {
+                                         style: {
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '40px',
                                             fontSize: '24px',
                                             color: '#9ca3af',
-                                        },
-                                        children: new Date(post.publishedAt || post.createdAt).toLocaleDateString('en-SG', { dateStyle: 'long' })
+                                            fontFamily: 'Inter',
+                                         },
+                                         children: [
+                                             // Author
+                                             {
+                                                 type: 'div',
+                                                 props: {
+                                                     style: { display: 'flex', alignItems: 'center', gap: '12px' },
+                                                     children: [
+                                                         {
+                                                             type: 'img',
+                                                             props: {
+                                                                 src: 'https://ui-avatars.com/api/?name=Ichimaru+Gin&background=random&color=fff',
+                                                                 style: { width: '48px', height: '48px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.1)' }
+                                                             }
+                                                         },
+                                                         "Ichimaru Gin"
+                                                     ]
+                                                 }
+                                             },
+                                             // Divider
+                                             { type: 'div', props: { style: { width: '4px', height: '4px', borderRadius: '50%', background: '#6b7280' } } },
+                                             // Date
+                                             { type: 'div', props: { children: new Date(post.publishedAt || post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) } },
+                                             // Divider
+                                             { type: 'div', props: { style: { width: '4px', height: '4px', borderRadius: '50%', background: '#6b7280' } } },
+                                             // Read Time
+                                             { type: 'div', props: { children: `${readTime} min read` } },
+                                         ]
                                     }
-                                },
-                            ]
+                                }
+                             ]
                         }
                     }
                 ],

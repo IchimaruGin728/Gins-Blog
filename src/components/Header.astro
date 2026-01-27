@@ -104,7 +104,15 @@
     </div>
 
     <!-- Right: Auth/Profile -->
-    <div class="z-50 relative">
+    <div class="flex items-center gap-3 z-50 relative">
+      <a
+        href="/rss.xml"
+        target="_blank"
+        class="hidden md:flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/10 text-gray-400 hover:text-brand-accent transition-all border border-transparent hover:border-white/10"
+        title="RSS Feed"
+      >
+        <span class="i-heroicons-rss w-4 h-4"></span>
+      </a>
       {
         Astro.locals.user ? (
           <a

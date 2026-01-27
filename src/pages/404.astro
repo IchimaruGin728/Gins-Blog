@@ -1,0 +1,54 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="404 - Aiyo!" description="Nothing to see here lah!">
+  <div
+    class="min-h-[70vh] flex flex-col items-center justify-center text-center px-4"
+  >
+    <!-- Glitch Effect Container -->
+    <div class="relative mb-8">
+      <h1
+        class="text-9xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/10 opacity-20 select-none"
+      >
+        404
+      </h1>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <h2
+          class="text-4xl md:text-6xl font-bold font-display text-brand-accent drop-shadow-[0_0_15px_rgba(244,114,182,0.5)] animate-pulse"
+        >
+          Aiyo!
+        </h2>
+      </div>
+    </div>
+
+    <div
+      class="glass-panel p-8 rounded-3xl max-w-lg w-full border border-white/10 backdrop-blur-xl"
+    >
+      <p class="text-xl md:text-2xl font-medium text-white mb-4">
+        Page not found lah!
+      </p>
+      <p class="text-gray-400 mb-8 font-mono text-sm leading-relaxed">
+        You lost or what? This signal is transmission dead. <br />
+        Valid coordinates are required for teleportation.
+      </p>
+
+      <a
+        href="/"
+        class="group relative inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-accent/50 transition-all duration-300"
+      >
+        <div
+          class="absolute inset-0 rounded-xl bg-brand-accent/10 opacity-0 group-hover:opacity-100 transition-opacity blur-lg"
+        >
+        </div>
+        <span
+          class="i-heroicons-home text-brand-accent group-hover:scale-110 transition-transform"
+        ></span>
+        <span
+          class="font-bold text-white group-hover:text-brand-accent transition-colors"
+          >Balik Kampung (Home)</span
+        >
+      </a>
+    </div>
+  </div>
+</Layout>
