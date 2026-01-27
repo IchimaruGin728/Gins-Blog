@@ -20,13 +20,23 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 	}
 
 	try {
+        console.log("Validating Discord code...");
 		const tokens: OAuth2Tokens = await getDiscord(locals.runtime.env).validateAuthorizationCode(code, codeVerifier);
-		const discordUserResponse = await fetch('https://discord.com/api/users/@me', {
-			headers: {
-				Authorization: `Bearer ${tokens.accessToken}`
-			}
-		});
-		const discordUser: DiscordUser = await discordUserResponse.json();
+        console.log("Tokens received:", tokens.accessToken ? "Present" : "Missing");
+
+        let discordUser: DiscordUser;
+        try {
+            console.log("Fetching Discord user...");
+            const discordUserResponse = await fetch('https://discord.com/api/users/@me', {
+                headers: {
+                    Authorization: `Bearer ${tokens.accessToken}`
+                }
+            });
+            discordUser = await discordUserResponse.json();
+            console.log("Discord User fetched:", discordUser.username);
+        } catch (fetchError: any) {
+             throw new Error(`Failed to fetch Discord user: ${fetchError.message}`);
+        }
 
 		const db = getDb(locals.runtime.env);
 
@@ -47,9 +57,12 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
             });
 		}
 
+		console.log("Creating session, userId:", userId);
 		const token = generateSessionToken();
 		const session = await createSession(token, userId, db, locals.runtime.env);
-		cookies.set('session', token, {
+		
+        console.log("Setting session cookie...");
+        cookies.set('session', token, {
 			path: '/',
 			httpOnly: true,
 			sameSite: 'lax',

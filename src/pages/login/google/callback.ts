@@ -20,13 +20,23 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 	}
 
 	try {
+        console.log("Validating Google code...");
 		const tokens: OAuth2Tokens = await getGoogle(locals.runtime.env).validateAuthorizationCode(code, codeVerifier);
-		const googleUserResponse = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
-			headers: {
-				Authorization: `Bearer ${tokens.accessToken}`
-			}
-		});
-		const googleUser: GoogleUser = await googleUserResponse.json();
+        console.log("Tokens received:", tokens.accessToken ? "Present" : "Missing");
+
+        let googleUser: GoogleUser;
+        try {
+            console.log("Fetching Google user...");
+            const googleUserResponse = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
+                headers: {
+                    Authorization: `Bearer ${tokens.accessToken}`
+                }
+            });
+            googleUser = await googleUserResponse.json();
+            console.log("Google User fetched:", googleUser.name);
+        } catch (fetchError: any) {
+             throw new Error(`Failed to fetch Google user: ${fetchError.message}`);
+        }
 
 		const db = getDb(locals.runtime.env);
 
@@ -44,13 +54,15 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
                 googleId: googleUser.sub,
                 username: googleUser.name,
                 avatar: googleUser.picture,
-                // We handle potential username collisions next time or just append random
             });
 		}
 
+		console.log("Creating session, userId:", userId);
 		const token = generateSessionToken();
 		const session = await createSession(token, userId, db, locals.runtime.env);
-		cookies.set('session', token, {
+		
+        console.log("Setting session cookie...");
+        cookies.set('session', token, {
 			path: '/',
 			httpOnly: true,
 			sameSite: 'lax',
