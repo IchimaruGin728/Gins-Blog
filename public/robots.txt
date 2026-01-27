@@ -1,6 +1,8 @@
 User-agent: *
 Allow: /
 
+Sitemap: https://blog.ichimarugin728.com/sitemap-index.xml
+
 # Disallow admin areas
 User-agent: *
 Disallow: /IchimaruGin728/

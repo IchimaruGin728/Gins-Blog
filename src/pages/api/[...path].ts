@@ -121,11 +121,13 @@ const getPostRoute = app.get('/posts/:slug', async (c) => {
 });
 
 // Get Recent Posts (for Admin List)
+// Get Recent Posts (for Admin List)
 const listPostsRoute = app.get('/posts', async (c) => {
     // @ts-ignore
     const db = getDb(c.env);
-    // @ts-ignore
-    const allPosts = await db.select({
+    const limitParam = c.req.query('limit');
+    
+    let query = db.select({
         id: posts.id,
         title: posts.title,
         slug: posts.slug,
@@ -134,9 +136,15 @@ const listPostsRoute = app.get('/posts', async (c) => {
     })
     .from(posts)
     // @ts-ignore
-    .orderBy(desc(posts.publishedAt))
-    .limit(20)
-    .all();
+    .orderBy(desc(posts.publishedAt));
+
+    if (limitParam !== 'all') {
+        // @ts-ignore
+        query = query.limit(limitParam ? parseInt(limitParam) : 20);
+    }
+
+    // @ts-ignore
+    const allPosts = await query.all();
     return c.json(allPosts);
 });
 

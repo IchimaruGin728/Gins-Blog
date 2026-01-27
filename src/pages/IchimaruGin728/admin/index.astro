@@ -140,11 +140,17 @@ const recentPosts = await safeFetch(
     </div>
   </div>
 
-  <!-- Recent Signals List -->
+  <!-- Signal Log List -->
   <div class="glass-panel p-8 rounded-3xl mb-12">
-    <h2 class="text-2xl font-bold mb-6">Recent Transmissions</h2>
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold">Signal Log</h2>
+      <div id="signal-log-count" class="text-xs font-mono text-gray-400">
+        Showing Recent 10
+      </div>
+    </div>
+
     <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
+      <table class="w-full text-left border-collapse" id="signal-log-table">
         <thead>
           <tr
             class="text-gray-400 border-b border-white/10 text-xs uppercase tracking-wider font-mono"
@@ -155,7 +161,7 @@ const recentPosts = await safeFetch(
             <th class="py-4 font-normal text-right">Action</th>
           </tr>
         </thead>
-        <tbody class="text-sm">
+        <tbody class="text-sm" id="signal-log-body">
           {
             (recentPosts.results || []).map((post: any) => {
               const isPublished = Date.now() >= (post.publishedAt || 0);
@@ -210,6 +216,15 @@ const recentPosts = await safeFetch(
           }
         </tbody>
       </table>
+    </div>
+
+    <div class="mt-6 flex justify-center">
+      <button
+        id="load-all-signals-btn"
+        class="px-6 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono tracking-widest uppercase transition-colors text-gray-400 hover:text-white"
+      >
+        Load Full Archive
+      </button>
     </div>
   </div>
 
@@ -333,12 +348,21 @@ const recentPosts = await safeFetch(
         placeholder="Initiate transmission..."></textarea>
     </div>
 
-    <button
-      type="submit"
-      class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-primary to-brand-accent hover:opacity-90 text-white font-bold tracking-wider transition-opacity"
-    >
-      BROADCAST SIGNAL
-    </button>
+    <div class="flex items-center gap-4">
+      <button
+        type="submit"
+        class="flex-1 py-4 rounded-xl bg-gradient-to-r from-brand-primary to-brand-accent hover:opacity-90 text-white font-bold tracking-wider transition-opacity"
+      >
+        BROADCAST SIGNAL
+      </button>
+      <button
+        type="button"
+        id="delete-current-btn"
+        class="hidden px-6 py-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 font-bold tracking-wider transition-colors"
+      >
+        <span class="i-heroicons-trash w-5 h-5"></span>
+      </button>
+    </div>
 
     <div id="status" class="hidden p-4 rounded-xl text-center text-sm"></div>
   </div>
@@ -517,6 +541,12 @@ const recentPosts = await safeFetch(
         status!.classList.remove("hidden");
         status!.classList.add("bg-green-500/20", "text-green-200");
         form.reset();
+        // Reset Editor State
+        document.getElementById("delete-current-btn")?.classList.add("hidden");
+        document.querySelector('button[type="submit"]')!.innerHTML =
+          "BROADCAST SIGNAL";
+        // Refresh list after short delay
+        setTimeout(() => window.location.reload(), 1000);
       } else {
         status!.innerText = "Transmission Failed.";
         status!.classList.remove("hidden");
@@ -527,6 +557,33 @@ const recentPosts = await safeFetch(
       status!.innerText = "Network Error.";
       status!.classList.remove("hidden");
       status!.classList.add("bg-red-500/20", "text-red-200");
+    }
+  });
+
+  // Handle Delete from Editor
+  const deleteCurrentBtn = document.getElementById("delete-current-btn");
+  deleteCurrentBtn?.addEventListener("click", async () => {
+    const slug = (document.getElementById("slug-input") as HTMLInputElement)
+      .value;
+    if (!slug) return;
+
+    if (
+      !confirm(
+        "CRITICAL WARNING: This will permanently purge this signal from the database. This action is irreversible. Proceed?",
+      )
+    )
+      return;
+
+    try {
+      const res = await fetch(`/api/posts/${slug}`, { method: "DELETE" });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        alert("Failed to delete signal");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Network Error");
     }
   });
 
@@ -585,9 +642,13 @@ const recentPosts = await safeFetch(
           .getElementById("create-post-form")
           ?.scrollIntoView({ behavior: "smooth" });
 
-        // Update Button Text
+        // Update Button Text & Show Delete
         const btn = document.querySelector('button[type="submit"]');
         if (btn) btn.innerHTML = "UPDATE SIGNAL";
+
+        document
+          .getElementById("delete-current-btn")
+          ?.classList.remove("hidden");
       }
     } catch (e) {
       console.error("Failed to load post", e);
@@ -649,6 +710,63 @@ const recentPosts = await safeFetch(
         !resultsContainer.contains(e.target as Node)
       ) {
         resultsContainer.classList.add("hidden");
+      }
+    });
+
+    // Load All Archives Logic
+    const loadAllBtn = document.getElementById("load-all-signals-btn");
+    const tableBody = document.getElementById("signal-log-body");
+
+    loadAllBtn?.addEventListener("click", async () => {
+      loadAllBtn.innerText = "Loading Archive...";
+      loadAllBtn.setAttribute("disabled", "true");
+
+      try {
+        const res = await fetch("/api/posts?limit=all");
+        const allPosts = (await res.json()) as any[];
+
+        if (tableBody) {
+          tableBody.innerHTML = allPosts
+            .map((post) => {
+              const isPublished = Date.now() >= (post.publishedAt || 0);
+              const dateStr = new Date(
+                post.publishedAt || post.createdAt,
+              ).toLocaleDateString();
+
+              return `
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                      <td class="py-4">
+                        <span class="inline-block w-2 h-2 rounded-full ${isPublished ? "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]" : "bg-yellow-400"}"></span>
+                      </td>
+                      <td class="py-4 font-medium text-white">${post.title}</td>
+                      <td class="py-4 text-gray-400 font-mono text-xs">${dateStr}</td>
+                      <td class="py-4 text-right flex items-center justify-end gap-2">
+                        <button class="edit-post-btn px-3 py-1 rounded-lg bg-white/5 hover:bg-brand-primary/20 text-gray-300 hover:text-brand-accent border border-white/10 hover:border-brand-primary/50 transition-all text-xs" data-slug="${post.slug}" title="Edit Post">
+                          <span class="i-heroicons-pencil-square w-4 h-4"></span>
+                        </button>
+                        <button class="toggle-status-btn px-3 py-1 rounded-lg bg-white/5 hover:bg-yellow-500/20 text-gray-300 hover:text-yellow-400 border border-white/10 hover:border-yellow-500/50 transition-all text-xs" data-slug="${post.slug}" data-status="${isPublished ? "published" : "draft"}" title="${isPublished ? "Unpublish (Hide)" : "Publish (Show)"}">
+                          <span class="${isPublished ? "i-heroicons-eye-slash w-4 h-4" : "i-heroicons-eye w-4 h-4"}"></span>
+                        </button>
+                        <button class="delete-post-btn px-3 py-1 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-300 hover:text-red-400 border border-white/10 hover:border-red-500/50 transition-all text-xs" data-slug="${post.slug}" title="Delete Post">
+                          <span class="i-heroicons-trash w-4 h-4"></span>
+                        </button>
+                      </td>
+                    </tr>
+                    `;
+            })
+            .join("");
+
+          // Re-bind buttons since DOM changed
+          bindActionButtons();
+
+          loadAllBtn.classList.add("hidden");
+          const countEl = document.getElementById("signal-log-count");
+          if (countEl)
+            countEl.innerText = `Showing All ${allPosts.length} Signals`;
+        }
+      } catch (e) {
+        console.error(e);
+        loadAllBtn.innerText = "Sync Failed";
       }
     });
   }

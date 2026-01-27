@@ -3,6 +3,8 @@ import cloudflare from '@astrojs/cloudflare';
 import preact from '@astrojs/preact';
 import unocss from 'unocss/astro';
 
+import sitemap from '@astrojs/sitemap';
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://blog.ichimarugin728.com',
@@ -13,12 +15,9 @@ export default defineConfig({
       enabled: true,
     },
   }),
-  integrations: [
-    preact({
-      compat: true,
-    }),
-    unocss({
-      injectReset: true,
-    }),
-  ],
+  integrations: [preact({
+    compat: true,
+  }), unocss({
+    injectReset: true,
+  }), sitemap()],
 });
