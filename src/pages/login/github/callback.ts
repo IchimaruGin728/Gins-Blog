@@ -59,7 +59,12 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 		return redirect('/');
 	} catch (e) {
         console.error(e);
-		return new Response(null, {
+	} catch (e: any) {
+        console.error(e);
+		return new Response(JSON.stringify({
+            error: e.message,
+            stack: e.stack
+        }, null, 2), {
 			status: 500
 		});
 	}
