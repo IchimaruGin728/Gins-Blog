@@ -351,7 +351,7 @@ const recentPosts = await safeFetch(
     <div class="flex items-center gap-4">
       <button
         type="submit"
-        class="flex-1 py-4 rounded-xl bg-gradient-to-r from-brand-primary to-brand-accent hover:opacity-90 text-white font-bold tracking-wider transition-opacity"
+        class="relative z-10 flex-1 py-4 rounded-xl bg-gradient-to-r from-brand-primary to-brand-accent hover:opacity-90 hover:scale-[1.01] active:scale-[0.98] text-white font-bold tracking-wider transition-all cursor-pointer shadow-lg hover:shadow-brand-accent/25"
       >
         BROADCAST SIGNAL
       </button>
@@ -366,6 +366,73 @@ const recentPosts = await safeFetch(
 
     <div id="status" class="hidden p-4 rounded-xl text-center text-sm"></div>
   </div>
+
+  <!-- Success Modal Overlay -->
+  <div
+    id="success-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300"
+  >
+    <div class="relative w-full max-w-lg flex flex-col items-center">
+      <!-- Glitch/Success Effect (Like 404) -->
+      <div
+        class="relative mb-8 transform scale-90 md:scale-100 transition-transform duration-300 delay-100 pointer-events-none"
+      >
+        <h1
+          class="text-9xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/10 opacity-20 select-none"
+        >
+          200
+        </h1>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <h2
+            class="text-4xl md:text-5xl font-bold font-display text-green-400 drop-shadow-[0_0_15px_rgba(74,222,128,0.5)] animate-pulse flex items-center gap-3"
+          >
+            <span class="i-heroicons-check-circle text-5xl"></span>
+            <span>Signal Live!</span>
+          </h2>
+        </div>
+      </div>
+
+      <div
+        class="glass-panel p-8 md:p-12 rounded-3xl w-full text-center transform scale-95 transition-transform duration-300 border border-white/10 shadow-2xl"
+      >
+        <p class="text-xl md:text-2xl font-medium text-white mb-4">
+          Transmission Successful
+        </p>
+        <p class="text-gray-400 font-mono text-sm leading-relaxed mb-8">
+          The signal has been injected into the network stream.<br />
+          All systems operational.
+        </p>
+
+        <div class="flex flex-col gap-4">
+          <a
+            id="verify-signal-btn"
+            href="#"
+            target="_blank"
+            class="group relative w-full py-4 rounded-xl bg-gradient-to-r from-brand-primary to-brand-accent hover:opacity-90 text-white font-bold transition-all flex items-center justify-center gap-2 overflow-hidden shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)]"
+          >
+            <div
+              class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+            >
+            </div>
+            <span class="relative z-10">Verify Signal</span>
+            <span
+              class="i-heroicons-arrow-top-right-on-square w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform"
+            ></span>
+          </a>
+
+          <button
+            id="return-uplink-btn"
+            class="group relative w-full py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/30 text-gray-400 hover:text-white transition-all flex items-center justify-center gap-2"
+          >
+            <span
+              class="i-heroicons-arrow-path w-5 h-5 group-hover:-rotate-180 transition-transform duration-500"
+            ></span>
+            <span>Return to Uplink</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </Layout>
 
 <script>
@@ -374,6 +441,8 @@ const recentPosts = await safeFetch(
 
   const client = hc<AppType>(window.location.origin);
   const form = document.getElementById("create-post-form") as HTMLFormElement;
+
+  console.log("💎 Admin Module Loaded");
 
   // Bind Edit Buttons (Recent List)
   // Bind Edit Buttons (Recent List)
@@ -521,8 +590,16 @@ const recentPosts = await safeFetch(
   // Post Submission
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    console.log("🚀 Initiating Broadcast Sequence...");
+
     const formData = new FormData(form);
     status!.className = "hidden p-4 rounded-xl text-center text-sm";
+
+    // Validation Check
+    if (!formData.get("title") || !formData.get("slug")) {
+      alert("Missing Critical Data: Title or Slug required.");
+      return;
+    }
 
     try {
       const res = await client.api.posts.$post({
@@ -537,16 +614,38 @@ const recentPosts = await safeFetch(
       });
 
       if (res.ok) {
-        status!.innerText = "Signal Broadcasted Successfully.";
-        status!.classList.remove("hidden");
-        status!.classList.add("bg-green-500/20", "text-green-200");
+        // Show Success Modal
+        const modal = document.getElementById("success-modal");
+        const verifyBtn = document.getElementById(
+          "verify-signal-btn",
+        ) as HTMLAnchorElement;
+        const returnBtn = document.getElementById("return-uplink-btn");
+        const slug = formData.get("slug") as string;
+
+        // Setup Modal content
+        verifyBtn.href = `/blog/${slug}`;
+
+        // Show Modal with Animation
+        modal?.classList.remove("hidden");
+        // Force Reflow
+        void modal?.offsetWidth;
+        modal?.classList.remove("opacity-0");
+        modal?.querySelector(".glass-panel")?.classList.remove("scale-95");
+        modal?.querySelector(".glass-panel")?.classList.add("scale-100");
+
+        // Reset Form Logic
         form.reset();
-        // Reset Editor State
         document.getElementById("delete-current-btn")?.classList.add("hidden");
         document.querySelector('button[type="submit"]')!.innerHTML =
           "BROADCAST SIGNAL";
-        // Refresh list after short delay
-        setTimeout(() => window.location.reload(), 1000);
+
+        // Return Logic
+        returnBtn?.addEventListener("click", () => {
+          modal?.classList.add("opacity-0");
+          modal?.querySelector(".glass-panel")?.classList.add("scale-95");
+          setTimeout(() => modal?.classList.add("hidden"), 300);
+          window.location.reload(); // Refresh list
+        });
       } else {
         status!.innerText = "Transmission Failed.";
         status!.classList.remove("hidden");
