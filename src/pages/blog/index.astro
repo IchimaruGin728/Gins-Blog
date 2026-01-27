@@ -2,7 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import { getDb } from "../../lib/db";
 import { posts } from "../../../db/schema";
-import { desc } from "drizzle-orm";
+import { desc, lte } from "drizzle-orm";
 
 // Access Cloudflare bindings from locals
 const { env } = Astro.locals.runtime;
@@ -15,6 +15,7 @@ try {
   allPosts = await db
     .select()
     .from(posts)
+    .where(lte(posts.publishedAt, Date.now()))
     .orderBy(desc(posts.publishedAt))
     .all();
 } catch (e: any) {

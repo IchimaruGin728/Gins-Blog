@@ -2,15 +2,16 @@
 import Layout from "../layouts/Layout.astro";
 import { getDb } from "../lib/db";
 import { posts } from "../../db/schema";
-import { desc } from "drizzle-orm";
+import { desc, lte } from "drizzle-orm";
 
 const { env } = Astro.locals.runtime;
 const db = getDb(env);
 
-// Fetch recent posts for the "Recent Posts" card
+// Fetch recent posts for the "Recent Posts" card (only published)
 const recentPosts = await db
 	.select()
 	.from(posts)
+	.where(lte(posts.publishedAt, Date.now()))
 	.orderBy(desc(posts.publishedAt))
 	.limit(3);
 ---
