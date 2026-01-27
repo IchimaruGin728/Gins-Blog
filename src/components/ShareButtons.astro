@@ -138,10 +138,86 @@ const shareUrls = {
       </svg>
     </button>
 
+    <!-- WeChat (Copy Link with QR) -->
+    <button
+      id="share-wechat"
+      class="group relative flex items-center justify-center w-12 h-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#09B83E]/50 transition-all duration-300 hover:scale-110 active:scale-95"
+      title="Copy link for WeChat"
+    >
+      <svg
+        class="w-5 h-5 text-gray-400 group-hover:text-[#09B83E] transition-colors"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.703-1.03a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-5.523 3.039-6.835.921-.419 1.942-.655 3.015-.655.28 0 .553.017.822.05-.837-2.786-4.011-4.976-7.655-4.976zm-.357 3.023c.598 0 1.083.484 1.083 1.083s-.485 1.083-1.083 1.083a1.083 1.083 0 0 1 0-2.166zm-4.668 0c.598 0 1.083.484 1.083 1.083s-.485 1.083-1.083 1.083a1.083 1.083 0 0 1 0-2.166zm15.334 2.862c-3.66 0-6.633 2.443-6.633 5.455 0 3.012 2.973 5.455 6.633 5.455.636 0 1.26-.08 1.854-.266.254-.088.515-.05.728.107l1.26.76a.314.314 0 0 0 .157.047.281.281 0 0 0 .275-.276.327.327 0 0 0-.046-.168l-.358-1.194a.537.537 0 0 1 .203-.596c1.556-1.213 2.543-2.975 2.543-4.959 0-3.012-2.973-5.455-6.633-5.455zm-4.116 2.366c.531 0 .961.43.961.96 0 .532-.43.962-.96.962s-.961-.43-.961-.961c0-.531.43-.961.96-.961zm4.668 0c.531 0 .961.43.961.96 0 .532-.43.962-.96.962s-.961-.43-.961-.961c0-.531.43-.961.96-.961z"
+        ></path>
+      </svg>
+    </button>
+
+    <!-- Copy Link -->
+    <button
+      id="share-copy"
+      class="group relative flex items-center gap-2 px-4 h-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-accent/50 transition-all duration-300 hover:scale-105 active:scale-95"
+      title="Copy link"
+    >
+      <svg
+        class="w-5 h-5 text-gray-400 group-hover:text-brand-accent transition-colors"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+        ></path>
+      </svg>
+      <span
+        class="text-xs font-medium text-gray-400 group-hover:text-brand-accent transition-colors"
+        >Copy</span
+      >
+    </button>
+  </div>
+
+  <!-- Toast notification -->
+  <div
+    id="copy-toast"
+    class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 px-4 py-2 bg-brand-accent/90 text-white text-sm rounded-lg shadow-lg backdrop-blur-sm z-50 animate-[slideUp_0.3s_ease-out]"
+  >
+    ✓ Link copied to clipboard!
+  </div>
+</div>
+
+<script define:vars={{ url }}>
+  function copyToClipboard() {
+    navigator.clipboard.writeText(url).then(() => {
+      const toast = document.getElementById("copy-toast");
+      if (toast) {
+        toast.classList.remove("hidden");
+        setTimeout(() => {
+          toast.classList.add("hidden");
+        }, 2000);
+      }
+    });
+  }
+
+  // Copy link button
+  const copyBtn = document.getElementById("share-copy");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", copyToClipboard);
+  }
+
   // Discord (copy link)
   const discordBtn = document.getElementById("share-discord");
   if (discordBtn) {
     discordBtn.addEventListener("click", copyToClipboard);
   }
-</script>
+
+  // WeChat (copy link)
+  const wechatBtn = document.getElementById("share-wechat");
+  if (wechatBtn) {
+    wechatBtn.addEventListener("click", copyToClipboard);
+  }
 </script>
