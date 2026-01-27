@@ -1,11 +1,11 @@
-import { google } from '../../../lib/auth';
+import { getGoogle } from '../../../lib/auth';
 import { generateState, generateCodeVerifier } from 'arctic';
 import type { APIRoute } from 'astro';
 
-export const GET: APIRoute = async ({ cookies, redirect }) => {
+export const GET: APIRoute = async ({ cookies, redirect, locals }) => {
 	const state = generateState();
     const codeVerifier = generateCodeVerifier();
-	const url = google.createAuthorizationURL(state, codeVerifier, ['profile', 'email']);
+	const url = getGoogle(locals.runtime.env).createAuthorizationURL(state, codeVerifier, ['profile', 'email']);
 
 	cookies.set('google_oauth_state', state, {
 		path: '/',

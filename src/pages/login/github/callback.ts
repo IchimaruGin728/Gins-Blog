@@ -1,4 +1,4 @@
-import { github } from '../../../lib/auth';
+import { getGithub } from '../../../lib/auth';
 import { createSession, generateSessionToken } from '../../../lib/session';
 import { getDb } from '../../../lib/db';
 import { users } from '../../../../db/schema';
@@ -19,7 +19,7 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 	}
 
 	try {
-		const tokens: OAuth2Tokens = await github.validateAuthorizationCode(code);
+		const tokens: OAuth2Tokens = await getGithub(locals.runtime.env).validateAuthorizationCode(code);
 		const githubUserResponse = await fetch('https://api.github.com/user', {
 			headers: {
 				Authorization: `Bearer ${tokens.accessToken}`

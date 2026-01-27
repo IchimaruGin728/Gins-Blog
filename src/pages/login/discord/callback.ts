@@ -1,4 +1,4 @@
-import { discord } from '../../../lib/auth';
+import { getDiscord } from '../../../lib/auth';
 import { createSession, generateSessionToken } from '../../../lib/session';
 import { getDb } from '../../../lib/db';
 import { users } from '../../../../db/schema';
@@ -20,7 +20,7 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 	}
 
 	try {
-		const tokens: OAuth2Tokens = await discord.validateAuthorizationCode(code, codeVerifier);
+		const tokens: OAuth2Tokens = await getDiscord(locals.runtime.env).validateAuthorizationCode(code, codeVerifier);
 		const discordUserResponse = await fetch('https://discord.com/api/users/@me', {
 			headers: {
 				Authorization: `Bearer ${tokens.accessToken}`

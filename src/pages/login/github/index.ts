@@ -1,10 +1,10 @@
 import { generateState } from 'arctic';
-import { github } from '../../../lib/auth';
+import { getGithub } from '../../../lib/auth';
 import type { APIRoute } from 'astro';
 
-export const GET: APIRoute = async ({ cookies, redirect }) => {
+export const GET: APIRoute = async ({ cookies, redirect, locals }) => {
 	const state = generateState();
-	const url = github.createAuthorizationURL(state, []);
+	const url = getGithub(locals.runtime.env).createAuthorizationURL(state, []);
 
 	cookies.set('github_oauth_state', state, {
 		path: '/',

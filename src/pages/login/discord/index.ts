@@ -1,11 +1,11 @@
-import { discord } from '../../../lib/auth';
+import { getDiscord } from '../../../lib/auth';
 import { generateState, generateCodeVerifier } from 'arctic';
 import type { APIRoute } from 'astro';
 
-export const GET: APIRoute = async ({ cookies, redirect }) => {
+export const GET: APIRoute = async ({ cookies, redirect, locals }) => {
 	const state = generateState();
     const codeVerifier = generateCodeVerifier();
-    const url = discord.createAuthorizationURL(state, codeVerifier, ['identify', 'email']);
+    const url = getDiscord(locals.runtime.env).createAuthorizationURL(state, codeVerifier, ['identify', 'email']);
 
 	cookies.set('discord_oauth_state', state, {
 		path: '/',
