@@ -44,7 +44,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
              return new Response('Unauthorized - Zero Trust Access Required', { status: 401 });
         }
         // Allow pass through if ZT User exists
-        return next();
     }
 
     // Public Route Caching logic (unchanged)
