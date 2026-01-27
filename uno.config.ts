@@ -3,10 +3,10 @@ import { defineConfig, presetUno, presetIcons, presetTypography, presetWebFonts 
 export default defineConfig({
 
   shortcuts: {
-    'glass-panel': 'bg-white/10 dark:bg-black/20 backdrop-filter backdrop-blur-xl border border-white/10 shadow-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:bg-white/15 dark:hover:bg-white/5',
+    'glass-panel': 'bg-white/10 dark:bg-black/20 backdrop-filter backdrop-blur-xl border border-white/10 shadow-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:bg-white/15 dark:hover:bg-white/5 will-change-transform',
      // Safari fix specific requirement
     'glass-safari': '-webkit-backdrop-filter: blur(20px)',
-    'btn-animated': 'transition-transform active:scale-95 hover:-translate-y-0.5',
+    'btn-animated': 'transition-transform active:scale-95 hover:-translate-y-0.5 will-change-transform',
   },
   theme: {
     colors: {
