@@ -1,4 +1,3 @@
----
 import type { APIRoute } from 'astro';
 import { getDb } from '../lib/db';
 import { posts } from '../../db/schema';
