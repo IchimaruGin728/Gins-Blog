@@ -40,11 +40,52 @@
         id="search-trigger-btn"
         class="group/search relative flex items-center justify-center h-8 w-8 bg-white/10 hover:bg-brand-primary/20 hover:w-48 border border-white/5 hover:border-brand-primary/30 rounded-full transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden cursor-text"
       >
-        <!-- Icon -->
-        <span
-          class="absolute left-2 text-white group-hover/search:text-brand-primary transition-colors z-10 text-base"
-          >🔍</span
+        <!-- Custom SVG Search Icon -->
+        <svg
+          class="absolute left-2 w-4 h-4 z-10 transition-all duration-300 group-hover/search:scale-110"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
         >
+          <defs>
+            <linearGradient
+              id="searchGradient"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1"
+              ></stop>
+              <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1"
+              ></stop>
+            </linearGradient>
+          </defs>
+          <!-- Search Circle -->
+          <circle
+            cx="10"
+            cy="10"
+            r="6"
+            stroke="url(#searchGradient)"
+            stroke-width="2"></circle>
+          <!-- Inner Glow -->
+          <circle
+            cx="10"
+            cy="10"
+            r="3"
+            fill="url(#searchGradient)"
+            opacity="0.2"
+            class="group-hover/search:opacity-30 transition-opacity"></circle>
+          <!-- Handle -->
+          <line
+            x1="14.5"
+            y1="14.5"
+            x2="20"
+            y2="20"
+            stroke="url(#searchGradient)"
+            stroke-width="2"
+            stroke-linecap="round"></line>
+        </svg>
 
         <!-- Text Label (Reveals on Hover) -->
         <div
