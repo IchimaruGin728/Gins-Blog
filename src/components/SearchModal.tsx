@@ -27,8 +27,16 @@ export default function SearchModal() {
                 setIsOpen(false);
             }
         };
+
+        const handleOpenEvent = () => setIsOpen(true);
+
         window.addEventListener('keydown', handleKeydown);
-        return () => window.removeEventListener('keydown', handleKeydown);
+        window.addEventListener('open-search-modal', handleOpenEvent);
+        
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+            window.removeEventListener('open-search-modal', handleOpenEvent);
+        };
     }, []);
 
     // Focus input when opened

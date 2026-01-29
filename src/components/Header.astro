@@ -151,10 +151,7 @@
     const btn = document.getElementById("search-trigger-btn");
     if (btn) {
       btn.addEventListener("click", () => {
-        // Simulate Cmd+K or expose a global function
-        window.dispatchEvent(
-          new KeyboardEvent("keydown", { key: "k", metaKey: true }),
-        );
+        window.dispatchEvent(new CustomEvent("open-search-modal"));
       });
     }
   </script>

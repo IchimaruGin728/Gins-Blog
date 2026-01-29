@@ -155,22 +155,8 @@ const searchPostsRoute = app.get('/search', async (c) => {
     
     if (!query) return c.json([]);
 
-    // Simple LIKE search for now
-    // @ts-ignore
-    const results = await db.select({
-        metadata: {
-            title: posts.title,
-            slug: posts.slug
-        },
-        score: 1 // Dummy score for SQL search
-    })
-    .from(posts)
-    // @ts-ignore
-    .where(options => {
-        return `title LIKE '%${query}%' OR content LIKE '%${query}%'`;
-    })
-    .limit(5)
-    .all();
+    // Fallback to JS filtering for reliable robust search
+    // We fetch all posts and filter in memory since the dataset is small and we need custom scoring logic
     
     // Fix: db.select return type might not match exact structure needed by frontend if we don't alias correctly
     // Frontend expects: { metadata: { title, slug }, score }
@@ -179,12 +165,18 @@ const searchPostsRoute = app.get('/search', async (c) => {
     
     // Fallback to JS filtering if SQL 'LIKE' is unsafe or tricky in this setup without 'like' import
     // @ts-ignore
-    const all = await db.select({ title: posts.title, slug: posts.slug, content: posts.content }).from(posts).all();
+    const all = await db.select({ 
+        title: posts.title, 
+        slug: posts.slug, 
+        content: posts.content,
+        publishedAt: posts.publishedAt 
+    }).from(posts).all();
     const qLower = query.toLowerCase();
     
     const matches = all.filter((p: any) => 
-        p.title.toLowerCase().includes(qLower) || 
-        p.content.toLowerCase().includes(qLower)
+        p.publishedAt && // Only published posts
+        (p.title.toLowerCase().includes(qLower) || 
+        p.content.toLowerCase().includes(qLower))
     ).map((p: any) => ({
         metadata: { title: p.title, slug: p.slug },
         score: p.title.toLowerCase().includes(qLower) ? 1.0 : 0.5
