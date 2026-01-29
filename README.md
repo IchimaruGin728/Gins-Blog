@@ -6,15 +6,17 @@ A high-performance, edge-first blog built with **Astro**, **Cloudflare Pages**, 
 
 ![Gins Blog Home Preview](media/home.png)
 
+> **Live Demo**: [blog.ichimarugin728.com](https://blog.ichimarugin728.com)
+
 ## ✨ Gallery
 
 | Blog Index | About Page |
 | :---: | :---: |
 | ![Blog Page](media/blog.png) | ![About Page](media/about.png) |
 
-| Admin Dashboard (Secret) |
-| :---: |
-| ![Admin Panel](media/admin.png) |
+| Profile Customization | Admin Dashboard (Secret) |
+| :---: | :---: |
+| ![Profile Page](media/profile.png) | ![Admin Panel](media/admin.png) |
 
 ## 🚀 Key Features
 
