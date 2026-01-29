@@ -4,11 +4,22 @@
 
 A high-performance, edge-first blog built with **Astro**, **Cloudflare Pages**, and **Neo-Aesthetics** design principles. Features glassmorphism, P3 wide color gamut, and AI-powered search.
 
-![Admin Dashboard Preview](https://github.com/user-attachments/assets/placeholder-image)
+![Gins Blog Home Preview](media/home.png)
+
+## ✨ Gallery
+
+| Blog Index | About Page |
+| :---: | :---: |
+| ![Blog Page](media/blog.png) | ![About Page](media/about.png) |
+
+| Admin Dashboard (Secret) |
+| :---: |
+| ![Admin Panel](media/admin.png) |
 
 ## 🚀 Key Features
 
 -   **Neo-Aesthetics UI**: Full glassmorphism, fluid animations, and Display-P3 color support.
+-   **Profile Customization**: Users can seamlessly switch their profile identity (Avatar & Username) between connected providers (**GitHub**, **Google**, **Discord**) or use a custom upload.
 -   **Edge-First Architecture**: Runs entirely on Cloudflare Workers/Pages.
 -   **Full Stack**:
     -   **Database**: Cloudflare D1 (SQLite) with Drizzle ORM.
