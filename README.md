@@ -18,9 +18,18 @@ A high-performance, edge-first blog built with **Astro**, **Cloudflare Pages**, 
 | :---: | :---: |
 | ![Profile Page](media/profile.png) | ![Admin Panel](media/admin.png) |
 
+| Music Manager | Switch Configuration |
+| :---: | :---: |
+| ![Music Console](media/music-manager.png) | ![Profile Switching](media/switch-profile.png) |
+
+| Mobile Experience |
+| :---: |
+| <img src="media/mobile.png" width="300" /> |
+
 ## 🚀 Key Features
 
 -   **Neo-Aesthetics UI**: Full glassmorphism, fluid animations, and Display-P3 color support.
+-   **PWA Support**: Installable as a native app on mobile and desktop devices.
 -   **Profile Customization**: Users can seamlessly switch their profile identity (Avatar & Username) between connected providers (**GitHub**, **Google**, **Discord**) or use a custom upload.
 -   **Edge-First Architecture**: Runs entirely on Cloudflare Workers/Pages.
 -   **Full Stack**:
@@ -28,7 +37,7 @@ A high-performance, edge-first blog built with **Astro**, **Cloudflare Pages**, 
     -   **Storage**: Cloudflare R2 for media.
     -   **Cache**: Cloudflare KV for high-performance API caching.
     -   **AI Search**: Cloudflare Vectorize + Workers AI for semantic search.
--   **Secret Admin Panel**: Hidden route for content management (CRUD).
+-   **Secret Admin Panel**: Hidden route for content management (CRUD) & **Music Manager**.
 -   **Auth**: OAuth (GitHub, Google, Discord) via Arctic + Oslo.
 
 ---
