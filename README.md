@@ -80,9 +80,9 @@ npm run db:push
 
 **c. KV Namespaces (Cache & Session)**
 ```bash
-wrangler kv:namespace create GIN_KV
-wrangler kv:namespace create SESSION
-wrangler kv:namespace create GINS_CACHE
+wrangler kv namespace create GIN_KV
+wrangler kv namespace create SESSION
+wrangler kv namespace create GINS_CACHE
 # Update "id" in wrangler.jsonc for each binding
 ```
 
