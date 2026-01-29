@@ -1,0 +1,242 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { getDb } from "../../../lib/db";
+import { posts } from "../../../../db/schema";
+import { eq, and, lte, gt, lt, desc } from "drizzle-orm";
+import Comments from "../../../components/Comments";
+import { Markdown } from "astro-remote";
+import MarkdownImage from "../../../components/MarkdownImage.astro";
+import ShareButtons from "../../../components/ShareButtons.astro";
+import { getLangFromUrl, useTranslations } from "../../../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect("/404");
+}
+
+const { env } = Astro.locals.runtime;
+// CACHE LIFT: Check KV Layer first (Speed optimization)
+const CACHE_KEY = `post:${slug}`;
+let result = null;
+let isCached = false;
+
+try {
+  const cached = await env.GINS_CACHE.get(CACHE_KEY, "json");
+  if (cached) {
+    result = cached as typeof posts.$inferSelect;
+    isCached = true;
+  }
+} catch (e) {
+  console.warn("KV Cache Miss/Error:", e);
+}
+
+// Fallback to D1 if not in Cache
+if (!result) {
+  const db = getDb(env);
+  result = await db
+    .select()
+    .from(posts)
+    .where(and(eq(posts.slug, slug), lte(posts.publishedAt, Date.now())))
+    .get();
+
+  // Hydrate Cache if found (Background non-blocking)
+  if (result) {
+    try {
+      await env.GINS_CACHE.put(CACHE_KEY, JSON.stringify(result), {
+        expirationTtl: 60 * 60 * 24 * 7, // 7 Days Cache
+      });
+    } catch (e) {
+      console.warn("Failed to write to KV:", e);
+    }
+  }
+}
+
+if (!result) {
+  return Astro.redirect("/404");
+}
+
+// Fetch Next & Previous Posts
+
+const db = getDb(env);
+const currentPublishedAt = result.publishedAt || 0;
+
+const prevPost = await db
+  .select({ title: posts.title, slug: posts.slug })
+  .from(posts)
+  .where(
+    and(
+      lt(posts.publishedAt, currentPublishedAt),
+      lte(posts.publishedAt, Date.now()),
+    ),
+  )
+  .orderBy(desc(posts.publishedAt))
+  .limit(1)
+  .get();
+
+const nextPost = await db
+  .select({ title: posts.title, slug: posts.slug })
+  .from(posts)
+  .where(
+    and(
+      gt(posts.publishedAt, currentPublishedAt),
+      lte(posts.publishedAt, Date.now()),
+    ),
+  )
+  .orderBy(posts.publishedAt)
+  .limit(1)
+  .get();
+
+// Extract description from content (first 160 chars)
+const contentPreview =
+  result.content
+    .replace(/<[^>]*>/g, "")
+    .slice(0, 160)
+    .trim() + "...";
+const publishedTime = new Date(
+  result.publishedAt || result.createdAt,
+).toISOString();
+
+// JSON-LD Structured Data
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: result.title,
+  description: contentPreview,
+  author: {
+    "@type": "Person",
+    name: "IchimaruGin728",
+    url: "https://blog.ichimarugin728.com/about",
+  },
+  datePublished: publishedTime,
+  dateModified: new Date(result.updatedAt).toISOString(),
+  publisher: {
+    "@type": "Organization",
+    name: "Gin's Blog",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://blog.ichimarugin728.com/favicon.png",
+    },
+  },
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": `https://blog.ichimarugin728.com/zh-SG/blog/${slug}`,
+  },
+};
+
+// Smart Caching Strategy (Stale-While-Revalidate)
+// max-age=0: Browser always revalidates
+// s-maxage=60: Cloudflare caches for 60s
+// stale-while-revalidate=600: Serving stale content for up to 10 mins while background updating
+Astro.response.headers.set(
+  "Cache-Control",
+  "public, max-age=0, s-maxage=60, stale-while-revalidate=600",
+);
+---
+
+<Layout
+  title={result.title}
+  description={contentPreview}
+  type="article"
+  publishedTime={publishedTime}
+>
+  <article class="max-w-3xl mx-auto">
+    <header class="mb-12 text-center">
+      <div
+        class="inline-block px-4 py-1 rounded-full bg-brand-primary/10 text-brand-accent font-mono text-sm mb-6 border border-brand-primary/20"
+      >
+        {new Date(result.publishedAt || result.createdAt).toLocaleDateString()}
+      </div>
+      <h1 class="text-5xl font-display font-bold mb-6 leading-tight">
+        {result.title}
+      </h1>
+    </header>
+
+    <div
+      class="glass-panel rounded-3xl p-8 md:p-12 prose prose-invert prose-lg max-w-none text-gray-300"
+    >
+      <Markdown
+        content={result.content}
+        components={{
+          img: MarkdownImage,
+        }}
+      />
+    </div>
+
+    <!-- Share Buttons -->
+    <div class="mt-8">
+      <ShareButtons
+        url={Astro.url.href}
+        title={result.title}
+        description={result.content.substring(0, 160)}
+      />
+    </div>
+
+    <!-- Post Navigation -->
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+      {
+        prevPost ? (
+          <a
+            href={`/zh-SG/blog/${prevPost.slug}`}
+            class="group glass-panel p-6 rounded-2xl border border-white/5 hover:border-white/20 transition-all text-left"
+          >
+            <div class="text-xs font-mono text-gray-500 mb-2 group-hover:text-brand-accent transition-colors">
+              ← {t("blog.prev")}
+            </div>
+            <div class="font-bold text-lg leading-tight group-hover:text-white transition-colors line-clamp-2">
+              {prevPost.title}
+            </div>
+          </a>
+        ) : (
+          <div />
+        )
+      }
+
+      {
+        nextPost ? (
+          <a
+            href={`/zh-SG/blog/${nextPost.slug}`}
+            class="group glass-panel p-6 rounded-2xl border border-white/5 hover:border-white/20 transition-all text-right"
+          >
+            <div class="text-xs font-mono text-gray-500 mb-2 group-hover:text-brand-accent transition-colors">
+              {t("blog.next")} →
+            </div>
+            <div class="font-bold text-lg leading-tight group-hover:text-white transition-colors line-clamp-2">
+              {nextPost.title}
+            </div>
+          </a>
+        ) : (
+          <div />
+        )
+      }
+    </div>
+
+    <!-- Comments Section -->
+    <div class="mt-16">
+      <Comments
+        client:visible
+        postId={result.id}
+        currentUser={Astro.locals.user || undefined}
+      />
+    </div>
+
+    <div class="mt-12 text-center">
+      <a
+        href="/zh-SG/blog"
+        class="inline-flex items-center gap-2 text-brand-accent hover:text-white transition-colors"
+      >
+        <span class="i-heroicons-arrow-left"></span>
+        {t("blog.back")}
+      </a>
+    </div>
+  </article>
+
+  <!-- JSON-LD Structured Data -->
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(structuredData)}
+  />
+</Layout>
