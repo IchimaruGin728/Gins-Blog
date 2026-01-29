@@ -1,5 +1,7 @@
 # Gins Blog (Neo-Aesthetics Edition) 💎
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)
+
 A high-performance, edge-first blog built with **Astro**, **Cloudflare Pages**, and **Neo-Aesthetics** design principles. Features glassmorphism, P3 wide color gamut, and AI-powered search.
 
 ![Admin Dashboard Preview](https://github.com/user-attachments/assets/placeholder-image)
@@ -84,6 +86,8 @@ The admin panel is protected by obscure routing (Security by Obscurity) + Middle
 
     *If you don't do this, anyone who reads this code knows your login URL.*
 
+    > **Strong Recommendation**: For maximum security, enable **Cloudflare Access (Zero Trust)** for this route. It adds an extra layer of authentication (like an Email PIN or Google Login) before anyone can even see your admin login page.
+
 ### 5. Environment Variables (`.dev.vars`)
 
 Create a `.dev.vars` file in the root directory for local development secrets. **DO NOT COMMIT THIS FILE.**
@@ -144,6 +148,6 @@ export default defineConfig({
 ## 📜 License
 
 - **Code**: All source code is licensed under the [MIT License](LICENSE).
-- **Content**: All articles and media are licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+- **Content & Design**: All articles, media, and unique **Neo-Aesthetics UI designs** are licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). You cannot clone the visual identity for commercial purposes without permission.
 
 Feel free to use the code, but please credit me if you quote my articles! Cheers!
