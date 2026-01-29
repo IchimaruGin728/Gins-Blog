@@ -1,0 +1,36 @@
+---
+import { languages } from "../i18n/ui";
+import { getLangFromUrl } from "../i18n/utils";
+
+const url = Astro.url;
+const currentLang = getLangFromUrl(url);
+
+// Helper to remove current lang from slug if it exists to clean up logic
+// But simpler approach: just map key to URL
+---
+
+<div class="relative group z-50">
+  <button
+    class="flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-white transition-colors"
+  >
+    <span class="i-heroicons-language w-5 h-5"></span>
+    <span class="hidden md:inline">{languages[currentLang]}</span>
+  </button>
+
+  <div
+    class="absolute right-0 top-full mt-2 w-32 py-2 bg-black/80 backdrop-blur-md rounded-xl border border-white/10 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right"
+  >
+    {
+      Object.entries(languages).map(([lang, label]) => (
+        <a
+          href={lang === "en-SG" ? "/" : `/${lang}/`}
+          class={`block px-4 py-2 text-sm hover:bg-white/10 transition-colors ${
+            currentLang === lang ? "text-brand-accent" : "text-gray-300"
+          }`}
+        >
+          {label}
+        </a>
+      ))
+    }
+  </div>
+</div>

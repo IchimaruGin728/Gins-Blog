@@ -1,0 +1,51 @@
+export const languages = {
+  'en-SG': 'English',
+  'zh-SG': '中文（简体）',
+};
+
+export const defaultLang = 'en-SG';
+
+export const ui = {
+  'en-SG': {
+    'nav.home': 'Home',
+    'nav.blog': 'Blog',
+    'nav.about': 'About',
+    'nav.search': 'Search...',
+    'nav.login': 'LOGIN',
+    'hero.title': "Gin's Blog",
+    'hero.subtitle': 'Full Stack Development, Tech, and Life observations.',
+    'footer.rights': 'All Systems Nominal.',
+    'about.fullstack': 'FULL STACK',
+    'about.ai': 'AI ENTHUSIAST',
+    'about.description': 'Architecting the future of the web with Edge Computing and Neo-Aesthetics. Turning caffeine into crystal-clear code.',
+    'about.connect': 'Connect',
+    'about.chronicle': 'Chronicle',
+    'chronicle.ai_search': 'AI Search Redesign',
+    'chronicle.ai_search_desc': 'Implemented RAG-based intelligent Q&A system integrated with Vectorize vector database.',
+    'chronicle.blog_launch': 'Blog 2.0 Launch',
+    'chronicle.blog_launch_desc': 'Refactored with Astro + Cloudflare Pages, introducing the new Neo-Aesthetics design language.',
+    'chronicle.inception': 'Inception',
+    'chronicle.inception_desc': 'Hello, World. Gin\'s Blog was established.',
+  },
+  'zh-SG': {
+    'nav.home': '首页',
+    'nav.blog': '博客',
+    'nav.about': '关于',
+    'nav.search': '搜索...',
+    'nav.login': '登录',
+    'hero.title': "Gin的博客",
+    'hero.subtitle': '全栈开发、技术探索与生活随笔。',
+    'footer.rights': '系统运行正常。',
+    'about.fullstack': '全栈开发',
+    'about.ai': 'AI 爱好者',
+    'about.description': '利用边缘计算和新美学架构构建未来的网络。将咖啡转化为清晰的代码。',
+    'about.connect': '联系方式',
+    'about.chronicle': '编年史',
+    'chronicle.ai_search': 'AI 搜索重构',
+    'chronicle.ai_search_desc': '实现了基于 RAG 的智能问答系统，集成了 Vectorize 向量数据库。',
+    'chronicle.blog_launch': '博客 2.0 发布',
+    'chronicle.blog_launch_desc': '使用 Astro + Cloudflare Pages 重构，引入了全新的新美学设计语言。',
+    'chronicle.inception': '起源',
+    'chronicle.inception_desc': 'Hello, World. Gin 的博客建立了。',
+  },
+} as const;

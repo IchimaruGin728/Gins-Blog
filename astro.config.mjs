@@ -21,4 +21,11 @@ export default defineConfig({
     injectReset: true,
   }), sitemap()],
   prefetch: true,
+  i18n: {
+    defaultLocale: "en-SG",
+    locales: ["en-SG", "zh-SG"],
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
 });

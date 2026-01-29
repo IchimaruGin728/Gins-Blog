@@ -3,6 +3,10 @@ import Layout from "../layouts/Layout.astro";
 import { getDb } from "../lib/db";
 import { posts } from "../../db/schema";
 import { desc, lte } from "drizzle-orm";
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 
 const { env } = Astro.locals.runtime;
 const db = getDb(env);
@@ -16,7 +20,7 @@ const recentPosts = await db
 	.limit(3);
 ---
 
-<Layout title="Home">
+<Layout title={t("hero.title")}>
 	<!-- Top Banner / Header already in Layout, but we might want a specific layout adjustment or spacer -->
 	<div
 		class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(180px,auto)] mb-12"
@@ -33,10 +37,14 @@ const recentPosts = await db
 				<h1
 					class="text-3xl md:text-5xl font-display font-bold mb-2 md:mb-4 tracking-tight"
 				>
-					The Amethyst.
+					<span
+						class="bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-400"
+					>
+						{t("hero.title")}
+					</span>
 				</h1>
 				<p class="text-gray-400 text-sm md:text-lg">
-					High-performance architecture meets neo-aesthetic design.
+					{t("hero.subtitle")}
 				</p>
 			</div>
 		</div>

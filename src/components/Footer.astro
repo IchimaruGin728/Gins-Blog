@@ -1,3 +1,10 @@
+---
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
 <footer
   class="py-8 mt-auto border-t border-white/5 bg-black/80 backdrop-blur-md w-full"
 >
@@ -5,7 +12,7 @@
     class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6"
   >
     <div class="text-gray-500 text-sm font-mono">
-      &copy; {new Date().getFullYear()} IchimaruGin728. All Systems Nominal.
+      &copy; {new Date().getFullYear()} IchimaruGin728. {t("footer.rights")}
     </div>
 
     <div class="flex gap-6 text-gray-400">

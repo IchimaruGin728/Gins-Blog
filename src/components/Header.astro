@@ -1,3 +1,11 @@
+---
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+import LanguagePicker from "./LanguagePicker.astro";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
 <nav
   class="fixed top-0 w-full z-50 px-6 py-4"
   style="padding-top: max(1rem, env(safe-area-inset-top)); padding-left: max(1.5rem, env(safe-area-inset-left)); padding-right: max(1.5rem, env(safe-area-inset-right));"
@@ -7,7 +15,7 @@
   >
     <!-- Left: Logo -->
     <a
-      href="/"
+      href={lang === "en-SG" ? "/" : `/${lang}/`}
       class="text-xl md:text-xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-primary z-50 relative leading-none flex items-center"
     >
       Gin's Blog
@@ -22,22 +30,22 @@
         class="flex items-center gap-1 px-2 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/search:opacity-50 group-hover/search:scale-95 group-hover/search:blur-[1px]"
       >
         <a
-          href="/"
+          href={lang === "en-SG" ? "/" : `/${lang}/`}
           data-astro-prefetch
           class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-full transition-all"
-          >Home</a
+          >{t("nav.home")}</a
         >
         <a
-          href="/blog"
+          href={lang === "en-SG" ? "/blog" : `/${lang}/blog`}
           data-astro-prefetch
           class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-full transition-all"
-          >Blog</a
+          >{t("nav.blog")}</a
         >
         <a
-          href="/about"
+          href={lang === "en-SG" ? "/about" : `/${lang}/about`}
           data-astro-prefetch
           class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-full transition-all"
-          >About</a
+          >{t("nav.about")}</a
         >
       </nav>
 
@@ -97,7 +105,7 @@
         <div
           class="flex items-center gap-2 pl-8 opacity-0 group-hover/search:opacity-100 translate-x-4 group-hover/search:translate-x-0 transition-all duration-500 delay-75 whitespace-nowrap"
         >
-          <span class="text-xs text-gray-200">Search...</span>
+          <span class="text-xs text-gray-200">{t("nav.search")}</span>
           <kbd
             class="px-1.5 py-0.5 text-[10px] text-brand-primary bg-brand-primary/10 border border-brand-primary/20 rounded font-mono"
             >⌘K</kbd
@@ -107,14 +115,16 @@
     </div>
 
     <!-- Right: Auth/Profile -->
-    <div class="flex items-center gap-3 z-50 relative">
+    <div class="flex items-center gap-4 z-50 relative">
+      <LanguagePicker />
+
       <a
         href="/rss.xml"
         target="_blank"
         class="hidden md:flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/10 text-gray-400 hover:text-brand-accent transition-all border border-transparent hover:border-white/10"
         title="RSS Feed"
       >
-        <span class="i-heroicons-rss w-4 h-4"></span>
+        <span class="i-heroicons-rss-20-solid w-5 h-5"></span>
       </a>
       {
         Astro.locals.user ? (
@@ -139,7 +149,7 @@
             href="/login"
             class="px-4 md:px-5 py-2.5 md:py-2 rounded-full bg-white/5 hover:bg-white/10 text-xs md:text-xs font-bold tracking-wide transition-all border border-white/10 hover:border-white/20 hover:scale-105 active:scale-95 flex items-center leading-none"
           >
-            LOGIN
+            {t("nav.login")}
           </a>
         )
       }
