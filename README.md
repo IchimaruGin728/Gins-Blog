@@ -18,13 +18,13 @@ A high-performance, edge-first blog built with **Astro**, **Cloudflare Pages**, 
 | :---: | :---: |
 | ![Profile Page](media/profile.png) | ![Admin Panel](media/admin.png) |
 
-| Music Manager | Switch Configuration |
+| CMS Editor | Music Manager |
 | :---: | :---: |
-| ![Music Console](media/music-manager.png) | ![Profile Switching](media/switch-profile.png) |
+| ![Editor Interface](media/editor.png) | ![Music Console](media/music-manager.png) |
 
-| Mobile Experience |
-| :---: |
-| <img src="media/mobile.png" width="300" /> |
+| Switch Configuration | Mobile Experience |
+| :---: | :---: |
+| ![Profile Switching](media/switch-profile.png) | <img src="media/mobile.png" width="300" /> |
 
 ## 🚀 Key Features
 
