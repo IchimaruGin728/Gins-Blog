@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "latest",
+    "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/logos": "^1.2.10",
     "@iconify-json/simple-icons": "^1.2.68",
     "@types/node": "latest",
