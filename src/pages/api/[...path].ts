@@ -171,13 +171,23 @@ const searchPostsRoute = app.get('/search', async (c) => {
         content: posts.content,
         publishedAt: posts.publishedAt 
     }).from(posts).all();
+    
+    // DEBUG LOG
+    console.log(`[Search] Found ${all.length} total posts in DB`);
+    
     const qLower = query.toLowerCase();
     
-    const matches = all.filter((p: any) => 
-        p.publishedAt && // Only published posts
-        (p.title.toLowerCase().includes(qLower) || 
-        p.content.toLowerCase().includes(qLower))
-    ).map((p: any) => ({
+    const matches = all.filter((p: any) => {
+        // Strict check: Must have publishedAt and it must be a valid number > 0
+        const isPublished = p.publishedAt !== null && typeof p.publishedAt === 'number' && p.publishedAt > 0;
+        
+        if (!isPublished) return false;
+
+        return (
+            p.title.toLowerCase().includes(qLower) || 
+            p.content.toLowerCase().includes(qLower)
+        );
+    }).map((p: any) => ({
         metadata: { title: p.title, slug: p.slug },
         score: p.title.toLowerCase().includes(qLower) ? 1.0 : 0.5
     })).slice(0, 5);
