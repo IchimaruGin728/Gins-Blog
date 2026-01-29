@@ -7,7 +7,7 @@ A bleeding-edge blog platform built with the **Pure Cloudflare Worker Architectu
 - **Framework**: Astro 5.0 + Hono
 - **UI**: Preact + UnoCSS ("Neo-Gin" Theme)
 - **Database**: D1 + Drizzle ORM
-- **Auth**: Arctic (GitHub/Google)
+- **Auth**: Arctic (GitHub/Google/Discord)
 
 ## Setup
 
