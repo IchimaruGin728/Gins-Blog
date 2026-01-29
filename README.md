@@ -143,4 +143,7 @@ export default defineConfig({
 
 ## 📜 License
 
-MIT License. Crafted with ❤️ by IchimaruGin728.
+- **Code**: All source code is licensed under the [MIT License](LICENSE).
+- **Content**: All articles and media are licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+Feel free to use the code, but please credit me if you quote my articles! Cheers!
