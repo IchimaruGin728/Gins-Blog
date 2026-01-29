@@ -10,21 +10,25 @@ A high-performance, edge-first blog built with **Astro**, **Cloudflare Pages**, 
 
 ## ✨ Gallery
 
+### 🌐 Core Experience
 | Blog Index | About Page |
 | :---: | :---: |
 | ![Blog Page](media/blog.png) | ![About Page](media/about.png) |
 
-| Profile Customization | Admin Dashboard (Secret) |
+### 👤 User System
+| Profile Customization | Identity Switching |
 | :---: | :---: |
-| ![Profile Page](media/profile.png) | ![Admin Panel](media/admin.png) |
+| ![Profile Page](media/profile.png) | ![Profile Switching](media/switch-profile.png) |
 
-| CMS Editor | Music Manager |
+### 🛡️ Admin Suite
+| Dashboard | CMS Editor |
 | :---: | :---: |
-| ![Editor Interface](media/editor.png) | ![Music Console](media/music-manager.png) |
+| ![Admin Panel](media/admin.png) | ![Editor Interface](media/editor.png) |
 
-| Switch Configuration | Mobile Experience |
+### 📱 Extras
+| Music Manager | Mobile View |
 | :---: | :---: |
-| ![Profile Switching](media/switch-profile.png) | <img src="media/mobile.png" width="300" /> |
+| ![Music Console](media/music-manager.png) | <img src="media/mobile.png" width="300" /> |
 
 ## 🚀 Key Features
 
