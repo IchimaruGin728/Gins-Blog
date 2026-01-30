@@ -57,13 +57,17 @@ const recentPosts = await db
         <div
           class="font-mono text-xs text-brand-accent mb-4 tracking-widest uppercase"
         >
-          System Status
+          {t("home.system_status")}
         </div>
-        <div class="text-3xl font-display font-bold">Operational</div>
+        <div class="text-3xl font-display font-bold">
+          {t("home.operational")}
+        </div>
       </div>
       <div class="flex items-center gap-2">
         <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-        <span class="text-xs text-gray-500 font-mono">All Systems Normal</span>
+        <span class="text-xs text-gray-500 font-mono"
+          >{t("home.all_systems_normal")}</span
+        >
       </div>
     </div>
 
@@ -71,14 +75,14 @@ const recentPosts = await db
     <div
       class="glass-panel p-8 rounded-3xl flex flex-col justify-between relative overflow-hidden group md:row-span-2 max-h-[500px] animate-fade-in-up animate-delay-200"
     >
-      <h2 class="text-xl font-bold mb-6">Recent Posts</h2>
+      <h2 class="text-xl font-bold mb-6">{t("home.recent_posts")}</h2>
 
       <div class="flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
         {
           recentPosts.length > 0 ? (
             recentPosts.map((post) => (
               <a
-                href={`/blog/${post.slug}`}
+                href={`/zh-SG/blog/${post.slug}`}
                 class="block group/item hover:bg-white/5 p-4 rounded-xl transition-colors border border-transparent hover:border-white/5"
               >
                 <h3 class="font-bold text-sm text-gray-200 group-hover/item:text-brand-accent transition-colors line-clamp-2">
@@ -93,7 +97,7 @@ const recentPosts = await db
             ))
           ) : (
             <div class="text-gray-500 text-sm italic">
-              No signals detected yet.
+              {t("home.no_signals")}
             </div>
           )
         }
@@ -101,10 +105,11 @@ const recentPosts = await db
 
       <div class="mt-4 pt-4 border-t border-white/5">
         <a
-          href="/blog"
+          href="/zh-SG/blog"
           class="text-xs text-gray-400 hover:text-white flex items-center gap-2 transition-colors"
         >
-          View Archive <span class="i-heroicons-arrow-right text-xs"></span>
+          {t("home.view_archive")}
+          <span class="i-heroicons-arrow-right text-xs"></span>
         </a>
       </div>
     </div>
@@ -119,7 +124,7 @@ const recentPosts = await db
       >
       </div>
       <div class="mt-auto relative z-10">
-        <h2 class="text-xl font-bold">Gallery</h2>
+        <h2 class="text-xl font-bold">{t("home.gallery")}</h2>
       </div>
     </a>
 
@@ -133,7 +138,7 @@ const recentPosts = await db
       >
       </div>
       <div class="mt-auto relative z-10">
-        <h2 class="text-xl font-bold">Projects</h2>
+        <h2 class="text-xl font-bold">{t("home.projects")}</h2>
       </div>
     </a>
 
