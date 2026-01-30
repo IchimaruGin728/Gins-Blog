@@ -4,25 +4,9 @@ import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-
-const descriptions = {
-  "en-SG": "Page not found lah!",
-  "zh-SG": "找不到页面！",
-};
-
-const subtitles = {
-  "en-SG":
-    "You lost or what? This signal is transmission dead. Valid coordinates are required for teleportation.",
-  "zh-SG": "你在此迷失了吗？信号信号中断。传送需要有效的坐标。",
-};
-
-const homeBtn = {
-  "en-SG": "Balik Kampung (Home)",
-  "zh-SG": "返回首页",
-};
 ---
 
-<Layout title="404 - Aiyo!" description="Nothing to see here lah!">
+<Layout title={t("404.title")} description={t("404.description")}>
   <div
     class="min-h-[70vh] flex flex-col items-center justify-center text-center px-4"
   >
@@ -46,10 +30,10 @@ const homeBtn = {
       class="glass-panel p-8 rounded-3xl max-w-lg w-full border border-white/10 backdrop-blur-xl"
     >
       <p class="text-xl md:text-2xl font-medium text-white mb-4">
-        {descriptions[lang] || descriptions["en-SG"]}
+        {t("404.text")}
       </p>
       <p class="text-gray-400 mb-8 font-mono text-sm leading-relaxed">
-        {subtitles[lang] || subtitles["en-SG"]}
+        {t("404.subtitle")}
       </p>
 
       <a
@@ -65,7 +49,7 @@ const homeBtn = {
         ></span>
         <span
           class="font-bold text-white group-hover:text-brand-accent transition-colors"
-          >{homeBtn[lang] || homeBtn["en-SG"]}</span
+          >{t("404.home")}</span
         >
       </a>
     </div>

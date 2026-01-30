@@ -65,6 +65,11 @@ export const ui = {
     'login.google': 'Continue with Google',
     'login.discord': 'Continue with Discord',
     'login.terms': 'By clicking continue, you agree to our Terms of Service and Privacy Policy.',
+    '404.title': '404 - Aiyo!',
+    '404.description': 'Nothing to see here lah!',
+    '404.text': 'Page not found lah!',
+    '404.subtitle': 'You lost or what? This signal is transmission dead. Valid coordinates are required for teleportation.',
+    '404.home': 'Balik Kampung (Home)',
   },
   'zh-SG': {
     'nav.home': '首页',
@@ -125,5 +130,10 @@ export const ui = {
     'login.google': '通过 Google 继续',
     'login.discord': '通过 Discord 继续',
     'login.terms': '点击继续即表示您同意我们的服务条款和隐私政策。',
+    '404.title': '404 - 哎哟!',
+    '404.description': '这里什么都没有啦!',
+    '404.text': '找不到页面！',
+    '404.subtitle': '你在此迷失了吗？信号信号中断。传送需要有效的坐标。',
+    '404.home': '返回首页',
   },
 } as const;

@@ -8,16 +8,42 @@ import { getLangFromUrl, useTranslations } from "../i18n/utils";
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
+// Access Cloudflare bindings from locals
 const { env } = Astro.locals.runtime;
-const db = getDb(env);
+// Initialize Cache
+import { getCache } from "../lib/cache";
+let cache;
+try {
+	cache = getCache(env);
+} catch (e) {
+	console.error("Cache initialization failed:", e);
+}
 
-// Fetch recent posts for the "Recent Posts" card (only published)
-const recentPosts = await db
-	.select()
-	.from(posts)
-	.where(lte(posts.publishedAt, Date.now()))
-	.orderBy(desc(posts.publishedAt))
-	.limit(3);
+// Fetch recent posts with caching
+let recentPosts: (typeof posts.$inferSelect)[] = [];
+const CACHE_KEY = "home_recent_posts_en";
+const CACHE_TTL = 300; // 5 minutes
+
+try {
+	const fetchPosts = async () => {
+		const db = getDb(env);
+		return await db
+			.select()
+			.from(posts)
+			.where(lte(posts.publishedAt, Date.now()))
+			.orderBy(desc(posts.publishedAt))
+			.limit(3);
+	};
+
+	if (cache) {
+		recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
+	} else {
+		recentPosts = await fetchPosts();
+	}
+} catch (e) {
+	console.error("Failed to fetch posts:", e);
+	// Fallback to empty array or handle error gracefully
+}
 ---
 
 <Layout title={t("hero.title")}>
