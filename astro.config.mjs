@@ -20,7 +20,9 @@ export default defineConfig({
   }), unocss({
     injectReset: true,
   }), sitemap()],
-  prefetch: true,
+  prefetch: {
+    defaultStrategy: 'viewport',
+  },
   i18n: {
     defaultLocale: "en-SG",
     locales: ["en-SG", "zh-SG"],

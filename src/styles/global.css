@@ -51,8 +51,54 @@ body {
 
 /* Custom Navigation Loading Bar */
 ._astro_loading_indicator {
-  background: linear-gradient(to right, #581C87, #C084FC) !important;
-  box-shadow: 0 0 10px #C084FC, 0 0 20px #581C87 !important;
+  background: linear-gradient(90deg, #581C87 0%, #C084FC 50%, #581C87 100%) !important;
+  background-size: 200% 100% !important;
+  box-shadow: 0 0 15px #C084FC, 0 0 30px #581C87 !important;
   height: 3px !important;
   z-index: 9999 !important;
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* Custom Page Transition Keyframes */
+@keyframes slide-up-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes slide-up-exit {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+/* Page Transition: Slide Up */
+.main-content {
+  view-transition-name: main-content;
+}
+
+::view-transition-old(main-content) {
+  animation: 0.3s ease-in both slide-up-exit;
+}
+
+::view-transition-new(main-content) {
+  animation: 0.4s ease-out both slide-up-enter;
 }
