@@ -8,6 +8,24 @@ A high-performance, edge-first blog built with **Astro**, **Cloudflare Workers &
 
 > **Live Demo**: [blog.ichimarugin728.com](https://blog.ichimarugin728.com)
 
+## 🆕 Latest Updates
+
+We've just pushed a major update focused on internationalization and polishing the user experience.
+
+*   **🌐 Multi-Language Support**: Fully integrated **i18n** for **English (SG)** and **Chinese (Simplified)**.
+    *   Content automatically served based on URL path.
+    *   Dynamic locale routing for SEO (`og:locale`, `html lang`).
+*   **📡 Smart RSS**: Multi-language RSS feeds.
+    *   English users get `/rss.xml`.
+    *   Chinese users get `/zh-SG/rss.xml`.
+*   **🎨 UI Polish**:
+    *   **Smoother Transitions**: Implemented view transitions with cross-fade animations for a "native app" feel.
+    *   **Prefetching**: Hover-to-load mechanics for instant page navigation.
+    *   **Robust Search**: Fixed issues with search interaction persisting across client-side navigation.
+*   **🐛 Bug Fixes**: Patched Z-index overlaps, mobile navigation active states, and footer link logic.
+
+---
+
 ## ✨ Gallery
 
 ### 🌐 Core Experience
@@ -28,7 +46,7 @@ A high-performance, edge-first blog built with **Astro**, **Cloudflare Workers &
 ### 📱 Extras
 | Music Manager | Mobile View |
 | :---: | :---: |
-| ![Music Console](media/music-manager.png) | <img src="media/mobile.png" width="300" /> |
+| ![Music Console](media/music-manager.png) | <img src="media/mobile.jpg" width="300" /> |
 
 ## 🚀 Key Features
 
