@@ -1,32 +1,80 @@
-# Gins Blog (Neo-Aesthetics Edition) 💎
+# Gin's Blog - Neo-Aesthetics Edition 💎
 
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)
+<div align="center">
 
-A high-performance, edge-first blog built with **Astro**, **Cloudflare Workers & Pages**, and **Neo-Aesthetics** design principles. Features glassmorphism, P3 wide color gamut, and AI-powered search.
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) 
+![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)
+![Node: 24+](https://img.shields.io/badge/Node-24%2B-green.svg)
+![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-orange.svg)
+
+**A high-performance, edge-first blog platform built with modern web technologies**
+
+[🌐 Live Demo](https://blog.ichimarugin728.com) • [📖 中文文档](./README.zh.md)
 
 ![Gins Blog Home Preview](media/home.png)
 
-> **Live Demo**: [blog.ichimarugin728.com](https://blog.ichimarugin728.com)
-
-## 🆕 Latest Updates
-
-We've just pushed a major update focused on internationalization and polishing the user experience.
-
-*   **🌐 Multi-Language Support**: Fully integrated **i18n** for **English (SG)** and **Chinese (Simplified)**.
-    *   Content automatically served based on URL path.
-    *   Dynamic locale routing for SEO (`og:locale`, `html lang`).
-*   **📡 Smart RSS**: Multi-language RSS feeds.
-    *   English users get `/rss.xml`.
-    *   Chinese users get `/zh-SG/rss.xml`.
-*   **🎨 UI Polish**:
-    *   **Smoother Transitions**: Implemented view transitions with cross-fade animations for a "native app" feel.
-    *   **Prefetching**: Hover-to-load mechanics for instant page navigation.
-    *   **Robust Search**: Fixed issues with search interaction persisting across client-side navigation.
-*   **🐛 Bug Fixes**: Patched Z-index overlaps, mobile navigation active states, and footer link logic.
+</div>
 
 ---
 
-## ✨ Gallery
+## 📋 Table of Contents
+
+- [✨ Features](#-features)
+- [🎨 Gallery](#-gallery)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🚀 Quick Start](#-quick-start)
+- [📦 Deployment](#-deployment)
+- [🎨 Customization](#-customization)
+- [📜 License](#-license)
+
+---
+
+## ✨ Features
+
+### 🎨 **Neo-Aesthetics Design**
+- **Glassmorphism UI** - Frosted glass effects with backdrop blur
+- **Display-P3 Wide Color Gamut** - Vibrant colors beyond sRGB
+- **Fluid Animations** - Smooth transitions and micro-interactions
+- **Adaptive Theme** - Intelligent dark mode with system preference detection
+- **Safari-Style Mobile Nav** - Shrinking navigation bar with holographic text effects
+
+### 🌐 **Internationalization (i18n)**
+- **Multi-Language Support** - English (SG) and Chinese (Simplified)
+- **Dynamic Locale Routing** - SEO-optimized with `og:locale` and `html lang`
+- **Localized RSS Feeds** - Separate feeds for each language (`/rss.xml`, `/zh-SG/rss.xml`)
+- **Smart Language Detection** - Automatic URL-based language switching
+
+### 🔐 **Authentication & Authorization**
+- **OAuth Integration** - GitHub, Google, Discord via Arctic + Oslo
+- **Session Management** - Secure cookie-based sessions with Cloudflare KV
+- **Profile Customization** - Switch identity between connected providers or upload custom avatar
+- **Zero Trust Admin** - Protected admin routes with Cloudflare Access integration
+
+### 📝 **Content Management**
+- **Rich Markdown Editor** - Full CMS with live preview and media upload
+- **File Upload Publishing** - Direct `.md` or `.rtf` file upload for quick publishing
+- **Automatic Slug Generation** - SEO-friendly URL generation from titles
+- **Scheduled Publishing** - Set publication dates for future posts
+- **Music Manager** - Dedicated console for managing music/playlist data
+
+### 🚀 **Performance & Infrastructure**
+- **Edge-First Architecture** - Runs entirely on Cloudflare Workers/Pages
+- **Smart Caching** - KV-based caching for API responses and homepage data
+- **Prefetching** - Hover-to-load mechanics for instant page navigation
+- **PWA Support** - Installable as a native app on mobile and desktop
+- **Smart Routing** - Cloudflare Smart Placement for optimal latency
+
+### 🔍 **AI-Powered Search**
+- **Semantic Search** - Cloudflare Vectorize + Workers AI for intelligent content discovery
+- **Multi-Language Support** - Search across both English and Chinese content
+- **Instant Results** - Fast, edge-based vector search
+
+---
+
+## 🎨 Gallery
+
+<details>
+<summary>Click to expand gallery</summary>
 
 ### 🌐 Core Experience
 | Blog Index | About Page |
@@ -43,37 +91,80 @@ We've just pushed a major update focused on internationalization and polishing t
 | :---: | :---: |
 | ![Admin Panel](media/admin.png) | ![Editor Interface](media/editor.png) |
 
-### 📱 Extras
+### 📱 Mobile Experience
 | Music Manager | Mobile View |
 | :---: | :---: |
 | ![Music Console](media/music-manager.png) | <img src="media/mobile.jpg" width="300" /> |
 
-## 🚀 Key Features
-
--   **Neo-Aesthetics UI**: Full glassmorphism, fluid animations, and Display-P3 color support.
--   **PWA Support**: Installable as a native app on mobile and desktop devices.
--   **Profile Customization**: Users can seamlessly switch their profile identity (Avatar & Username) between connected providers (**GitHub**, **Google**, **Discord**) or use a custom upload.
--   **Edge-First Architecture**: Runs entirely on Cloudflare Workers/Pages.
--   **Full Stack**:
-    -   **Database**: Cloudflare D1 (SQLite) with Drizzle ORM.
-    -   **Storage**: Cloudflare R2 for media.
-    -   **Cache**: Cloudflare KV for high-performance API caching.
-    -   **AI Search**: Cloudflare Vectorize + Workers AI for semantic search.
--   **Secret Admin Panel**: Hidden route for content management (CRUD) & **Music Manager**.
--   **Auth**: OAuth (GitHub, Google, Discord) via Arctic + Oslo.
+</details>
 
 ---
 
-## 🛠️ Setup Guide
+## 🛠️ Tech Stack
 
-### 1. Prerequisites
+### **Frontend**
+| Technology | Purpose | Version |
+|------------|---------|---------|
+| [Astro](https://astro.build) | Static site generator with server-side rendering | Latest |
+| [Preact](https://preactjs.com) | Lightweight React alternative for interactive components | Latest |
+| [UnoCSS](https://unocss.dev) | Instant on-demand atomic CSS engine | Latest |
+| [Satori](https://github.com/vercel/satori) | SVG-based OG image generation | ^0.19.1 |
 
--   Node.js (v20+)
--   pnpm or npm
--   Cloudflare Account (Free tier works, but AI/Vectorize might need Paid for higher limits)
--   Wrangler CLI (`npm i -g wrangler`)
+### **Backend & Edge**
+| Technology | Purpose | Version |
+|------------|---------|---------|
+| [Cloudflare Workers](https://workers.cloudflare.com) | Serverless edge compute platform | - |
+| [Cloudflare Pages](https://pages.cloudflare.com) | Static site hosting with edge functions | - |
+| [Hono](https://hono.dev) | Ultrafast web framework for Workers | Latest |
+| [Drizzle ORM](https://orm.drizzle.team) | Type-safe SQL ORM for D1 | Latest |
 
-### 2. Installation
+### **Database & Storage**
+| Technology | Purpose |
+|------------|---------|
+| [Cloudflare D1](https://developers.cloudflare.com/d1) | SQLite-based serverless SQL database |
+| [Cloudflare R2](https://developers.cloudflare.com/r2) | S3-compatible object storage for media |
+| [Cloudflare KV](https://developers.cloudflare.com/kv) | Low-latency key-value store for caching & sessions |
+| [Cloudflare Vectorize](https://developers.cloudflare.com/vectorize) | Vector database for AI-powered search |
+
+### **AI & Search**
+| Technology | Purpose |
+|------------|---------|
+| [Workers AI](https://developers.cloudflare.com/workers-ai) | Serverless AI models for embeddings |
+| [Vectorize](https://developers.cloudflare.com/vectorize) | Vector similarity search (768-dim, cosine) |
+
+### **Authentication**
+| Technology | Purpose | Version |
+|------------|---------|---------|
+| [Arctic](https://arctic.js.org) | OAuth 2.0 client library | Latest |
+| [Oslo](https://oslo.js.org) | Auth utilities (sessions, PKCE, etc.) | Latest |
+
+### **Utilities**
+| Technology | Purpose | Version |
+|------------|---------|---------|
+| [Marked](https://marked.js.org) | Markdown parser for content | ^17.0.1 |
+| [Zod](https://zod.dev) | TypeScript-first schema validation | ^3.25.76 |
+| [TypeScript](https://www.typescriptlang.org) | Type-safe JavaScript | ^5.9.3 |
+
+---
+
+## 🚀 Quick Start
+
+### **Prerequisites**
+
+Before you begin, ensure you have the following installed:
+
+- **Node.js** `24+` ([Download](https://nodejs.org))
+- **npm** or **pnpm** (comes with Node.js)
+- **Cloudflare Account** ([Sign up for free](https://dash.cloudflare.com/sign-up))
+- **Wrangler CLI** (Cloudflare's command-line tool)
+
+```bash
+npm install -g wrangler
+```
+
+---
+
+### **Step 1: Clone the Repository**
 
 ```bash
 git clone https://github.com/your-username/gins-blog.git
@@ -81,117 +172,260 @@ cd gins-blog
 npm install
 ```
 
-### 3. Cloudflare Configuration (Critical)
+---
 
-You need to create the separate Cloudflare resources and update `wrangler.jsonc`.
+### **Step 2: Set Up Cloudflare Resources**
 
-**a. Database (D1)**
+You'll need to create several Cloudflare resources. Follow these steps carefully.
+
+#### **2.1 Create D1 Database**
+
 ```bash
 wrangler d1 create gins-blog-db
-# Copy the "database_id" output to your wrangler.jsonc
 ```
 
-**b. Initialize Database**
+**Output:**
+```
+database_id = "abc123-def456-ghi789"
+```
+
+Copy the `database_id` and update `wrangler.jsonc`:
+
+```jsonc
+{
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "gins-blog-db",
+      "database_id": "abc123-def456-ghi789" // <--- Paste here
+    }
+  ]
+}
+```
+
+#### **2.2 Initialize Database Schema**
+
 ```bash
 npm run db:push
 ```
 
-**c. KV Namespaces (Cache & Session)**
+This will create all necessary tables (`users`, `sessions`, `posts`, `comments`, `likes`, `music`).
+
+---
+
+#### **2.3 Create KV Namespaces**
+
 ```bash
-wrangler kv namespace create GIN_KV
-wrangler kv namespace create SESSION
+# Cache namespace
 wrangler kv namespace create GINS_CACHE
-# Update "id" in wrangler.jsonc for each binding
+
+# Session namespace
+wrangler kv namespace create SESSION
+
+# General KV namespace
+wrangler kv namespace create GIN_KV
 ```
 
-**d. R2 Bucket (Media)**
+For each command, you'll get an `id`. Update `wrangler.jsonc`:
+
+```jsonc
+{
+  "kv_namespaces": [
+    {
+      "binding": "GINS_CACHE",
+      "id": "your-cache-namespace-id"
+    },
+    {
+      "binding": "SESSION",
+      "id": "your-session-namespace-id"
+    },
+    {
+      "binding": "GIN_KV",
+      "id": "your-kv-namespace-id"
+    }
+  ]
+}
+```
+
+---
+
+#### **2.4 Create R2 Bucket**
+
 ```bash
 wrangler r2 bucket create gins-media
-# Update "bucket_name" in wrangler.jsonc if you chose a different name
 ```
 
-**e. Vectorize & AI (Search)**
+Update `wrangler.jsonc`:
+
+```jsonc
+{
+  "r2_buckets": [
+    {
+      "binding": "GINS_MEDIA",
+      "bucket_name": "gins-media"
+    }
+  ]
+}
+```
+
+---
+
+#### **2.5 Create Vectorize Index (Optional - for AI Search)**
+
 ```bash
 wrangler vectorize create gins-vector --dimensions=768 --metric=cosine
-# Update "index_name" in wrangler.jsonc
 ```
 
-### 4. Admin Panel Security (IMPORTANT 🔒)
+Update `wrangler.jsonc`:
 
-The admin panel is protected by obscure routing (Security by Obscurity) + Middleware Auth.
+```jsonc
+{
+  "vectorize": [
+    {
+      "binding": "VECTORIZE",
+      "index_name": "gins-vector"
+    }
+  ]
+}
+```
 
--   **Rename the Admin Folder**:
-    The admin panel lives in `src/pages/IchimaruGin728`.
-    **You MUST rename this folder** to something only you know (e.g., `src/pages/my-secret-admin`).
-    
-    ```bash
-    mv src/pages/IchimaruGin728 src/pages/YOUR_SECRET_ROUTE
-    ```
+---
 
-    *If you don't do this, anyone who reads this code knows your login URL.*
+### **Step 3: Configure OAuth Providers**
 
-    > **Strong Recommendation**: For maximum security, enable **Cloudflare Access (Zero Trust)** for this route. It adds an extra layer of authentication (like an Email PIN or Google Login) before anyone can even see your admin login page.
-
-### 5. Environment Variables (`.dev.vars`)
-
-Create a `.dev.vars` file in the root directory for local development secrets. **DO NOT COMMIT THIS FILE.**
+Create a `.dev.vars` file in the root directory:
 
 ```env
-# Auth Providers (Get these from respective developer consoles)
-GITHUB_CLIENT_ID=...
-GITHUB_CLIENT_SECRET=...
+# GitHub OAuth (https://github.com/settings/developers)
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
 
-GOOGLE_CLIENT_ID=...
-GOOGLE_CLIENT_SECRET=...
+# Google OAuth (https://console.cloud.google.com/apis/credentials)
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
 GOOGLE_REDIRECT_URI=http://localhost:4321/login/google/callback
 
-DISCORD_CLIENT_ID=...
-DISCORD_CLIENT_SECRET=...
+# Discord OAuth (https://discord.com/developers/applications)
+DISCORD_CLIENT_ID=your_discord_client_id
+DISCORD_CLIENT_SECRET=your_discord_client_secret
 DISCORD_REDIRECT_URI=http://localhost:4321/login/discord/callback
-
-# Admin Access Token (Optional, if using simple auth)
-ADMIN_SECRET=...
 ```
 
-For production, verify these variables in your Cloudflare Pages Dashboard -> Settings -> Environment Variables.
+> **⚠️ IMPORTANT:** Add `.dev.vars` to your `.gitignore` to prevent committing secrets!
+
+---
+
+### **Step 4: Secure Your Admin Panel**
+
+The admin panel is currently located at `/IchimaruGin728/admin`. **You must rename this folder** to something unique:
+
+```bash
+mv src/pages/IchimaruGin728 src/pages/YOUR_SECRET_ROUTE
+```
+
+For example:
+```bash
+mv src/pages/IchimaruGin728 src/pages/my-secret-admin-panel
+```
+
+> **🔒 Pro Tip:** Enable [Cloudflare Access (Zero Trust)](https://developers.cloudflare.com/cloudflare-one/applications/) for your admin route for maximum security.
+
+---
+
+### **Step 5: Run Locally**
+
+```bash
+npm run dev
+```
+
+Visit `http://localhost:4321` 🎉
+
+---
+
+## 📦 Deployment
+
+### **Deploy to Cloudflare Pages**
+
+1. **Set up production environment variables:**
+
+Go to your [Cloudflare Pages Dashboard](https://dash.cloudflare.com) → Select your project → Settings → Environment Variables
+
+Add all variables from `.dev.vars` (with production values for redirect URIs).
+
+2. **Deploy:**
+
+```bash
+npm run deploy
+```
+
+Or connect your GitHub repository to Cloudflare Pages for automatic deployments on push.
 
 ---
 
 ## 🎨 Customization
 
-### Personal Info
-Edit `src/pages/about.astro` to update your bio, timeline, and Gravatar hash.
+### **Update Personal Information**
 
-### Config
+Edit `src/pages/about.astro` and `src/pages/zh-SG/about.astro` to update:
+- Bio and timeline
+- Social links
+- Gravatar hash
+
+### **Change Site Configuration**
+
 Update `astro.config.mjs`:
+
 ```js
 export default defineConfig({
-  site: 'https://your-domain.com', // <--- Change this
+  site: 'https://your-domain.com', // Your production URL
   // ...
 });
 ```
 
-### UI & Tuning
--   **UnoCSS**: Edit `uno.config.ts` to change the `brand` color palette.
--   **Fonts**: `src/styles/global.css` or `uno.config.ts`.
+### **Customize Branding**
 
----
+**Colors:** Edit `uno.config.ts`
 
-## 🧞 Commands
+```ts
+export default defineConfig({
+  theme: {
+    colors: {
+      brand: {
+        primary: '#8b5cf6',    // Your primary color
+        accent: '#a78bfa',     // Your accent color
+        // ...
+      }
+    }
+  }
+});
+```
 
-| Command | Action |
-| :--- | :--- |
-| `npm run dev` | Start local dev server at `localhost:4321` |
-| `npm run build` | Build your production site |
-| `npm run preview` | Preview your build locally |
-| `npm run deploy` | Deploy to Cloudflare Pages |
-| `npm run db:push` | Push schema changes to D1 |
+**Fonts:** Edit `src/styles/global.css` or update font imports in `uno.config.ts`.
 
 ---
 
 ## 📜 License
 
-- **Code**: All source code is licensed under the [MIT License](LICENSE).
-- **Content & Design**: All articles, media, and unique **Neo-Aesthetics UI designs** are licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). You cannot clone the visual identity for commercial purposes without permission.
+- **Code**: Licensed under the [MIT License](LICENSE).
+- **Content & Design**: All articles, media, and unique **Neo-Aesthetics UI designs** are licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
-Feel free to use the code, but please credit me if you quote my articles! Cheers!
+You're free to use the code, but please credit me if you reference my articles or design work. Commercial use of the visual identity requires permission.
+
+---
+
+## 🙏 Acknowledgments
+
+Built with ❤️ using modern web technologies. Special thanks to:
+- The Astro team for an amazing framework
+- Cloudflare for making edge computing accessible
+- The open-source community
+
+---
+
+<div align="center">
+
+**[⬆ Back to Top](#gins-blog---neo-aesthetics-edition-)**
+
+Made with 💜 by [Ichimaru Gin](https://github.com/IchimaruGin728)
+
+</div>

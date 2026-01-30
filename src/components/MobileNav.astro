@@ -42,7 +42,7 @@ const isActive = (path: string) => {
       <a
         href={lang === "en-SG" ? "/" : `/${lang}/`}
         data-astro-prefetch
-        class={`group relative flex items-center justify-center gap-2 px-3 py-2 rounded-2xl transition-all duration-500 ease-in-out ${
+        class={`group relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-out ${
           isActive("/")
             ? "bg-brand-accent/20 scale-110"
             : "hover:bg-white/5 active:scale-90 active:bg-white/10"
@@ -66,12 +66,12 @@ const isActive = (path: string) => {
           ></path>
         </svg>
         <span
-          class={`nav-label text-xs font-medium transition-all duration-500 ease-in-out ${
+          class={`nav-label text-xs font-medium transition-all duration-300 ease-out ${
             isActive("/")
               ? "text-brand-accent font-bold"
               : "text-gray-500 group-hover:text-gray-300"
           }`}
-          style="white-space: nowrap; will-change: transform, opacity, filter;"
+          style="white-space: nowrap;"
         >
           {t("nav.home")}
         </span>
@@ -86,7 +86,7 @@ const isActive = (path: string) => {
       <a
         href={lang === "en-SG" ? "/blog" : `/${lang}/blog/`}
         data-astro-prefetch
-        class={`group relative flex items-center justify-center gap-2 px-3 py-2 rounded-2xl transition-all duration-500 ease-in-out ${
+        class={`group relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-out ${
           isActive("/blog")
             ? "bg-brand-accent/20 scale-110"
             : "hover:bg-white/5 active:scale-90 active:bg-white/10"
@@ -110,12 +110,12 @@ const isActive = (path: string) => {
           ></path>
         </svg>
         <span
-          class={`nav-label text-xs font-medium transition-all duration-500 ease-in-out ${
+          class={`nav-label text-xs font-medium transition-all duration-300 ease-out ${
             isActive("/blog")
               ? "text-brand-accent font-bold"
               : "text-gray-500 group-hover:text-gray-300"
           }`}
-          style="white-space: nowrap; will-change: transform, opacity, filter;"
+          style="white-space: nowrap;"
         >
           {t("nav.blog")}
         </span>
@@ -129,7 +129,7 @@ const isActive = (path: string) => {
       <!-- Search -->
       <button
         id="mobile-search-btn"
-        class="group relative flex items-center justify-center gap-2 px-3 py-2 rounded-2xl transition-all duration-500 ease-in-out hover:bg-white/5 active:scale-90 active:bg-white/10"
+        class="group relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-out hover:bg-white/5 active:scale-90 active:bg-white/10"
       >
         <svg
           class="w-6 h-6 text-gray-400 group-hover:text-white group-hover:scale-105 transition-all duration-300"
@@ -144,8 +144,8 @@ const isActive = (path: string) => {
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
         <span
-          class="nav-label text-xs font-medium text-gray-500 group-hover:text-gray-300 transition-all duration-500 ease-in-out"
-          style="white-space: nowrap; will-change: transform, opacity, filter;"
+          class="nav-label text-xs font-medium text-gray-500 group-hover:text-gray-300 transition-all duration-300 ease-out"
+          style="white-space: nowrap;"
         >
           {t("nav.search")}
         </span>
@@ -155,7 +155,7 @@ const isActive = (path: string) => {
       <a
         href={lang === "en-SG" ? "/about" : `/${lang}/about/`}
         data-astro-prefetch
-        class={`group relative flex items-center justify-center gap-2 px-3 py-2 rounded-2xl transition-all duration-500 ease-in-out ${
+        class={`group relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-out ${
           isActive("/about")
             ? "bg-brand-accent/20 scale-110"
             : "hover:bg-white/5 active:scale-90 active:bg-white/10"
@@ -179,12 +179,12 @@ const isActive = (path: string) => {
           ></path>
         </svg>
         <span
-          class={`nav-label text-xs font-medium transition-all duration-500 ease-in-out ${
+          class={`nav-label text-xs font-medium transition-all duration-300 ease-out ${
             isActive("/about")
               ? "text-brand-accent font-bold"
               : "text-gray-500 group-hover:text-gray-300"
           }`}
-          style="white-space: nowrap; will-change: transform, opacity, filter;"
+          style="white-space: nowrap;"
         >
           {t("nav.about")}
         </span>
@@ -231,25 +231,25 @@ const isActive = (path: string) => {
             currentScrollY > lastScrollY && currentScrollY > 50;
 
           if (isScrollingDown) {
-            // Shrink: Holographic shutdown effect - blur, fade, slide down
+            // Shrink: Simple vertical collapse animation (no blur for performance)
             navLabels.forEach((el) => {
-              (el as HTMLElement).style.transform = "translateY(4px)";
-              (el as HTMLElement).style.filter = "blur(4px)";
-              (el as HTMLElement).style.width = "0";
+              (el as HTMLElement).style.transform = "scaleY(0)";
+              (el as HTMLElement).style.height = "0";
+              (el as HTMLElement).style.marginTop = "0";
               (el as HTMLElement).style.opacity = "0";
             });
-            navPanel.classList.remove("px-6", "py-3", "rounded-2xl");
-            navPanel.classList.add("px-3", "py-2", "rounded-full");
+            navPanel.classList.remove("py-3");
+            navPanel.classList.add("py-2.5");
           } else {
-            // Expand: Holographic boot-up effect - clear, fade in, slide up
+            // Expand: Restore labels
             navLabels.forEach((el) => {
-              (el as HTMLElement).style.transform = "translateY(0)";
-              (el as HTMLElement).style.filter = "blur(0)";
-              (el as HTMLElement).style.width = "auto";
+              (el as HTMLElement).style.transform = "scaleY(1)";
+              (el as HTMLElement).style.height = "auto";
+              (el as HTMLElement).style.marginTop = "";
               (el as HTMLElement).style.opacity = "1";
             });
-            navPanel.classList.remove("px-3", "py-2", "rounded-full");
-            navPanel.classList.add("px-6", "py-3", "rounded-2xl");
+            navPanel.classList.remove("py-2.5");
+            navPanel.classList.add("py-3");
           }
 
           lastScrollY = currentScrollY;
