@@ -21,7 +21,7 @@ export default defineConfig({
     injectReset: true,
   }), sitemap()],
   prefetch: {
-    defaultStrategy: 'viewport',
+    defaultStrategy: 'hover',
   },
   i18n: {
     defaultLocale: "en-SG",

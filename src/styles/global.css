@@ -96,9 +96,9 @@ body {
 }
 
 ::view-transition-old(main-content) {
-  animation: 0.3s ease-in both slide-up-exit;
+  animation: 0.15s ease-in both slide-up-exit;
 }
 
 ::view-transition-new(main-content) {
-  animation: 0.4s ease-out both slide-up-enter;
+  animation: 0.25s ease-out both slide-up-enter;
 }
