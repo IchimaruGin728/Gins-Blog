@@ -119,7 +119,7 @@ const t = useTranslations(lang);
       <LanguagePicker />
 
       <a
-        href="/rss.xml"
+        href={lang === "en-SG" ? "/rss.xml" : `/${lang}/rss.xml`}
         target="_blank"
         class="hidden md:flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/10 text-gray-400 hover:text-brand-accent transition-all border border-transparent hover:border-white/10"
         title="RSS Feed"
