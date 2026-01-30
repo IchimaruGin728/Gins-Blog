@@ -129,7 +129,7 @@ const t = useTranslations(lang);
       {
         Astro.locals.user ? (
           <a
-            href="/profile"
+            href={lang === "en-SG" ? "/profile" : `/${lang}/profile`}
             class="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
             <span class="text-xs font-mono hidden md:block text-gray-300">
@@ -146,7 +146,7 @@ const t = useTranslations(lang);
           </a>
         ) : (
           <a
-            href="/login"
+            href={lang === "en-SG" ? "/login" : `/${lang}/login`}
             class="px-4 md:px-5 py-2.5 md:py-2 rounded-full bg-white/5 hover:bg-white/10 text-xs md:text-xs font-bold tracking-wide transition-all border border-white/10 hover:border-white/20 hover:scale-105 active:scale-95 flex items-center leading-none"
           >
             {t("nav.login")}
