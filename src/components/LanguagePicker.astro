@@ -24,6 +24,7 @@ const currentLang = getLangFromUrl(url);
       Object.entries(languages).map(([lang, label]) => (
         <a
           href={lang === "en-SG" ? "/" : `/${lang}/`}
+          data-astro-prefetch
           class={`block px-4 py-2 text-sm hover:bg-white/10 transition-colors ${
             currentLang === lang ? "text-brand-accent" : "text-gray-300"
           }`}
