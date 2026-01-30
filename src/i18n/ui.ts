@@ -57,7 +57,7 @@ export const ui = {
     'about.chronicle': '编年史',
     'blog.latest_thoughts': '最新',
     'blog.thoughts_highlight': '文章',
-    'blog.musings': '关于架构、加密货币和前沿技术的思考。',
+    'blog.musings': '关于架构、Web3 和前沿技术的思考。',
     'blog.back': '返回列表',
     'blog.prev': '上一篇',
     'blog.next': '下一篇',
