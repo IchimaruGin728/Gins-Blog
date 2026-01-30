@@ -36,13 +36,13 @@ const t = useTranslations(lang);
           >{t("nav.home")}</a
         >
         <a
-          href={lang === "en-SG" ? "/blog" : `/${lang}/blog`}
+          href={lang === "en-SG" ? "/blog" : `/${lang}/blog/`}
           data-astro-prefetch
           class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-full transition-all"
           >{t("nav.blog")}</a
         >
         <a
-          href={lang === "en-SG" ? "/about" : `/${lang}/about`}
+          href={lang === "en-SG" ? "/about" : `/${lang}/about/`}
           data-astro-prefetch
           class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-full transition-all"
           >{t("nav.about")}</a
