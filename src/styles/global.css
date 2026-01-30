@@ -69,24 +69,20 @@ body {
 }
 
 /* Custom Page Transition Keyframes */
-@keyframes slide-up-enter {
+@keyframes fade-enter {
   0% {
     opacity: 0;
-    transform: translateY(20px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
   }
 }
-@keyframes slide-up-exit {
+@keyframes fade-exit {
   0% {
     opacity: 1;
-    transform: translateY(0);
   }
   100% {
     opacity: 0;
-    transform: translateY(-20px);
   }
 }
 
@@ -96,9 +92,9 @@ body {
 }
 
 ::view-transition-old(main-content) {
-  animation: 0.15s ease-in both slide-up-exit;
+  animation: 0.1s ease-in both fade-exit;
 }
 
 ::view-transition-new(main-content) {
-  animation: 0.25s ease-out both slide-up-enter;
+  animation: 0.2s ease-out both fade-enter;
 }
