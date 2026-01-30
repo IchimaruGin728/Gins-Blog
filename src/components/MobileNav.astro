@@ -40,6 +40,7 @@ const isActive = (path: string) => {
       <!-- Home -->
       <a
         href={lang === "en-SG" ? "/" : `/${lang}/`}
+        data-astro-prefetch
         class={`group relative flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-500 ease-out ${
           isActive("/")
             ? "bg-brand-accent/20 scale-110"
@@ -82,6 +83,7 @@ const isActive = (path: string) => {
       <!-- Blog -->
       <a
         href={lang === "en-SG" ? "/blog" : `/${lang}/blog/`}
+        data-astro-prefetch
         class={`group relative flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-500 ease-out ${
           isActive("/blog")
             ? "bg-brand-accent/20 scale-110"
@@ -148,6 +150,7 @@ const isActive = (path: string) => {
       <!-- About -->
       <a
         href={lang === "en-SG" ? "/about" : `/${lang}/about/`}
+        data-astro-prefetch
         class={`group relative flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-500 ease-out ${
           isActive("/about")
             ? "bg-brand-accent/20 scale-110"

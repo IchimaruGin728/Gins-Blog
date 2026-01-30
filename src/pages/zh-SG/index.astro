@@ -83,6 +83,7 @@ const recentPosts = await db
             recentPosts.map((post) => (
               <a
                 href={`/zh-SG/blog/${post.slug}`}
+                data-astro-prefetch
                 class="block group/item hover:bg-white/5 p-4 rounded-xl transition-colors border border-transparent hover:border-white/5"
               >
                 <h3
@@ -109,6 +110,7 @@ const recentPosts = await db
       <div class="mt-4 pt-4 border-t border-white/5">
         <a
           href="/zh-SG/blog"
+          data-astro-prefetch
           class="text-xs text-gray-400 hover:text-white flex items-center gap-2 transition-colors"
         >
           {t("home.view_archive")}
@@ -120,6 +122,7 @@ const recentPosts = await db
     <!-- Gallery (1x1) -->
     <a
       href="/gallery"
+      data-astro-prefetch
       class="glass-panel p-8 flex flex-col justify-between rounded-3xl group hover:bg-white/5 transition-colors relative overflow-hidden animate-fade-in-up animate-delay-300"
     >
       <div
@@ -134,6 +137,7 @@ const recentPosts = await db
     <!-- Projects (1x1) -->
     <a
       href="/projects"
+      data-astro-prefetch
       class="glass-panel p-8 flex flex-col justify-between rounded-3xl group hover:bg-white/5 transition-colors relative overflow-hidden animate-fade-in-up animate-delay-400"
     >
       <div

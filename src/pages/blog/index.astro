@@ -48,6 +48,7 @@ try {
       allPosts.map((post) => (
         <a
           href={`/blog/${post.slug}`}
+          data-astro-prefetch
           class="group glass-panel rounded-3xl p-8 hover:bg-white/5 transition-all relative overflow-hidden"
         >
           <div class="absolute inset-0 bg-gradient-to-r from-brand-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
