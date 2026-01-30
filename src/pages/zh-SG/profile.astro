@@ -1,20 +1,16 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import { useTranslations } from "../i18n/utils";
+import Layout from "../../layouts/Layout.astro";
+import { useTranslations } from "../../i18n/utils";
 
-const lang = "en-SG";
+const lang = "zh-SG";
 const t = useTranslations(lang);
 
 const user = Astro.locals.user;
 if (!user) return Astro.redirect("/login");
 
-// Fetch extended user details if needed (middleware usually gets basic info)
-// But middleware might not fetch bio/socials.
-// We should probably rely on the user object being complete or fetch fresh here.
-// For now, let's assume we fetch fresh data to be safe.
 const env = Astro.locals.runtime.env;
-import { getDb } from "../lib/db";
-import { users } from "../../db/schema";
+import { getDb } from "../../lib/db";
+import { users } from "../../../db/schema";
 import { eq } from "drizzle-orm";
 
 const db = getDb(env);
