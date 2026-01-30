@@ -1,5 +1,6 @@
 ---
 import { ClientRouter } from "astro:transitions";
+import LoadingIndicator from "astro-loading-indicator/component";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import MobileNav from "../components/MobileNav.astro";
@@ -57,6 +58,7 @@ const fullTitle =
 <html lang={lang} class="dark">
   <head>
     <ClientRouter />
+    <LoadingIndicator color="#581C87" height="3px" threshold={false} />
     <meta charset="UTF-8" />
     <meta
       name="viewport"

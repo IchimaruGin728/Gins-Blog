@@ -29,6 +29,7 @@
     "@resvg/resvg-wasm": "^2.6.2",
     "arctic": "latest",
     "astro": "latest",
+    "astro-loading-indicator": "^0.7.1",
     "astro-remote": "^0.3.4",
     "drizzle-orm": "latest",
     "hono": "latest",

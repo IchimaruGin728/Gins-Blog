@@ -48,3 +48,11 @@ body {
   background-color: #581C87; /* Brand Primary */
   color: white;
 }
+
+/* Custom Navigation Loading Bar */
+._astro_loading_indicator {
+  background: linear-gradient(to right, #581C87, #C084FC) !important;
+  box-shadow: 0 0 10px #C084FC, 0 0 20px #581C87 !important;
+  height: 3px !important;
+  z-index: 9999 !important;
+}
