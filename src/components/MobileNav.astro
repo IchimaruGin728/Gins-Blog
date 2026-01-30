@@ -1,12 +1,30 @@
 ---
 // MobileNav component - Bottom navigation for mobile devices
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
 const currentPath = Astro.url.pathname;
+
+// Helper to strip locale from path for comparison
+const getPathWithoutLocale = (path: string) => {
+  if (path.startsWith("/zh-SG/")) {
+    return path.replace("/zh-SG", "") || "/";
+  }
+  if (path === "/zh-SG") {
+    return "/";
+  }
+  return path;
+};
+
+const normalizedPath = getPathWithoutLocale(currentPath);
 
 const isActive = (path: string) => {
   if (path === "/") {
-    return currentPath === "/";
+    return normalizedPath === "/";
   }
-  return currentPath.startsWith(path);
+  return normalizedPath.startsWith(path);
 };
 ---
 
@@ -21,7 +39,7 @@ const isActive = (path: string) => {
     <div class="flex justify-around items-center">
       <!-- Home -->
       <a
-        href="/"
+        href={lang === "en-SG" ? "/" : `/${lang}/`}
         class={`group relative flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-500 ease-out ${
           isActive("/")
             ? "bg-brand-accent/20 scale-110"
@@ -52,7 +70,7 @@ const isActive = (path: string) => {
               : "text-gray-500 group-hover:text-gray-300"
           }`}
         >
-          Home
+          {t("nav.home")}
         </span>
         {
           isActive("/") && (
@@ -63,7 +81,7 @@ const isActive = (path: string) => {
 
       <!-- Blog -->
       <a
-        href="/blog"
+        href={lang === "en-SG" ? "/blog" : `/${lang}/blog/`}
         class={`group relative flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-500 ease-out ${
           isActive("/blog")
             ? "bg-brand-accent/20 scale-110"
@@ -94,7 +112,7 @@ const isActive = (path: string) => {
               : "text-gray-500 group-hover:text-gray-300"
           }`}
         >
-          Blog
+          {t("nav.blog")}
         </span>
         {
           isActive("/blog") && (
@@ -123,13 +141,13 @@ const isActive = (path: string) => {
         <span
           class="text-xs font-medium text-gray-500 group-hover:text-gray-300 transition-all duration-300"
         >
-          Search
+          {t("nav.search")}
         </span>
       </button>
 
       <!-- About -->
       <a
-        href="/about"
+        href={lang === "en-SG" ? "/about" : `/${lang}/about/`}
         class={`group relative flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-500 ease-out ${
           isActive("/about")
             ? "bg-brand-accent/20 scale-110"
@@ -160,7 +178,7 @@ const isActive = (path: string) => {
               : "text-gray-500 group-hover:text-gray-300"
           }`}
         >
-          About
+          {t("nav.about")}
         </span>
         {
           isActive("/about") && (
@@ -177,9 +195,7 @@ const isActive = (path: string) => {
   const mobileSearchBtn = document.getElementById("mobile-search-btn");
   if (mobileSearchBtn) {
     mobileSearchBtn.addEventListener("click", () => {
-      window.dispatchEvent(
-        new KeyboardEvent("keydown", { key: "k", metaKey: true }),
-      );
+      window.dispatchEvent(new CustomEvent("open-search-modal"));
     });
   }
 </script>

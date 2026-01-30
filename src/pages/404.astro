@@ -1,5 +1,25 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const descriptions = {
+  "en-SG": "Page not found lah!",
+  "zh-SG": "找不到页面！",
+};
+
+const subtitles = {
+  "en-SG":
+    "You lost or what? This signal is transmission dead. Valid coordinates are required for teleportation.",
+  "zh-SG": "你在此迷失了吗？信号信号中断。传送需要有效的坐标。",
+};
+
+const homeBtn = {
+  "en-SG": "Balik Kampung (Home)",
+  "zh-SG": "返回首页",
+};
 ---
 
 <Layout title="404 - Aiyo!" description="Nothing to see here lah!">
@@ -26,15 +46,14 @@ import Layout from "../layouts/Layout.astro";
       class="glass-panel p-8 rounded-3xl max-w-lg w-full border border-white/10 backdrop-blur-xl"
     >
       <p class="text-xl md:text-2xl font-medium text-white mb-4">
-        Page not found lah!
+        {descriptions[lang] || descriptions["en-SG"]}
       </p>
       <p class="text-gray-400 mb-8 font-mono text-sm leading-relaxed">
-        You lost or what? This signal is transmission dead. <br />
-        Valid coordinates are required for teleportation.
+        {subtitles[lang] || subtitles["en-SG"]}
       </p>
 
       <a
-        href="/"
+        href={lang === "en-SG" ? "/" : `/${lang}/`}
         class="group relative inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-accent/50 transition-all duration-300"
       >
         <div
@@ -46,7 +65,7 @@ import Layout from "../layouts/Layout.astro";
         ></span>
         <span
           class="font-bold text-white group-hover:text-brand-accent transition-colors"
-          >Balik Kampung (Home)</span
+          >{homeBtn[lang] || homeBtn["en-SG"]}</span
         >
       </a>
     </div>

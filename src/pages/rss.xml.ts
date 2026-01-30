@@ -28,6 +28,6 @@ export async function GET(context: APIContext) {
       description: post.content ? (post.content.substring(0, 200) + '...') : '',
       link: `/blog/${post.slug}`,
     })),
-    customData: `<language>en-us</language>`,
+    customData: `<language>en-SG</language>`,
   });
 }

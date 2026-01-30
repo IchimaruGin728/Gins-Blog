@@ -25,7 +25,7 @@ export default function SocialLinks({ initialLinks }: Props) {
         });
         
         if (res.ok) {
-          const data = await res.json();
+          const data = await res.json() as any;
           const entry = data.entry[0];
           const newLinks: SocialLink[] = [];
 
