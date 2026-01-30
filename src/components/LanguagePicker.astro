@@ -1,6 +1,6 @@
 ---
 import { languages } from "../i18n/ui";
-import { getLangFromUrl } from "../i18n/utils";
+import { getLangFromUrl, getRouteFromUrl } from "../i18n/utils";
 
 const url = Astro.url;
 const currentLang = getLangFromUrl(url);
@@ -23,7 +23,7 @@ const currentLang = getLangFromUrl(url);
     {
       Object.entries(languages).map(([lang, label]) => (
         <a
-          href={lang === "en-SG" ? "/" : `/${lang}/`}
+          href={getRouteFromUrl(url, lang)}
           data-astro-prefetch
           class={`block px-4 py-2 text-sm hover:bg-white/10 transition-colors ${
             currentLang === lang ? "text-brand-accent" : "text-gray-300"
