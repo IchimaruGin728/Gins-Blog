@@ -8,7 +8,18 @@ export default defineConfig({
     'glass-safari': '-webkit-backdrop-filter: blur(20px)',
     'btn-animated': 'transition-transform active:scale-95 hover:-translate-y-0.5 will-change-transform',
   },
+  presets: [
+    presetUno(),
+    presetIcons(),
+    presetTypography(),
+  ],
   theme: {
+    fontFamily: {
+      sans: 'Inter Variable, Inter, sans-serif',
+      mono: 'JetBrains Mono Variable, JetBrains Mono, monospace',
+      display: 'Outfit Variable, Outfit, sans-serif',
+    },
+    // ... existing colors/animation
     colors: {
       brand: {
         dark: '#050505',
@@ -31,17 +42,4 @@ export default defineConfig({
       },
     },
   },
-  presets: [
-    presetUno(),
-    presetIcons(),
-    presetTypography(),
-    presetWebFonts({
-      provider: 'google',
-      fonts: {
-        sans: 'Inter:400,500,600,700',
-        mono: 'JetBrains Mono',
-        display: 'Outfit:400,700', // Close to SF Pro Display feel available on Google Fonts
-      },
-    }),
-  ],
 });
