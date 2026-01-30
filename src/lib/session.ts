@@ -11,12 +11,47 @@ export function generateSessionToken(): string {
 	return encodeBase32LowerCaseNoPadding(bytes);
 }
 
-export async function createSession(token: string, userId: string, db: ReturnType<typeof getDb>, env: Env): Promise<Session> {
+export async function createSession(
+	token: string,
+	userId: string,
+	db: ReturnType<typeof getDb>,
+	env: Env,
+	userAgent?: string,
+	ipAddress?: string
+): Promise<Session> {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
+	const now = Date.now();
+	
+	// Deduplication: Remove existing sessions from same device (same userAgent + ipAddress)
+	if (userAgent && ipAddress) {
+		const { and } = await import('drizzle-orm');
+		const duplicateSessions = await db
+			.select()
+			.from(sessions)
+			.where(
+				and(
+					eq(sessions.userId, userId),
+					eq(sessions.userAgent, userAgent),
+					eq(sessions.ipAddress, ipAddress)
+				)
+			)
+			.all();
+
+		// Delete duplicate sessions from DB and KV
+		for (const dup of duplicateSessions) {
+			await db.delete(sessions).where(eq(sessions.id, dup.id));
+			await env.GIN_KV.delete(`session:${dup.id}`);
+		}
+	}
+	
 	const session: Session = {
 		id: sessionId,
 		userId,
-		expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 30
+		expiresAt: now + 1000 * 60 * 60 * 24 * 30,
+		userAgent: userAgent || null,
+		ipAddress: ipAddress || null,
+		createdAt: now,
+		lastActive: now,
 	};
 	
     // Write-Through: Insert into DB
@@ -31,7 +66,12 @@ export async function createSession(token: string, userId: string, db: ReturnTyp
 	return session;
 }
 
-export async function validateSessionToken(token: string, db: ReturnType<typeof getDb>, env: Env): Promise<SessionValidationResult> {
+export async function validateSessionToken(
+	token: string,
+	db: ReturnType<typeof getDb>,
+	env: Env,
+	request?: Request
+): Promise<SessionValidationResult> {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
     
     // 1. Check KV Cache (Fast Path)
@@ -46,7 +86,6 @@ export async function validateSessionToken(token: string, db: ReturnType<typeof 
         // Let's modify the cache structure to include User ID or fetch User from KV too?
         // For simplicity and speed: Cache the *Validation Result* or just fetch User from D1?
         // Fetching User from D1 is fast enough if Session is valid? No, we want NO D1 hits if possible.
-        // Let's assume we also cache User data in KV or assume quick D1 lookup by ID is acceptable.
         // Let's stick to: KV check Session -> D1 check User (Primary Key lookup is fast).
         
         // Check Expiration
@@ -56,9 +95,41 @@ export async function validateSessionToken(token: string, db: ReturnType<typeof 
              return { session: null, user: null };
         }
         
+        // Legacy session check: if missing userAgent or ipAddress, try to update or invalidate
+        if ((!session.userAgent || !session.ipAddress) && request) {
+            const userAgent = request.headers.get('user-agent');
+            const ipAddress = request.headers.get('cf-connecting-ip');
+            
+            if (userAgent && ipAddress) {
+                // Update legacy session with current device info
+                session.userAgent = userAgent;
+                session.ipAddress = ipAddress;
+                session.lastActive = Date.now();
+                
+                await db
+                    .update(sessions)
+                    .set({ 
+                        userAgent: session.userAgent,
+                        ipAddress: session.ipAddress,
+                        lastActive: session.lastActive 
+                    })
+                    .where(eq(sessions.id, session.id));
+                    
+                await env.GIN_KV.put(`session:${sessionId}`, JSON.stringify(session), {
+                    expiration: Math.floor(session.expiresAt / 1000)
+                });
+            } else {
+                // Cannot update, invalidate this legacy session
+                await env.GIN_KV.delete(`session:${sessionId}`);
+                await db.delete(sessions).where(eq(sessions.id, session.id));
+                return { session: null, user: null };
+            }
+        }
+        
         // Refresh Logic (Slide Expiration) - Update KV and DB if needed
         if (Date.now() >= session.expiresAt - 1000 * 60 * 60 * 24 * 15) {
             session.expiresAt = Date.now() + 1000 * 60 * 60 * 24 * 30;
+            session.lastActive = Date.now();
              // Update KV
             await env.GIN_KV.put(`session:${sessionId}`, JSON.stringify(session), {
                 expiration: Math.floor(session.expiresAt / 1000)
@@ -66,8 +137,22 @@ export async function validateSessionToken(token: string, db: ReturnType<typeof 
             // Async Update DB (Fire and forget? or await)
             await db
                 .update(sessions)
-                .set({ expiresAt: session.expiresAt })
+                .set({ expiresAt: session.expiresAt, lastActive: session.lastActive })
                 .where(eq(sessions.id, session.id));
+        } else {
+            // Just update lastActive without sliding expiration
+            const now = Date.now();
+            const lastActive = session.lastActive || 0;
+            if (now - lastActive > 60000) { // Update if > 1 minute since last update
+                session.lastActive = now;
+                await env.GIN_KV.put(`session:${sessionId}`, JSON.stringify(session), {
+                    expiration: Math.floor(session.expiresAt / 1000)
+                });
+                await db
+                    .update(sessions)
+                    .set({ lastActive: session.lastActive })
+                    .where(eq(sessions.id, session.id));
+            }
         }
         
         // Fetch User (Fast PK lookup)
@@ -93,14 +178,52 @@ export async function validateSessionToken(token: string, db: ReturnType<typeof 
 		await db.delete(sessions).where(eq(sessions.id, session.id));
 		return { session: null, user: null };
 	}
+	
+	// Legacy session check for DB path too
+	if ((!session.userAgent || !session.ipAddress) && request) {
+		const userAgent = request.headers.get('user-agent');
+		const ipAddress = request.headers.get('cf-connecting-ip');
+		
+		if (userAgent && ipAddress) {
+			session.userAgent = userAgent;
+			session.ipAddress = ipAddress;
+			session.lastActive = Date.now();
+			
+			await db
+				.update(sessions)
+				.set({ 
+					userAgent: session.userAgent,
+					ipAddress: session.ipAddress,
+					lastActive: session.lastActive 
+				})
+				.where(eq(sessions.id, session.id));
+		} else {
+			// Cannot update, invalidate this legacy session
+			await db.delete(sessions).where(eq(sessions.id, session.id));
+			return { session: null, user: null };
+		}
+	}
+	
 	if (Date.now() >= session.expiresAt - 1000 * 60 * 60 * 24 * 15) {
 		session.expiresAt = Date.now() + 1000 * 60 * 60 * 24 * 30;
+		session.lastActive = Date.now();
 		await db
 			.update(sessions)
 			.set({
-				expiresAt: session.expiresAt
+				expiresAt: session.expiresAt,
+				lastActive: session.lastActive
 			})
 			.where(eq(sessions.id, session.id));
+	} else {
+		const now = Date.now();
+		const lastActive = session.lastActive || 0;
+		if (now - lastActive > 60000) {
+			session.lastActive = now;
+			 await db
+				.update(sessions)
+				.set({ lastActive: session.lastActive })
+				.where(eq(sessions.id, session.id));
+		}
 	}
     
     // Hydrate KV Cache

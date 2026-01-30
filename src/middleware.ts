@@ -65,7 +65,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		return next();
 	}
 
-	const { user, session } = await validateSessionToken(token, db, env);
+	const { user, session } = await validateSessionToken(token, db, env, context.request);
     // ... existing session refresh logic ...
 
 	context.locals.session = session;

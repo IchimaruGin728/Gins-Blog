@@ -103,7 +103,14 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 	
 		console.log("Creating session, userId:", userId);
 		const token = generateSessionToken();
-		const session = await createSession(token, userId, db, locals.runtime.env);
+		const session = await createSession(
+			token,
+			userId,
+			db,
+			locals.runtime.env,
+			request.headers.get('user-agent') || undefined,
+			request.headers.get('cf-connecting-ip') || undefined
+		);
         
         console.log("Setting session cookie...");
 		cookies.set('session', token, {
