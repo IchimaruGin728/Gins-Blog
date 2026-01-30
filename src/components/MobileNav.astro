@@ -34,9 +34,10 @@ const isActive = (path: string) => {
   style="padding-bottom: max(1rem, env(safe-area-inset-bottom)); padding-left: max(1rem, env(safe-area-inset-left)); padding-right: max(1rem, env(safe-area-inset-right));"
 >
   <div
-    class="mx-4 mb-4 glass-panel rounded-2xl px-6 py-3 border border-white/10 backdrop-blur-xl shadow-2xl"
+    id="mobile-nav-panel"
+    class="mx-4 mb-4 glass-panel rounded-full px-6 py-3 border border-white/10 backdrop-blur-xl shadow-2xl transition-all duration-300 ease-in-out"
   >
-    <div class="flex justify-around items-center">
+    <div class="flex justify-around items-center gap-1">
       <!-- Home -->
       <a
         href={lang === "en-SG" ? "/" : `/${lang}/`}
@@ -65,7 +66,7 @@ const isActive = (path: string) => {
           ></path>
         </svg>
         <span
-          class={`text-xs font-medium transition-all duration-300 ${
+          class={`nav-label text-xs font-medium transition-all duration-300 overflow-hidden ${
             isActive("/")
               ? "text-brand-accent font-bold"
               : "text-gray-500 group-hover:text-gray-300"
@@ -108,7 +109,7 @@ const isActive = (path: string) => {
           ></path>
         </svg>
         <span
-          class={`text-xs font-medium transition-all duration-300 ${
+          class={`nav-label text-xs font-medium transition-all duration-300 overflow-hidden ${
             isActive("/blog")
               ? "text-brand-accent font-bold"
               : "text-gray-500 group-hover:text-gray-300"
@@ -141,7 +142,7 @@ const isActive = (path: string) => {
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
         <span
-          class="text-xs font-medium text-gray-500 group-hover:text-gray-300 transition-all duration-300"
+          class="nav-label text-xs font-medium text-gray-500 group-hover:text-gray-300 transition-all duration-300 overflow-hidden"
         >
           {t("nav.search")}
         </span>
@@ -175,7 +176,7 @@ const isActive = (path: string) => {
           ></path>
         </svg>
         <span
-          class={`text-xs font-medium transition-all duration-300 ${
+          class={`nav-label text-xs font-medium transition-all duration-300 overflow-hidden ${
             isActive("/about")
               ? "text-brand-accent font-bold"
               : "text-gray-500 group-hover:text-gray-300"
@@ -208,6 +209,47 @@ const isActive = (path: string) => {
       newBtn.addEventListener("click", () => {
         window.dispatchEvent(new CustomEvent("open-search-modal"));
       });
+    }
+
+    // Scroll Logic for Shrinking Nav
+    let lastScrollY = window.scrollY;
+    const navPanel = document.getElementById("mobile-nav-panel");
+    const navLabels = document.querySelectorAll(".nav-label");
+
+    if (navPanel) {
+      window.addEventListener(
+        "scroll",
+        () => {
+          const currentScrollY = window.scrollY;
+
+          // Threshold: 50px scroll to trigger
+          const isScrollingDown =
+            currentScrollY > lastScrollY && currentScrollY > 50;
+
+          if (isScrollingDown) {
+            // Shrink: Remove labels, change padding
+            navLabels.forEach((el) => {
+              (el as HTMLElement).style.height = "0px";
+              (el as HTMLElement).style.opacity = "0";
+              (el as HTMLElement).classList.add("hidden-label");
+            });
+            navPanel.classList.remove("px-6");
+            navPanel.classList.add("px-8", "py-2"); // Adjust padding for icon-only look
+          } else {
+            // Expand: Restore labels
+            navLabels.forEach((el) => {
+              (el as HTMLElement).style.height = "auto";
+              (el as HTMLElement).style.opacity = "1";
+              (el as HTMLElement).classList.remove("hidden-label");
+            });
+            navPanel.classList.add("px-6");
+            navPanel.classList.remove("px-8", "py-2");
+          }
+
+          lastScrollY = currentScrollY;
+        },
+        { passive: true },
+      );
     }
   });
 </script>

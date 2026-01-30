@@ -287,6 +287,38 @@ const recentPosts = await safeFetch(
   <div class="glass-panel p-8 rounded-3xl">
     <h2 class="text-2xl font-bold mb-6">Transmission Uplink</h2>
 
+    <!-- Quick Publish via File -->
+    <div class="mb-12 p-6 rounded-2xl bg-white/5 border border-white/10">
+      <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <span class="i-heroicons-document-arrow-up"></span>
+        Direct Uplink (File)
+      </h3>
+      <p class="text-sm text-gray-400 mb-4">
+        Upload <code>.md</code> or <code>.rtf</code> files to publish immediately.
+      </p>
+      <div class="flex items-center gap-4">
+        <input
+          type="file"
+          id="quick-publish-file"
+          accept=".md,.markdown,.rtf,.txt"
+          class="block w-full text-sm text-gray-400
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-full file:border-0
+            file:text-xs file:font-bold
+            file:bg-brand-accent/10 file:text-brand-accent
+            hover:file:bg-brand-accent/20"
+        />
+        <button
+          id="quick-publish-btn"
+          class="px-5 py-2 whitespace-nowrap rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white font-medium transition-colors flex items-center gap-2"
+        >
+          <span class="i-heroicons-paper-airplane"></span>
+          Publish
+        </button>
+      </div>
+      <div id="quick-publish-status" class="mt-3 text-sm hidden"></div>
+    </div>
+
     <form id="create-post-form" class="space-y-6">
       <input type="hidden" name="id" id="post-id" />
       <div class="grid grid-cols-3 gap-6">
@@ -637,6 +669,59 @@ const recentPosts = await safeFetch(
     } catch (err) {
       console.error(err);
       uploadBtn!.innerText = "Failed";
+    }
+  });
+
+  // Quick Publish Logic
+  const quickPublishBtn = document.getElementById("quick-publish-btn");
+  const quickPublishFile = document.getElementById(
+    "quick-publish-file",
+  ) as HTMLInputElement;
+  const quickPublishStatus = document.getElementById("quick-publish-status");
+
+  quickPublishBtn?.addEventListener("click", async () => {
+    const file = quickPublishFile?.files?.[0];
+    if (!file) {
+      alert("Please select a file first.");
+      return;
+    }
+
+    if (!confirm(`Ready to broadcast ${file.name}?`)) return;
+
+    quickPublishBtn.innerHTML =
+      '<span class="animate-spin i-heroicons-arrow-path"></span> Broadcasting...';
+    (quickPublishBtn as HTMLButtonElement).disabled = true;
+    quickPublishStatus!.classList.add("hidden");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/posts/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = (await res.json()) as any;
+
+      if (res.ok) {
+        quickPublishStatus!.innerHTML = `<span class="text-green-400">✓ Signal Live: <a href="/blog/${result.slug}" target="_blank" class="underline hover:text-white">${result.slug}</a></span>`;
+        quickPublishStatus!.classList.remove("hidden");
+        quickPublishFile.value = "";
+
+        // Reload list after short delay
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        throw new Error(result.error || "Upload failed");
+      }
+    } catch (e: any) {
+      console.error(e);
+      quickPublishStatus!.innerHTML = `<span class="text-red-400">⚠ Transmission Error: ${e.message}</span>`;
+      quickPublishStatus!.classList.remove("hidden");
+    } finally {
+      quickPublishBtn.innerHTML =
+        '<span class="i-heroicons-paper-airplane"></span> Publish';
+      (quickPublishBtn as HTMLButtonElement).disabled = false;
     }
   });
 
