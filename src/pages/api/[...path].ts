@@ -6,12 +6,13 @@ import { posts, music } from '../../../db/schema';
 import * as schema from '../../../db/schema';
 import { eq, desc } from 'drizzle-orm';
 import type { APIRoute } from 'astro';
+import { insertPostVector, deletePostVector } from '../../lib/vectorize';
 
 // Initialize Hono
 const app = new Hono().basePath('/api');
 
 // RPC Route Definitions
-const route = app.post(
+app.post(
   '/posts',
   zValidator(
     'form',
@@ -84,32 +85,23 @@ const route = app.post(
         console.error("KV Cache Update failed", e);
     }
     
+    // Vectorize Indexing (Semantic Search)
     try {
-        const textToEmbed = `${title}\n${content.slice(0, 1000)}`;
-        const embeddingResponse = await env.AI.run('@cf/baai/bge-base-en-v1.5', {
-            text: [textToEmbed]
-        }) as { data: number[][] };
-        const embedding = embeddingResponse.data[0];
-
-        // Vectorize upsert = insert with same ID
-        await env.VECTOR_INDEX.upsert([
-            {
-                id: id,
-                values: embedding,
-                metadata: { title, slug }
-            }
-        ]);
+        await insertPostVector(env.AI, env.VECTOR_INDEX, {
+            id,
+            title,
+            content
+        });
     } catch (e) {
         console.error("AI Indexing failed", e);
     }
     
     return c.json({ success: true, id });
-// ... (existing POST /posts)
   }
 );
 
 // Get Single Post (for Admin Editor)
-const getPostRoute = app.get('/posts/:slug', async (c) => {
+app.get('/posts/:slug', async (c) => {
     // @ts-ignore
     const db = getDb(c.env);
     const slug = c.req.param('slug');
@@ -121,7 +113,7 @@ const getPostRoute = app.get('/posts/:slug', async (c) => {
 });
 
 // Get Recent Posts (for Admin List)
-const listPostsRoute = app.get('/posts', async (c) => {
+app.get('/posts', async (c) => {
     // @ts-ignore
     const db = getDb(c.env);
     const limitParam = c.req.query('limit');
@@ -148,7 +140,7 @@ const listPostsRoute = app.get('/posts', async (c) => {
 });
 
 // Search Posts (Admin)
-const searchPostsRoute = app.get('/search', async (c) => {
+app.get('/search', async (c) => {
     // @ts-ignore
     const db = getDb(c.env);
     const query = c.req.query('q');
@@ -196,7 +188,7 @@ const searchPostsRoute = app.get('/search', async (c) => {
 });
 
 // Toggle Post Status (Hide/Publish)
-const togglePostStatusRoute = app.patch('/posts/:slug/status', zValidator('json', z.object({
+app.patch('/posts/:slug/status', zValidator('json', z.object({
     action: z.enum(['publish', 'unpublish'])
 })), async (c) => {
     // @ts-ignore
@@ -220,18 +212,31 @@ const togglePostStatusRoute = app.patch('/posts/:slug/status', zValidator('json'
 });
 
 // Delete Post
-const deletePostRoute = app.delete('/posts/:slug', async (c) => {
+app.delete('/posts/:slug', async (c) => {
     // @ts-ignore
     const db = getDb(c.env);
     const slug = c.req.param('slug');
+    const env = c.env as Env;
 
     try {
+        // Get ID before deleting for Vectorize cleanup
+        // @ts-ignore
+        const post = await db.select({ id: posts.id }).from(posts).where(eq(posts.slug, slug)).get();
+        const id = post?.id;
+
         await db.delete(posts).where(eq(posts.slug, slug));
         
-        // Invalidate Cache and Vector Index
-        const env = c.env as Env;
+        // Invalidate Cache
         await env.GINS_CACHE.delete(`post:${slug}`);
-        // TODO: ideally remove from vector index too if ID is known, but simplistic for now
+        
+        // Remove from Vector Index
+        if (id) {
+            try {
+                await deletePostVector(env.VECTOR_INDEX, id);
+            } catch (e) {
+                console.error("Vector cleanup failed", e);
+            }
+        }
         
         return c.json({ success: true });
     } catch (e) {
@@ -275,7 +280,7 @@ app.get('/music', async (c) => {
 });
 
 
-export type AppType = typeof route;
+export type AppType = typeof app;
 
 import { getZeroTrustUser } from '../../lib/zerotrust';
 

@@ -85,7 +85,10 @@ const recentPosts = await db
 								href={`/blog/${post.slug}`}
 								class="block group/item hover:bg-white/5 p-4 rounded-xl transition-colors border border-transparent hover:border-white/5"
 							>
-								<h3 class="font-bold text-sm text-gray-200 group-hover/item:text-brand-accent transition-colors line-clamp-2">
+								<h3
+									class="font-bold text-sm text-gray-200 group-hover/item:text-brand-accent transition-colors line-clamp-2"
+									transition:name={`title-${post.slug}`}
+								>
 									{post.title}
 								</h3>
 								<span class="text-xs text-gray-500 mt-2 block font-mono">

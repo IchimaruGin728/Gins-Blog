@@ -96,22 +96,26 @@ export default function SearchModal() {
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] px-4">
             {/* Backdrop */}
             <div 
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300 animate-[fadeIn_0.2s_ease-out]"
                 onClick={() => setIsOpen(false)}
             ></div>
 
             {/* Modal */}
-            <div className="relative w-full max-w-2xl bg-[#09090b] border border-white/10 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ease-out animate-[slideUp_0.3s_ease-out]">
+            <div className="relative w-full max-w-2xl bg-[#09090b]/90 border border-white/10 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl transition-all duration-300 ease-out animate-[scaleIn_0.25s_cubic-bezier(0.16,1,0.3,1)]">
                 
                 <style>{`
-                    @keyframes slideUp {
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    @keyframes scaleIn {
                         from {
                             opacity: 0;
-                            transform: translateY(20px) scale(0.95);
+                            transform: scale(0.95) translateY(10px);
                         }
                         to {
                             opacity: 1;
-                            transform: translateY(0) scale(1);
+                            transform: scale(1) translateY(0);
                         }
                     }
                 `}</style>

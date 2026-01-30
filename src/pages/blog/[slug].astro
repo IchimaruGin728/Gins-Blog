@@ -18,13 +18,11 @@ const { env } = Astro.locals.runtime;
 // CACHE LIFT: Check KV Layer first (Speed optimization)
 const CACHE_KEY = `post:${slug}`;
 let result = null;
-let isCached = false;
 
 try {
   const cached = await env.GINS_CACHE.get(CACHE_KEY, "json");
   if (cached) {
     result = cached as typeof posts.$inferSelect;
-    isCached = true;
   }
 } catch (e) {
   console.warn("KV Cache Miss/Error:", e);
@@ -146,7 +144,10 @@ Astro.response.headers.set(
       >
         {new Date(result.publishedAt || result.createdAt).toLocaleDateString()}
       </div>
-      <h1 class="text-5xl font-display font-bold mb-6 leading-tight">
+      <h1
+        class="text-5xl font-display font-bold mb-6 leading-tight"
+        transition:name={`title-${slug}`}
+      >
         {result.title}
       </h1>
     </header>
@@ -232,6 +233,7 @@ Astro.response.headers.set(
 
   <!-- JSON-LD Structured Data -->
   <script
+    is:inline
     type="application/ld+json"
     set:html={JSON.stringify(structuredData)}
   />
