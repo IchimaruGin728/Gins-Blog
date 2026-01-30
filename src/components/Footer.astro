@@ -59,7 +59,7 @@ const t = useTranslations(lang);
         </svg>
       </a>
       <a
-        href="/rss.xml"
+        href={lang === "en-SG" ? "/rss.xml" : `/${lang}/rss.xml`}
         target="_blank"
         title="RSS Feed"
         class="hover:text-brand-accent transition-colors hover:scale-110 transform duration-200"

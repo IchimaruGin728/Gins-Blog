@@ -192,10 +192,19 @@ const isActive = (path: string) => {
 
 <script>
   // Trigger search modal when clicking mobile search button
-  const mobileSearchBtn = document.getElementById("mobile-search-btn");
-  if (mobileSearchBtn) {
-    mobileSearchBtn.addEventListener("click", () => {
-      window.dispatchEvent(new CustomEvent("open-search-modal"));
-    });
-  }
+  // Use astro:page-load for View Transitions support
+  document.addEventListener("astro:page-load", () => {
+    const mobileSearchBtn = document.getElementById("mobile-search-btn");
+    if (mobileSearchBtn) {
+      // Cloning to remove duplicates
+      const newBtn = mobileSearchBtn.cloneNode(true);
+      if (mobileSearchBtn.parentNode) {
+        mobileSearchBtn.parentNode.replaceChild(newBtn, mobileSearchBtn);
+      }
+
+      newBtn.addEventListener("click", () => {
+        window.dispatchEvent(new CustomEvent("open-search-modal"));
+      });
+    }
+  });
 </script>

@@ -158,11 +158,20 @@ const t = useTranslations(lang);
 
   <script>
     // Dispatch custom event or toggle state
-    const btn = document.getElementById("search-trigger-btn");
-    if (btn) {
-      btn.addEventListener("click", () => {
-        window.dispatchEvent(new CustomEvent("open-search-modal"));
-      });
-    }
+    // Use astro:page-load to ensure it works after View Transitions navigation
+    document.addEventListener("astro:page-load", () => {
+      const btn = document.getElementById("search-trigger-btn");
+      if (btn) {
+        // Cloning the element to remove old event listeners to prevent duplicates
+        const newBtn = btn.cloneNode(true);
+        if (btn.parentNode) {
+          btn.parentNode.replaceChild(newBtn, btn);
+        }
+
+        newBtn.addEventListener("click", () => {
+          window.dispatchEvent(new CustomEvent("open-search-modal"));
+        });
+      }
+    });
   </script>
 </nav>
