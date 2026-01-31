@@ -600,7 +600,8 @@ const usersList = await safeFetch(
   <!-- Users Modal -->
   <div
     id="users-modal"
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md hidden transition-opacity duration-300"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300"
+    onclick="if(event.target === this) this.classList.add('hidden')"
   >
     <div
       class="glass-panel w-full max-w-5xl max-h-[85vh] flex flex-col rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative"
@@ -608,7 +609,7 @@ const usersList = await safeFetch(
       <!-- Close Button -->
       <button
         onclick="document.getElementById('users-modal').classList.add('hidden')"
-        class="absolute top-6 right-6 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+        class="absolute top-6 right-6 p-2 rounded-lg bg-black/20 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors border border-white/5 hover:border-red-500/30 z-20"
       >
         <span class="i-heroicons-x-mark w-6 h-6"></span>
       </button>
@@ -705,7 +706,8 @@ const usersList = await safeFetch(
   <!-- Sessions Modal -->
   <div
     id="sessions-modal"
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md hidden transition-opacity duration-300"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300"
+    onclick="if(event.target === this) this.classList.add('hidden')"
   >
     <div
       class="glass-panel w-full max-w-6xl max-h-[85vh] flex flex-col rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative"
@@ -713,7 +715,7 @@ const usersList = await safeFetch(
       <!-- Close Button -->
       <button
         onclick="document.getElementById('sessions-modal').classList.add('hidden')"
-        class="absolute top-6 right-6 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+        class="absolute top-6 right-6 p-2 rounded-lg bg-black/20 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors border border-white/5 hover:border-red-500/30 z-20"
       >
         <span class="i-heroicons-x-mark w-6 h-6"></span>
       </button>
