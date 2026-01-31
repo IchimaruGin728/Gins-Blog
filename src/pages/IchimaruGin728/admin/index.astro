@@ -1268,13 +1268,13 @@ const COLO_LOCATIONS: Record<
           <div class="glass-panel p-4 rounded-xl">
             <div class="text-xs text-gray-400 mb-1">Min RTT</div>
             <div class="text-2xl font-bold text-green-300">
-              {Math.round(performanceSummary?.min_rtt || 0)}ms
+              {Math.round(Number(performanceSummary?.min_rtt || 0))}ms
             </div>
           </div>
           <div class="glass-panel p-4 rounded-xl">
             <div class="text-xs text-gray-400 mb-1">Max RTT</div>
             <div class="text-2xl font-bold text-orange-400">
-              {Math.round(performanceSummary?.max_rtt || 0)}ms
+              {Math.round(Number(performanceSummary?.max_rtt || 0))}ms
             </div>
           </div>
         </div>
@@ -1309,7 +1309,7 @@ const COLO_LOCATIONS: Record<
                         ? "text-yellow-400"
                         : "text-red-400";
                   const percentage = (
-                    (node.session_count / activeSessionCount) *
+                    (node.session_count / (activeSessionCount ?? 1)) *
                     100
                   ).toFixed(1);
 
