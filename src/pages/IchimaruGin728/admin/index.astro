@@ -1076,17 +1076,26 @@ const usersList = await safeFetch(
       const res = await fetch("/api/admin/sessions", {
         method: "DELETE",
         credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
+
+      const responseText = await res.text();
+      console.log("Logout All Response:", res.status, responseText);
+
       if (res.ok) {
         alert("All sessions terminated. The grid will now reboot.");
         window.location.reload();
       } else {
-        const errorData = await res
-          .json()
-          .catch(() => ({ error: "Unknown error" }));
-        alert(
-          `Failed to terminate sessions: ${errorData.error || res.statusText}`,
-        );
+        let errorMsg = `Failed (${res.status})`;
+        try {
+          const errorData = JSON.parse(responseText);
+          errorMsg = errorData.error || errorData.message || responseText;
+        } catch (e) {
+          console.error("Failed to parse error response:", e);
+        }
+        alert(`Failed to terminate sessions: ${errorMsg}`);
       }
       logoutAllBtn.innerHTML =
         '<span class="i-heroicons-power w-4 h-4"></span> Logout All Users';
