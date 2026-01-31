@@ -89,9 +89,8 @@
   - **Network**: ISP name, ASN, HTTP Protocol (h2/h3), TCP RTT
   - **Security**: TLS Version (1.2/1.3), Client Trust Score
   - **Location**: City, Country, Coordinates
-- **Device Intelligence** - Backend infrastructure ready for:
-  - **Hardware**: Screen resolution, Device Memory (GB), CPU Cores
-  - **Connection**: Network type (4g/5g/wifi) via `navigator` APIs
+- **Adaptive UX Metrics** - Captures basic client capabilities (Network Type, Screen Size) to optimize content delivery.
+  - *Privacy Note*: All analytics data is **self-hosted and private**, never shared with third parties.
 - **Unified Modal UX** - Backdrop click-to-close, 300ms fade+scale animations, consistent red-hover close buttons.
 
 ### 🎨 **Icon System Optimization**
