@@ -37,8 +37,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
         }
     }
 
-	// Zero Trust Check for Admin
-    if (context.url.pathname.startsWith('/IchimaruGin728/admin')) {
+	// Zero Trust Check for Admin Routes (Page + API)
+    if (context.url.pathname.startsWith('/IchimaruGin728/admin') || context.url.pathname.startsWith('/api/admin')) {
         const ztUser = getZeroTrustUser(context.request);
         if (!ztUser) {
              return new Response('Unauthorized - Zero Trust Access Required', { status: 401 });
