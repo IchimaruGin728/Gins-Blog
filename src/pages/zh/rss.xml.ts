@@ -5,7 +5,6 @@ import { posts } from "../../../db/schema";
 import { getDb } from "../../lib/db";
 
 export async function GET(context: APIContext) {
-	
 	const db = getDb(context.locals.runtime.env);
 
 	// Fetch published posts
@@ -13,7 +12,7 @@ export async function GET(context: APIContext) {
 		.select()
 		.from(posts)
 		.where(lte(posts.publishedAt, Date.now()))
-		
+
 		.orderBy(desc(posts.publishedAt))
 		.all();
 
@@ -23,9 +22,9 @@ export async function GET(context: APIContext) {
 		site: context.site!,
 		items: blogPosts.map((post) => ({
 			title: post.title,
-			
+
 			pubDate: new Date(post.publishedAt || post.createdAt),
-			description: post.content ? post.content.substring(0, 200) + "..." : "",
+			description: post.content ? `${post.content.substring(0, 200)}...` : "",
 			link: `/zh/blog/${post.slug}`,
 		})),
 		customData: `<language>zh-SG</language>`,

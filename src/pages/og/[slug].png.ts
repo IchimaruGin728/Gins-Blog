@@ -152,7 +152,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
 													},
 													children:
 														post.title.length > 50
-															? post.title.substring(0, 50) + "..."
+															? `${post.title.substring(0, 50)}...`
 															: post.title,
 												},
 											},
@@ -298,7 +298,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
 			// For now just error log
 			console.error("Resvg render error", e);
 			throw e;
-		} catch (e2) {
+		} catch (_e2) {
 			return new Response("Image Generation Failed", { status: 500 });
 		}
 	}

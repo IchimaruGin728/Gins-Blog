@@ -1,10 +1,8 @@
 ---
-import SocialLinks from "../../components/SocialLinks";
 import { getLangFromUrl, useTranslations } from "../../i18n/utils";
-import Layout from "../../layouts/Layout.astro";
 
 const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
+const _t = useTranslations(lang);
 ---
 
 <Layout title={`${t("nav.about")} - ${t("hero.title")}`}>

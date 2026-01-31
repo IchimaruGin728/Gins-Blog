@@ -3,7 +3,7 @@
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
+const _t = useTranslations(lang);
 
 const currentPath = Astro.url.pathname;
 
@@ -20,7 +20,7 @@ const getPathWithoutLocale = (path: string) => {
 
 const normalizedPath = getPathWithoutLocale(currentPath);
 
-const isActive = (path: string) => {
+const _isActive = (path: string) => {
 	if (path === "/") {
 		return normalizedPath === "/";
 	}

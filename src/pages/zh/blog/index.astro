@@ -2,21 +2,20 @@
 import { desc, lte } from "drizzle-orm";
 import { posts } from "../../../../db/schema";
 import { getLangFromUrl, useTranslations } from "../../../i18n/utils";
-import Layout from "../../../layouts/Layout.astro";
 import { getDb } from "../../../lib/db";
 
 const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
+const _t = useTranslations(lang);
 
 // Access Cloudflare bindings from locals
 const { env } = Astro.locals.runtime;
 
-let allPosts: (typeof posts.$inferSelect)[] = [];
-let error = null;
+let _allPosts: (typeof posts.$inferSelect)[] = [];
+let _error = null;
 
 try {
 	const db = getDb(env);
-	allPosts = await db
+	_allPosts = await db
 		.select()
 		.from(posts)
 		.where(lte(posts.publishedAt, Date.now()))
@@ -24,7 +23,7 @@ try {
 		.all();
 } catch (e: any) {
 	console.error("Failed to fetch posts:", e);
-	error = e.message;
+	_error = e.message;
 }
 ---
 

@@ -40,8 +40,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			.update(sessions)
 			.set({
 				screenResolution: screenResolution || null,
-				deviceMemory: deviceMemory ? parseInt(deviceMemory) : null,
-				cpuCores: cpuCores ? parseInt(cpuCores) : null,
+				deviceMemory: deviceMemory ? parseInt(deviceMemory, 10) : null,
+				cpuCores: cpuCores ? parseInt(cpuCores, 10) : null,
 				connectionType: connectionType || null,
 			})
 			.where(eq(sessions.id, validation.session.id));
@@ -51,8 +51,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		const updatedSession = {
 			...validation.session,
 			screenResolution: screenResolution || null,
-			deviceMemory: deviceMemory ? parseInt(deviceMemory) : null,
-			cpuCores: cpuCores ? parseInt(cpuCores) : null,
+			deviceMemory: deviceMemory ? parseInt(deviceMemory, 10) : null,
+			cpuCores: cpuCores ? parseInt(cpuCores, 10) : null,
 			connectionType: connectionType || null,
 		};
 

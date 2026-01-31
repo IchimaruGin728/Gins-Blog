@@ -1,11 +1,5 @@
 ---
-import { ClientRouter } from "astro:transitions";
-import LoadingIndicator from "astro-loading-indicator/component";
-import Footer from "../components/Footer.astro";
-import Header from "../components/Header.astro";
-import MobileNav from "../components/MobileNav.astro";
-import SearchModal from "../components/SearchModal";
-import { getLangFromUrl, getRouteFromUrl } from "../i18n/utils";
+import { getLangFromUrl } from "../i18n/utils";
 import "../styles/global.css";
 
 // Font Optimizations (Self-hosted)
@@ -13,7 +7,7 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/jetbrains-mono";
 import "@fontsource-variable/outfit";
 
-const lang = getLangFromUrl(Astro.url);
+const _lang = getLangFromUrl(Astro.url);
 
 interface Props {
 	title: string;
@@ -36,7 +30,7 @@ const {
 } = Astro.props;
 
 // Construct full URL for canonical and social media
-const canonicalURL = new URL(
+const _canonicalURL = new URL(
 	Astro.url.pathname,
 	Astro.site || Astro.url.origin,
 );
@@ -47,10 +41,10 @@ const ogImage =
 	(Astro.url.pathname.startsWith("/blog/")
 		? `/og${Astro.url.pathname.replace("/blog", "")}.png`
 		: "/og-default.png");
-const fullOgImage = new URL(ogImage, Astro.site || Astro.url.origin).href;
+const _fullOgImage = new URL(ogImage, Astro.site || Astro.url.origin).href;
 
 // Format title with site name
-const fullTitle =
+const _fullTitle =
 	title === "Home"
 		? "Gin's Blog - AI, Tech & Engineering"
 		: `${title} | Gin's Blog`;

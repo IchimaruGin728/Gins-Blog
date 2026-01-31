@@ -139,7 +139,7 @@ app.get("/posts", async (c) => {
 		.orderBy(desc(posts.publishedAt));
 
 	if (limitParam !== "all") {
-		query = (query as any).limit(limitParam ? parseInt(limitParam) : 20);
+		query = (query as any).limit(limitParam ? parseInt(limitParam, 10) : 20);
 	}
 
 	const allPosts = await query.all();
@@ -226,7 +226,7 @@ app.patch(
 			await env.GINS_CACHE.delete(`post:${slug}`);
 
 			return c.json({ success: true, status: action });
-		} catch (e) {
+		} catch (_e) {
 			return c.json({ error: "Failed to update status" }, 500);
 		}
 	},
@@ -262,7 +262,7 @@ app.delete("/posts/:slug", async (c) => {
 		}
 
 		return c.json({ success: true });
-	} catch (e) {
+	} catch (_e) {
 		return c.json({ error: "Failed to delete post" }, 500);
 	}
 });
@@ -304,7 +304,7 @@ app.get("/music", async (c) => {
 	const tracks = await db
 		.select()
 		.from(schema.music)
-		.orderBy(schema.music.createdAt, "desc")
+		.orderBy(desc(schema.music.createdAt))
 		.all();
 	return c.json(tracks);
 });

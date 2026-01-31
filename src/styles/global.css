@@ -53,18 +53,13 @@ body {
 
 /* Custom Navigation Loading Bar */
 ._astro_loading_indicator {
-	background: linear-gradient(
-		90deg,
-		#581c87 0%,
-		#c084fc 50%,
-		#581c87 100%
-	) !important;
-	background-size: 200% 100% !important;
+	background: linear-gradient(90deg, #581c87 0%, #c084fc 50%, #581c87 100%);
+	background-size: 200% 100%;
 	box-shadow:
 		0 0 15px #c084fc,
-		0 0 30px #581c87 !important;
-	height: 3px !important;
-	z-index: 9999 !important;
+		0 0 30px #581c87;
+	height: 3px;
+	z-index: 9999;
 	animation: shimmer 2s linear infinite;
 }
 

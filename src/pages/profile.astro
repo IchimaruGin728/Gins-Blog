@@ -1,9 +1,8 @@
 ---
 import { useTranslations } from "../i18n/utils";
-import Layout from "../layouts/Layout.astro";
 
 const lang = "en-SG";
-const t = useTranslations(lang);
+const _t = useTranslations(lang);
 
 const user = Astro.locals.user;
 if (!user) return Astro.redirect("/login");
@@ -25,7 +24,7 @@ const userProfile = await db
 	.where(eq(users.id, user.id))
 	.get();
 
-const socialLinks = userProfile?.socialLinks
+const _socialLinks = userProfile?.socialLinks
 	? JSON.parse(userProfile.socialLinks as string)
 	: {};
 ---

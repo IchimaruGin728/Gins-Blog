@@ -23,7 +23,7 @@ export async function GET(context: APIContext) {
 		items: blogPosts.map((post) => ({
 			title: post.title,
 			pubDate: new Date(post.publishedAt || post.createdAt),
-			description: post.content ? post.content.substring(0, 200) + "..." : "",
+			description: post.content ? `${post.content.substring(0, 200)}...` : "",
 			link: `/blog/${post.slug}`,
 		})),
 		customData: `<language>en-SG</language>`,

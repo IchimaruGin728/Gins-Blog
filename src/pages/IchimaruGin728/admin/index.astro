@@ -1,6 +1,4 @@
 ---
-import Layout from "../../../layouts/Layout.astro";
-
 // Protect Route handled by Middleware (Zero Trust)
 const env = Astro.locals.runtime.env;
 
@@ -15,17 +13,17 @@ async function safeFetch<T>(promise: Promise<T>, fallback: T): Promise<T> {
 }
 
 // Analytics Data
-const postCount = await safeFetch(
+const _postCount = await safeFetch(
 	env.DB.prepare("SELECT count(*) as count FROM posts").first<number>("count"),
 	0,
 );
 
-const userCount = await safeFetch(
+const _userCount = await safeFetch(
 	env.DB.prepare("SELECT count(*) as count FROM users").first<number>("count"),
 	0,
 );
 
-const activeSessionCount = await safeFetch(
+const _activeSessionCount = await safeFetch(
 	env.DB.prepare("SELECT count(*) as count FROM sessions WHERE expires_at > ?")
 		.bind(Date.now())
 		.first<number>("count"),
@@ -39,7 +37,7 @@ Astro.response.headers.set(
 );
 Astro.response.headers.set("Pragma", "no-cache");
 Astro.response.headers.set("Expires", "0");
-const recentPosts = await safeFetch(
+const _recentPosts = await safeFetch(
 	env.DB.prepare(
 		"SELECT * FROM posts ORDER BY published_at DESC LIMIT 10",
 	).all(),
@@ -48,7 +46,7 @@ const recentPosts = await safeFetch(
 );
 
 // Detailed Lists for Modals
-const activeSessionsList = await safeFetch(
+const _activeSessionsList = await safeFetch(
 	env.DB.prepare(
 		`
     SELECT 
@@ -102,14 +100,14 @@ const activeSessionsList = await safeFetch(
 	{ results: [] },
 );
 
-const usersList = await safeFetch(
+const _usersList = await safeFetch(
 	env.DB.prepare("SELECT * FROM users ORDER BY rowid DESC LIMIT 100").all(), // valid sqlite
 	// @ts-expect-error
 	{ results: [] },
 );
 
 // Edge Analytics Queries
-const edgeNodeStats = await safeFetch(
+const _edgeNodeStats = await safeFetch(
 	env.DB.prepare(
 		`
     SELECT 
@@ -130,7 +128,7 @@ const edgeNodeStats = await safeFetch(
 	{ results: [] },
 );
 
-const performanceSummary = await safeFetch(
+const _performanceSummary = await safeFetch(
 	env.DB.prepare(
 		`
     SELECT 
@@ -148,7 +146,7 @@ const performanceSummary = await safeFetch(
 );
 
 // Edge Node Location Mapping (100+ Major Cloudflare Nodes)
-const COLO_LOCATIONS: Record<
+const _COLO_LOCATIONS: Record<
 	string,
 	{ city: string; country: string; region: string; flag: string }
 > = {
