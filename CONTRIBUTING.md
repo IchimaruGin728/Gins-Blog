@@ -1,6 +1,6 @@
 # Contributing to Gins Blog
 
-[中文版](./CONTRIBUTING.zh.md)
+English | [简体中文](./CONTRIBUTING.zh.md)
 
 Thanks for your interest in contributing! This document provides guidelines for contributing to the project.
 
