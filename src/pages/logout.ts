@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { invalidateSession } from '../lib/session';
 import { getDb } from '../lib/db';
 
-export const POST: APIRoute = async ({ cookies, locals, redirect }) => {
+export const POST: APIRoute = async ({ cookies, locals }) => {
 	const sessionToken = cookies.get('session')?.value;
 	
 	if (sessionToken) {

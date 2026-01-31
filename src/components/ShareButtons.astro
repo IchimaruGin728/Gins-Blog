@@ -190,7 +190,7 @@ const shareUrls = {
   </div>
 </div>
 
-<script define:vars={{ url }}>
+<script is:inline define:vars={{ url }}>
   function copyToClipboard() {
     navigator.clipboard.writeText(url).then(() => {
       const toast = document.getElementById("copy-toast");
