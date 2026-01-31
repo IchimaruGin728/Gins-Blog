@@ -1066,6 +1066,23 @@ const COLO_LOCATIONS: Record<
                             Trust: {trustScore}/99
                           </div>
                         )}
+                        
+                        {/* Device Intelligence */}
+                        {(s.screen_resolution || s.device_memory || s.cpu_cores) && (
+                          <div class="pt-2 mt-2 border-t border-white/5 space-y-1">
+                             {s.screen_resolution && (
+                               <div class="flex items-center gap-1.5 text-gray-400">
+                                 <span class="i-heroicons-computer-desktop w-3 h-3" />
+                                 <span>{s.screen_resolution}</span>
+                               </div>
+                             )}
+                             <div class="flex items-center gap-2 text-gray-500 font-mono text-[10px]">
+                               {s.cpu_cores && <span>{s.cpu_cores} Cores</span>}
+                               {s.device_memory && <span>{s.device_memory}GB RAM</span>}
+                               {s.connection_type && <span class="uppercase border border-white/10 px-1 rounded">{s.connection_type}</span>}
+                             </div>
+                          </div>
+                        )}
                       </div>
                     </td>
 
@@ -1785,7 +1802,6 @@ const COLO_LOCATIONS: Record<
         });
 
         if (res.ok) {
-          // ... (success logic remains the same)
           const modal = document.getElementById("success-modal");
           const verifyBtn = document.getElementById(
             "verify-signal-btn",
@@ -1793,11 +1809,65 @@ const COLO_LOCATIONS: Record<
           const returnBtn = document.getElementById("return-uplink-btn");
           const slug = formData.get("slug") as string;
 
-          verifyBtn.href = `/blog/${slug}`;
-
-          modal?.classList.remove("hidden", "pointer-events-none");
+          if (verifyBtn) verifyBtn.href = `/blog/${slug}`;
           void modal?.offsetWidth;
           modal?.classList.remove("opacity-0");
+
+          // Reset Form
+          form.reset();
+          textarea.value = "";
+          document.getElementById("post-id")?.setAttribute("value", "");
+          // Reset button
+          const btn = document.querySelector('button[type="submit"]');
+          if (btn) btn.innerHTML = "BROADCAST SIGNAL";
+
+          // Optional: Reload list to show new post immediately?
+          // For now, let user choose action in modal.
+        } else {
+          try {
+            const data = await res.json();
+            alert(`Error: ${data.message || "Unknown error"}`);
+          } catch (e) {
+            alert("Error: Failed to save post");
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Network Error");
+      } finally {
+        status!.className = "hidden";
+      }
+    });
+    
+    // --- Device Intelligence Collection ---
+    const reportDeviceInfo = async () => {
+      // Don't report if already done this session (optional, but good for performance)
+      if (sessionStorage.getItem('gins_device_reported')) return;
+
+      const info = {
+        screenResolution: `${window.screen.width}x${window.screen.height}`,
+        // @ts-ignore
+        deviceMemory: navigator.deviceMemory,
+        cpuCores: navigator.hardwareConcurrency,
+        // @ts-ignore
+        connectionType: navigator.connection?.effectiveType
+      };
+
+      try {
+        await fetch('/api/session/device-info', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(info)
+        });
+        sessionStorage.setItem('gins_device_reported', 'true');
+        console.log('📡 Device Intelligence Reported:', info);
+      } catch (e) {
+        console.error('Device info report failed', e);
+      }
+    };
+    
+    // Report on load
+    reportDeviceInfo();
           modal?.querySelector(".glass-panel")?.classList.remove("scale-95");
           modal?.querySelector(".glass-panel")?.classList.add("scale-100");
 

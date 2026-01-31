@@ -7,7 +7,7 @@ import { validateSessionToken } from '../../../lib/session';
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const env = locals.runtime.env;
-    const db = getDb(env.DB);
+    const db = getDb(env);
     
     // 1. Validate Session
     const cookieHeader = request.headers.get("Cookie");
