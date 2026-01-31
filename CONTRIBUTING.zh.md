@@ -1,5 +1,7 @@
 # 参与贡献 (Contributing to Gins Blog)
 
+[English Version](./CONTRIBUTING.md)
+
 感谢你有兴趣参与贡献！本文档提供了参与该项目的相关指南。
 
 ## 分支策略 (Branching Strategy)

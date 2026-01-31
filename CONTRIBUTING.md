@@ -1,5 +1,7 @@
 # Contributing to Gins Blog
 
+[中文版](./CONTRIBUTING.zh.md)
+
 Thanks for your interest in contributing! This document provides guidelines for contributing to the project.
 
 ## Branching Strategy
