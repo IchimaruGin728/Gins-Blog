@@ -42,9 +42,15 @@ const t = useTranslations(lang);
         <span>{t("login.discord")}</span>
       </a>
 
-      <p class="mt-6 text-xs text-gray-500">
-        {t("login.terms")}
-      </p>
+      <div class="mt-6 flex flex-col items-center gap-2 text-xs text-gray-500">
+        <p>{t("login.terms")}</p>
+        <a
+          href="/privacy"
+          class="text-brand-accent hover:text-white transition-colors underline underline-offset-4"
+        >
+          Privacy Policy / 隐私政策
+        </a>
+      </div>
     </div>
   </div>
 </Layout>
