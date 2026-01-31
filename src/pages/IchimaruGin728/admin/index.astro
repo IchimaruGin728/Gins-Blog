@@ -528,7 +528,7 @@ const recentPosts = await safeFetch(
   import { hc } from "hono/client";
   import type { AppType } from "../../api/[...path]";
 
-  const client = hc<AppType>(window.location.origin);
+  const client = hc<AppType>(window.location.origin) as any;
   const form = document.getElementById("create-post-form") as HTMLFormElement;
 
   // Bind Edit Buttons (Recent List)
