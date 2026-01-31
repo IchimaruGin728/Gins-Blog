@@ -107,6 +107,97 @@ const usersList = await safeFetch(
   // @ts-ignore
   { results: [] },
 );
+
+// Edge Analytics Queries
+const edgeNodeStats = await safeFetch(
+  env.DB.prepare(
+    `
+    SELECT 
+      colo,
+      COUNT(*) as session_count,
+      AVG(client_tcp_rtt) as avg_rtt,
+      country,
+      continent
+    FROM sessions
+    WHERE expires_at > ? AND colo IS NOT NULL
+    GROUP BY colo
+    ORDER BY session_count DESC
+  `,
+  )
+    .bind(Date.now())
+    .all(),
+  // @ts-ignore
+  { results: [] },
+);
+
+const geographicDistribution = await safeFetch(
+  env.DB.prepare(
+    `
+    SELECT 
+      country,
+      continent,
+      COUNT(*) as count
+    FROM sessions
+    WHERE expires_at > ? AND country IS NOT NULL
+    GROUP BY country, continent
+    ORDER BY count DESC
+    LIMIT 15
+  `,
+  )
+    .bind(Date.now())
+    .all(),
+  // @ts-ignore
+  { results: [] },
+);
+
+const performanceSummary = await safeFetch(
+  env.DB.prepare(
+    `
+    SELECT 
+      AVG(client_tcp_rtt) as global_avg_rtt,
+      MIN(client_tcp_rtt) as min_rtt,
+      MAX(client_tcp_rtt) as max_rtt,
+      COUNT(DISTINCT colo) as active_nodes
+    FROM sessions
+    WHERE expires_at > ? AND client_tcp_rtt IS NOT NULL
+  `,
+  )
+    .bind(Date.now())
+    .first(),
+  null,
+);
+
+// Edge Node Location Mapping
+const COLO_LOCATIONS: Record<
+  string,
+  { city: string; country: string; region: string; flag: string }
+> = {
+  SJC: { city: "San Jose", country: "US", region: "California", flag: "🇺🇸" },
+  NRT: { city: "Tokyo", country: "JP", region: "Kanto", flag: "🇯🇵" },
+  SIN: { city: "Singapore", country: "SG", region: "Singapore", flag: "🇸🇬" },
+  HKG: { city: "Hong Kong", country: "HK", region: "Hong Kong", flag: "🇭🇰" },
+  LAX: { city: "Los Angeles", country: "US", region: "California", flag: "🇺🇸" },
+  SEA: { city: "Seattle", country: "US", region: "Washington", flag: "🇺🇸" },
+  ORD: { city: "Chicago", country: "US", region: "Illinois", flag: "🇺🇸" },
+  LHR: { city: "London", country: "GB", region: "England", flag: "🇬🇧" },
+  FRA: { city: "Frankfurt", country: "DE", region: "Hesse", flag: "🇩🇪" },
+  CDG: { city: "Paris", country: "FR", region: "Île-de-France", flag: "🇫🇷" },
+  AMS: {
+    city: "Amsterdam",
+    country: "NL",
+    region: "North Holland",
+    flag: "🇳🇱",
+  },
+  SYD: { city: "Sydney", country: "AU", region: "New South Wales", flag: "🇦🇺" },
+  ICN: { city: "Seoul", country: "KR", region: "Seoul", flag: "🇰🇷" },
+  BOM: { city: "Mumbai", country: "IN", region: "Maharashtra", flag: "🇮🇳" },
+  GRU: { city: "São Paulo", country: "BR", region: "São Paulo", flag: "🇧🇷" },
+  YYZ: { city: "Toronto", country: "CA", region: "Ontario", flag: "🇨🇦" },
+  DXB: { city: "Dubai", country: "AE", region: "Dubai", flag: "🇦🇪" },
+  TPE: { city: "Taipei", country: "TW", region: "Taipei", flag: "🇹🇼" },
+  KUL: { city: "Kuala Lumpur", country: "MY", region: "Selangor", flag: "🇲🇾" },
+  MNL: { city: "Manila", country: "PH", region: "Metro Manila", flag: "🇵🇭" },
+};
 ---
 
 <Layout title="Dashboard - Ichimaru Gin">
@@ -160,7 +251,7 @@ const usersList = await safeFetch(
     </header>
 
     <!-- Analytics Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-12">
       <div class="glass-panel p-6 rounded-2xl">
         <div
           class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-2"
@@ -223,6 +314,35 @@ const usersList = await safeFetch(
         >
           <span>Inspect Traffic</span>
           <span class="i-heroicons-arrow-right w-3 h-3"></span>
+        </div>
+      </div>
+
+      <!-- Edge Analytics Card (Clickable) -->
+      <div
+        class="glass-panel p-6 rounded-2xl cursor-pointer hover:bg-white/5 transition-colors group relative"
+        onclick="openInspector('edge')"
+      >
+        <div
+          class="absolute top-4 right-4 text-gray-500 group-hover:text-white transition-colors"
+        >
+          <span class="i-heroicons-server w-5 h-5"></span>
+        </div>
+        <div
+          class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-2"
+        >
+          Edge Nodes
+        </div>
+        <div
+          class="text-4xl font-bold font-display group-hover:text-blue-400 transition-colors"
+        >
+          {performanceSummary?.active_nodes || 0}
+        </div>
+        <div
+          class="text-xs text-gray-500 mt-2 flex items-center gap-1 group-hover:text-blue-400/70 transition-colors"
+        >
+          <span
+            >Avg {Math.round(performanceSummary?.global_avg_rtt || 0)}ms</span
+          >
         </div>
       </div>
 
@@ -979,6 +1099,167 @@ const usersList = await safeFetch(
       </div>
     </div>
   </div>
+
+  <!-- Edge Analytics Modal -->
+  <div
+    id="edge-analytics-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 pointer-events-none"
+  >
+    <div
+      class="glass-panel p-8 rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-y-auto scale-95 transition-transform duration-300"
+    >
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-3xl font-display font-bold flex items-center gap-3">
+            <span class="i-heroicons-server w-8 h-8 text-blue-400"></span>
+            Edge Analytics
+          </h2>
+          <p class="text-gray-400 mt-1">
+            Cloudflare node distribution & routing
+          </p>
+        </div>
+        <button
+          class="close-inspect-btn p-2 rounded-lg hover:bg-white/10 transition-colors"
+        >
+          <span class="i-heroicons-x-mark w-6 h-6"></span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-4 gap-4 mb-8">
+        <div class="glass-panel p-4 rounded-xl">
+          <div class="text-xs text-gray-400 mb-1">Active Nodes</div>
+          <div class="text-2xl font-bold text-blue-400">
+            {performanceSummary?.active_nodes || 0}
+          </div>
+        </div>
+        <div class="glass-panel p-4 rounded-xl">
+          <div class="text-xs text-gray-400 mb-1">Avg RTT</div>
+          <div class="text-2xl font-bold text-green-400">
+            {Math.round(performanceSummary?.global_avg_rtt || 0)}ms
+          </div>
+        </div>
+        <div class="glass-panel p-4 rounded-xl">
+          <div class="text-xs text-gray-400 mb-1">Min RTT</div>
+          <div class="text-2xl font-bold text-green-300">
+            {Math.round(performanceSummary?.min_rtt || 0)}ms
+          </div>
+        </div>
+        <div class="glass-panel p-4 rounded-xl">
+          <div class="text-xs text-gray-400 mb-1">Max RTT</div>
+          <div class="text-2xl font-bold text-orange-400">
+            {Math.round(performanceSummary?.max_rtt || 0)}ms
+          </div>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="border-b border-white/10">
+            <tr
+              class="text-left text-xs uppercase tracking-wider text-gray-400"
+            >
+              <th class="p-4">Node</th>
+              <th class="p-4">Location</th>
+              <th class="p-4 text-right">Sessions</th>
+              <th class="p-4 text-right">Avg RTT</th>
+              <th class="p-4 text-right">Performance</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm divide-y divide-white/5">
+            {
+              (edgeNodeStats.results || []).map((node: any) => {
+                const location = COLO_LOCATIONS[node.colo] || {
+                  city: node.colo,
+                  country: "??",
+                  flag: "🌐",
+                  region: "",
+                };
+                const avgRtt = Math.round(node.avg_rtt || 0);
+                const rttColor =
+                  avgRtt < 50
+                    ? "text-green-400"
+                    : avgRtt < 150
+                      ? "text-yellow-400"
+                      : "text-red-400";
+                const percentage = (
+                  (node.session_count / activeSessionCount) *
+                  100
+                ).toFixed(1);
+
+                return (
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-4">
+                      <div class="font-mono font-bold text-blue-400">
+                        {node.colo}
+                      </div>
+                    </td>
+                    <td class="p-4">
+                      <div class="flex items-center gap-2">
+                        <span class="text-2xl">{location.flag}</span>
+                        <div>
+                          <div class="font-semibold">{location.city}</div>
+                          <div class="text-xs text-gray-500">
+                            {location.region}, {location.country}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="p-4 text-right">
+                      <div class="font-bold">{node.session_count}</div>
+                      <div class="text-xs text-gray-500">{percentage}%</div>
+                    </td>
+                    <td
+                      class={`p-4 text-right font-mono font-bold ${rttColor}`}
+                    >
+                      {avgRtt}ms
+                    </td>
+                    <td class="p-4 text-right">
+                      {avgRtt < 50 && (
+                        <span class="px-2 py-1 rounded bg-green-500/20 text-green-300 text-xs">
+                          Excellent
+                        </span>
+                      )}
+                      {avgRtt >= 50 && avgRtt < 150 && (
+                        <span class="px-2 py-1 rounded bg-yellow-500/20 text-yellow-300 text-xs">
+                          Good
+                        </span>
+                      )}
+                      {avgRtt >= 150 && (
+                        <span class="px-2 py-1 rounded bg-red-500/20 text-red-300 text-xs">
+                          Poor
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            }
+          </tbody>
+        </table>
+      </div>
+
+      {
+        (edgeNodeStats.results || []).some(
+          (node: any) => Math.round(node.avg_rtt || 0) > 150,
+        ) && (
+          <div class="mt-6 p-4 rounded-xl bg-orange-500/10 border border-orange-500/30">
+            <div class="flex items-start gap-3">
+              <span class="i-heroicons-exclamation-triangle w-6 h-6 text-orange-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <div class="font-bold text-orange-300 mb-1">
+                  Routing Anomalies Detected
+                </div>
+                <div class="text-sm text-gray-300">
+                  High latency detected (&gt;150ms). Possible causes: suboptimal
+                  routing, VPN usage, or network congestion.
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </div>
 </Layout>
 
 <script>
@@ -1022,19 +1303,17 @@ const usersList = await safeFetch(
   // --- Modals Logic ---
   const activeSessionsModal = document.getElementById("active-sessions-modal");
   const userDatabaseModal = document.getElementById("user-database-modal");
+  const edgeAnalyticsModal = document.getElementById("edge-analytics-modal");
 
   const closeModals = () => {
-    activeSessionsModal?.classList.add(
-      "hidden",
-      "opacity-0",
-      "pointer-events-none",
-    );
-    userDatabaseModal?.classList.add(
-      "hidden",
-      "opacity-0",
-      "pointer-events-none",
-    );
-    // Reset scales
+    activeSessionsModal?.classList.add("opacity-0");
+    userDatabaseModal?.classList.add("opacity-0");
+    edgeAnalyticsModal?.classList.add("opacity-0");
+    setTimeout(() => {
+      activeSessionsModal?.classList.add("hidden", "pointer-events-none");
+      userDatabaseModal?.classList.add("hidden", "pointer-events-none");
+      edgeAnalyticsModal?.classList.add("hidden", "pointer-events-none");
+    }, 300);
     activeSessionsModal
       ?.querySelector(".glass-panel")
       ?.classList.remove("scale-100");
@@ -1045,6 +1324,12 @@ const usersList = await safeFetch(
       ?.querySelector(".glass-panel")
       ?.classList.remove("scale-100");
     userDatabaseModal?.querySelector(".glass-panel")?.classList.add("scale-95");
+    edgeAnalyticsModal
+      ?.querySelector(".glass-panel")
+      ?.classList.remove("scale-100");
+    edgeAnalyticsModal
+      ?.querySelector(".glass-panel")
+      ?.classList.add("scale-95");
   };
 
   document.querySelectorAll(".close-inspect-btn").forEach((btn) => {
@@ -1064,13 +1349,22 @@ const usersList = await safeFetch(
   window.openInspector = (type) => {
     if (type === "sessions") {
       activeSessionsModal?.classList.remove("hidden", "pointer-events-none");
-      // Trigger reflow for transition
       void activeSessionsModal?.offsetWidth;
       activeSessionsModal?.classList.remove("opacity-0");
       activeSessionsModal
         ?.querySelector(".glass-panel")
         ?.classList.remove("scale-95");
       activeSessionsModal
+        ?.querySelector(".glass-panel")
+        ?.classList.add("scale-100");
+    } else if (type === "edge") {
+      edgeAnalyticsModal?.classList.remove("hidden", "pointer-events-none");
+      void edgeAnalyticsModal?.offsetWidth;
+      edgeAnalyticsModal?.classList.remove("opacity-0");
+      edgeAnalyticsModal
+        ?.querySelector(".glass-panel")
+        ?.classList.remove("scale-95");
+      edgeAnalyticsModal
         ?.querySelector(".glass-panel")
         ?.classList.add("scale-100");
     } else {
