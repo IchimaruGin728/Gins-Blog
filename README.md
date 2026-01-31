@@ -73,8 +73,18 @@
 
 ### 📊 **Analytics & Insights**
 - **Real-time View Counts** - Hybrid D1+KV architecture using `UPDATE ... RETURNING` for zero-latency, fresh view stats.
-- **Geolocation Tracking** - Automatic city/country detection via Cloudflare Headers (`request.cf`) stored in session data.
-- **Unified Data Inspector** - Consolidated admin view for active sessions and user data with visual identity icons.
+- **Edge Analytics Dashboard** - Monitor 100+ global Cloudflare nodes with real-time RTT metrics
+  - **Global Coverage** - 35+ North American, 35+ European, 20+ Asia-Pacific nodes
+  - **Performance Monitoring** - Automatic routing anomaly detection and latency analysis
+  - **Visual Distribution** - Interactive node map with session counts and performance ratings
+- **Enhanced Session Tracking** - Comprehensive metadata including ISP, geolocation, TLS version, trust score
+- **Device Intelligence** - Screen resolution, memory, CPU cores, connection type tracking (ready for client-side collection)
+- **Unified Modal UX** - Backdrop click-to-close, consistent animations, and streamlined interactions
+
+### 🎨 **Icon System Optimization**
+- **Maximum Quality** - SVG geometric precision rendering with GPU acceleration
+- **Zero Latency** - Local inline icons with safelist preloading for instant rendering
+- **Performance** - Hardware-accelerated transforms (`translateZ(0)`) with anti-flicker optimizations
 
 ---
 
