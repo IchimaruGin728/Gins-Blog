@@ -18,8 +18,11 @@ export function getRouteFromUrl(url: URL, targetLang: string) {
   let path = url.pathname;
   const search = url.search;
   
-  // Remove current lang prefix if it exists
-  if (currentLang !== defaultLang) {
+  // Remove current lang prefix
+  // Handle Special Case: zh-SG internal -> zh URL
+  if (currentLang === 'zh-SG') {
+    path = path.replace(/^\/zh/, "") || "/";
+  } else if (currentLang !== defaultLang) {
     path = path.replace(`/${currentLang}`, "") || "/";
   }
 
@@ -34,6 +37,8 @@ export function getRouteFromUrl(url: URL, targetLang: string) {
   }
 
   // Otherwise prepend target lang
-  // Avoid double slashes if path is just "/"
-  return `/${targetLang}${path === "/" ? "" : path}${search}`;
+  // Handle Special Case: zh-SG internal -> zh URL
+  const prefix = targetLang === 'zh-SG' ? 'zh' : targetLang;
+  
+  return `/${prefix}${path === "/" ? "" : path}${search}`;
 }

@@ -40,7 +40,7 @@ const isActive = (path: string) => {
     <div class="flex justify-around items-center gap-1">
       <!-- Home -->
       <a
-        href={lang === "en-SG" ? "/" : `/${lang}/`}
+        href={lang === "en-SG" ? "/" : `/${lang === "zh-SG" ? "zh" : lang}/`}
         data-astro-prefetch
         class={`group relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-out ${
           isActive("/")
@@ -84,7 +84,9 @@ const isActive = (path: string) => {
 
       <!-- Blog -->
       <a
-        href={lang === "en-SG" ? "/blog" : `/${lang}/blog/`}
+        href={lang === "en-SG"
+          ? "/blog"
+          : `/${lang === "zh-SG" ? "zh" : lang}/blog/`}
         data-astro-prefetch
         class={`group relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-out ${
           isActive("/blog")
@@ -153,7 +155,9 @@ const isActive = (path: string) => {
 
       <!-- About -->
       <a
-        href={lang === "en-SG" ? "/about" : `/${lang}/about/`}
+        href={lang === "en-SG"
+          ? "/about"
+          : `/${lang === "zh-SG" ? "zh" : lang}/about/`}
         data-astro-prefetch
         class={`group relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-out ${
           isActive("/about")
