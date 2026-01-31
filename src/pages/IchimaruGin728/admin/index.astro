@@ -600,7 +600,7 @@ const usersList = await safeFetch(
   <!-- Data Inspector Modal (Unified) -->
   <div
     id="data-inspector-modal"
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300"
+    class="fixed inset-0 z-50 items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300"
     onclick="if(event.target === this) closeInspector()"
   >
     <div
@@ -924,6 +924,7 @@ const usersList = await safeFetch(
     const modal = document.getElementById("data-inspector-modal");
     if (modal) {
       modal.classList.remove("hidden");
+      modal.classList.add("flex");
       // @ts-ignore
       window.switchTab(tab);
     }
@@ -931,7 +932,11 @@ const usersList = await safeFetch(
 
   // @ts-ignore
   window.closeInspector = () => {
-    document.getElementById("data-inspector-modal")?.classList.add("hidden");
+    const modal = document.getElementById("data-inspector-modal");
+    if (modal) {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
   };
 
   // @ts-ignore
