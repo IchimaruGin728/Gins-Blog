@@ -37,10 +37,8 @@ export const GET: APIRoute = async ({ request, locals }) => {
 		// This automatically filters out:
 		// - Deleted posts (won't exist in D1)
 		// - Unpublished posts (publishedAt is null)
-		// @ts-expect-error
 		const db = getDb(env);
 
-		// @ts-expect-error
 		const validPosts = await db
 			.select({
 				id: posts.id,

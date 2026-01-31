@@ -40,7 +40,6 @@ app.post(
 		} = c.req.valid("form");
 		const env = c.env as Env;
 
-		// @ts-expect-error
 		const db = getDb(env);
 
 		// Use existing ID if provided (Edit Mode), or generate new
@@ -57,7 +56,6 @@ app.post(
 		// However, onConflict needs a target. `id` is PK.
 		// If we provide ID, it might exist.
 
-		// @ts-expect-error
 		await db
 			.insert(posts)
 			.values({
@@ -116,10 +114,8 @@ app.post(
 
 // Get Single Post (for Admin Editor)
 app.get("/posts/:slug", async (c) => {
-	// @ts-expect-error
 	const db = getDb(c.env);
 	const slug = c.req.param("slug");
-	// @ts-expect-error
 	const post = await db.select().from(posts).where(eq(posts.slug, slug)).get();
 
 	if (!post) return c.json({ error: "Post not found" }, 404);
@@ -128,7 +124,6 @@ app.get("/posts/:slug", async (c) => {
 
 // Get Recent Posts (for Admin List)
 app.get("/posts", async (c) => {
-	// @ts-expect-error
 	const db = getDb(c.env);
 	const limitParam = c.req.query("limit");
 
@@ -141,22 +136,18 @@ app.get("/posts", async (c) => {
 			updatedAt: posts.updatedAt,
 		})
 		.from(posts)
-		// @ts-expect-error
 		.orderBy(desc(posts.publishedAt));
 
 	if (limitParam !== "all") {
-		// @ts-expect-error
 		query = query.limit(limitParam ? parseInt(limitParam) : 20);
 	}
 
-	// @ts-expect-error
 	const allPosts = await query.all();
 	return c.json(allPosts);
 });
 
 // Search Posts (Admin)
 app.get("/search", async (c) => {
-	// @ts-expect-error
 	const db = getDb(c.env);
 	const query = c.req.query("q");
 
@@ -171,7 +162,6 @@ app.get("/search", async (c) => {
 	// Let's use raw SQL for simplicity if Drizzle helper is tricky with 'like' wrapper
 
 	// Fallback to JS filtering if SQL 'LIKE' is unsafe or tricky in this setup without 'like' import
-	// @ts-expect-error
 	const all = await db
 		.select({
 			title: posts.title,
@@ -221,7 +211,6 @@ app.patch(
 		}),
 	),
 	async (c) => {
-		// @ts-expect-error
 		const db = getDb(c.env);
 		const slug = c.req.param("slug");
 		const { action } = c.req.valid("json");
@@ -245,14 +234,12 @@ app.patch(
 
 // Delete Post
 app.delete("/posts/:slug", async (c) => {
-	// @ts-expect-error
 	const db = getDb(c.env);
 	const slug = c.req.param("slug");
 	const env = c.env as Env;
 
 	try {
 		// Get ID before deleting for Vectorize cleanup
-		// @ts-expect-error
 		const post = await db
 			.select({ id: posts.id })
 			.from(posts)
@@ -296,11 +283,9 @@ app.post(
 		if (!userId) return c.json({ error: "Unauthorized" }, 401);
 
 		const { title, artist, url, cover } = c.req.valid("form");
-		// @ts-expect-error
 		const db = getDb(c.env);
 
 		const id = crypto.randomUUID();
-		// @ts-expect-error
 		await db.insert(schema.music).values({
 			id,
 			title,
@@ -315,9 +300,7 @@ app.post(
 );
 
 app.get("/music", async (c) => {
-	// @ts-expect-error
 	const db = getDb(c.env);
-	// @ts-expect-error
 	const tracks = await db
 		.select()
 		.from(schema.music)
