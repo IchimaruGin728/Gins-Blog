@@ -1,21 +1,23 @@
 ---
+import { desc, lte } from "drizzle-orm";
+import { posts } from "../../../db/schema";
+import { getLangFromUrl, useTranslations } from "../../i18n/utils";
 import Layout from "../../layouts/Layout.astro";
 import { getDb } from "../../lib/db";
-import { posts } from "../../../db/schema";
-import { desc, lte } from "drizzle-orm";
-import { getLangFromUrl, useTranslations } from "../../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 const { env } = Astro.locals.runtime;
+
 // Initialize Cache
 import { getCache } from "../../lib/cache";
+
 let cache;
 try {
-  cache = getCache(env);
+	cache = getCache(env);
 } catch (e) {
-  console.error("Cache initialization failed:", e);
+	console.error("Cache initialization failed:", e);
 }
 
 let recentPosts: (typeof posts.$inferSelect)[] = [];
@@ -23,24 +25,24 @@ const CACHE_KEY = "home_recent_posts_zh";
 const CACHE_TTL = 300;
 
 try {
-  const fetchPosts = async () => {
-    const db = getDb(env);
-    return await db
-      .select()
-      .from(posts)
-      .where(lte(posts.publishedAt, Date.now()))
-      .orderBy(desc(posts.publishedAt))
-      .limit(3);
-  };
+	const fetchPosts = async () => {
+		const db = getDb(env);
+		return await db
+			.select()
+			.from(posts)
+			.where(lte(posts.publishedAt, Date.now()))
+			.orderBy(desc(posts.publishedAt))
+			.limit(3);
+	};
 
-  if (cache) {
-    recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
-  } else {
-    recentPosts = await fetchPosts();
-  }
+	if (cache) {
+		recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
+	} else {
+		recentPosts = await fetchPosts();
+	}
 } catch (e: any) {
-  console.error("Failed to fetch posts:", e);
-  // Fallback if needed
+	console.error("Failed to fetch posts:", e);
+	// Fallback if needed
 }
 ---
 

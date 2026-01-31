@@ -1,8 +1,8 @@
 ---
 interface Props {
-  url: string;
-  title: string;
-  description?: string;
+	url: string;
+	title: string;
+	description?: string;
 }
 
 const { url, title, description = "" } = Astro.props;
@@ -14,11 +14,11 @@ const encodedText = encodeURIComponent(`${title} - ${description}`.trim());
 
 // Share URLs
 const shareUrls = {
-  x: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
-  facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-  telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`,
-  whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
-  reddit: `https://reddit.com/submit?url=${encodedUrl}&title=${encodedTitle}`,
+	x: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
+	facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+	telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`,
+	whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
+	reddit: `https://reddit.com/submit?url=${encodedUrl}&title=${encodedTitle}`,
 };
 ---
 

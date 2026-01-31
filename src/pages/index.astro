@@ -1,17 +1,19 @@
 ---
+import { desc, lte } from "drizzle-orm";
+import { posts } from "../../db/schema";
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
 import Layout from "../layouts/Layout.astro";
 import { getDb } from "../lib/db";
-import { posts } from "../../db/schema";
-import { desc, lte } from "drizzle-orm";
-import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 // Access Cloudflare bindings from locals
 const { env } = Astro.locals.runtime;
+
 // Initialize Cache
 import { getCache } from "../lib/cache";
+
 let cache;
 try {
 	cache = getCache(env);

@@ -1,78 +1,107 @@
-import { getGoogle } from '../../../lib/auth';
-import { createSession, generateSessionToken, validateSessionToken } from '../../../lib/session';
-import { getDb } from '../../../lib/db';
-import { users } from '../../../../db/schema';
-import { eq } from 'drizzle-orm';
-import type { APIRoute } from 'astro';
-import type { OAuth2Tokens } from 'arctic';
+import type { OAuth2Tokens } from "arctic";
+import type { APIRoute } from "astro";
+import { eq } from "drizzle-orm";
+import { users } from "../../../../db/schema";
+import { getGoogle } from "../../../lib/auth";
+import { getDb } from "../../../lib/db";
+import {
+	createSession,
+	generateSessionToken,
+	validateSessionToken,
+} from "../../../lib/session";
 
 export const GET: APIRoute = async ({ request, cookies, locals }) => {
 	const url = new URL(request.url);
-	const code = url.searchParams.get('code');
-	const state = url.searchParams.get('state');
-	const storedState = cookies.get('google_oauth_state')?.value ?? null;
-	const codeVerifier = cookies.get('google_code_verifier')?.value ?? null;
+	const code = url.searchParams.get("code");
+	const state = url.searchParams.get("state");
+	const storedState = cookies.get("google_oauth_state")?.value ?? null;
+	const codeVerifier = cookies.get("google_code_verifier")?.value ?? null;
 
-	if (!code || !state || !storedState || !codeVerifier || state !== storedState) {
+	if (
+		!code ||
+		!state ||
+		!storedState ||
+		!codeVerifier ||
+		state !== storedState
+	) {
 		return new Response(null, {
-			status: 400
+			status: 400,
 		});
 	}
 
 	try {
-        console.log("Validating Google code...");
-		const tokens: OAuth2Tokens = await getGoogle(locals.runtime.env).validateAuthorizationCode(code, codeVerifier);
-        const accessToken = tokens.accessToken();
-        console.log("Tokens received:", accessToken ? "Present" : "Missing");
+		console.log("Validating Google code...");
+		const tokens: OAuth2Tokens = await getGoogle(
+			locals.runtime.env,
+		).validateAuthorizationCode(code, codeVerifier);
+		const accessToken = tokens.accessToken();
+		console.log("Tokens received:", accessToken ? "Present" : "Missing");
 
-        let googleUser: GoogleUser;
-        try {
-            console.log("Fetching Google user...");
-            const googleUserResponse = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
-                headers: {
-                    Authorization: `Bearer ${accessToken.trim()}`
-                }
-            });
-            googleUser = await googleUserResponse.json();
-            console.log("Google User fetched:", googleUser.name);
-        } catch (fetchError: any) {
-             throw new Error(`Failed to fetch Google user: ${fetchError.message}`);
-        }
+		let googleUser: GoogleUser;
+		try {
+			console.log("Fetching Google user...");
+			const googleUserResponse = await fetch(
+				"https://openidconnect.googleapis.com/v1/userinfo",
+				{
+					headers: {
+						Authorization: `Bearer ${accessToken.trim()}`,
+					},
+				},
+			);
+			googleUser = await googleUserResponse.json();
+			console.log("Google User fetched:", googleUser.name);
+		} catch (fetchError: any) {
+			throw new Error(`Failed to fetch Google user: ${fetchError.message}`);
+		}
 
 		const db = getDb(locals.runtime.env);
 
 		// Check if user is already logged in (linking a new provider)
-		const existingSessionToken = cookies.get('session')?.value;
+		const existingSessionToken = cookies.get("session")?.value;
 		let currentUserId: string | null = null;
-		
+
 		if (existingSessionToken) {
-			const sessionResult = await validateSessionToken(existingSessionToken, db, locals.runtime.env);
+			const sessionResult = await validateSessionToken(
+				existingSessionToken,
+				db,
+				locals.runtime.env,
+			);
 			if (sessionResult.session && sessionResult.user) {
 				currentUserId = sessionResult.user.id;
-				console.log("User is already logged in, linking Google account to user:", currentUserId);
+				console.log(
+					"User is already logged in, linking Google account to user:",
+					currentUserId,
+				);
 			}
 		}
 
 		// Check if this Google account is already linked to a user
-		const existingUser = await db.select().from(users).where(eq(users.googleId, googleUser.sub)).get();
+		const existingUser = await db
+			.select()
+			.from(users)
+			.where(eq(users.googleId, googleUser.sub))
+			.get();
 
 		let userId = "";
 
 		if (currentUserId) {
 			// User is logged in - link Google to their current account
 			if (existingUser && existingUser.id !== currentUserId) {
-				throw new Error("This Google account is already linked to another user account.");
+				throw new Error(
+					"This Google account is already linked to another user account.",
+				);
 			}
-			
+
 			// Update current user with Google ID and provider info
-			await db.update(users)
-				.set({ 
+			await db
+				.update(users)
+				.set({
 					googleId: googleUser.sub,
 					googleUsername: googleUser.name,
 					googleAvatar: googleUser.picture,
 				})
 				.where(eq(users.id, currentUserId));
-			
+
 			userId = currentUserId;
 			console.log("Google account linked to existing user:", userId);
 		} else if (existingUser) {
@@ -100,24 +129,24 @@ export const GET: APIRoute = async ({ request, cookies, locals }) => {
 			userId,
 			db,
 			locals.runtime.env,
-			request
+			request,
 		);
-		
-        console.log("Setting session cookie...");
-        cookies.set('session', token, {
-			path: '/',
+
+		console.log("Setting session cookie...");
+		cookies.set("session", token, {
+			path: "/",
 			httpOnly: true,
-			sameSite: 'lax',
+			sameSite: "lax",
 			secure: import.meta.env.PROD,
-			expires: new Date(session.expiresAt)
+			expires: new Date(session.expiresAt),
 		});
 
-        // Retrieve redirect URL from cookie or default to home
-        const redirectUrl = cookies.get('login_redirect')?.value ?? '/';
-        // Clean up the cookie
-        cookies.delete('login_redirect', { path: '/' });
+		// Retrieve redirect URL from cookie or default to home
+		const redirectUrl = cookies.get("login_redirect")?.value ?? "/";
+		// Clean up the cookie
+		cookies.delete("login_redirect", { path: "/" });
 
-        const html = `
+		const html = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -160,24 +189,31 @@ export const GET: APIRoute = async ({ request, cookies, locals }) => {
         `;
 
 		return new Response(html, {
-            headers: {
-                'Content-Type': 'text/html'
-            }
-        });
-	} catch (e: any) {
-        console.error(e);
-		return new Response(JSON.stringify({
-            error: e.message,
-            stack: e.stack
-        }, null, 2), {
-			status: 500
+			headers: {
+				"Content-Type": "text/html",
+			},
 		});
+	} catch (e: any) {
+		console.error(e);
+		return new Response(
+			JSON.stringify(
+				{
+					error: e.message,
+					stack: e.stack,
+				},
+				null,
+				2,
+			),
+			{
+				status: 500,
+			},
+		);
 	}
 };
 
 interface GoogleUser {
 	sub: string;
 	name: string;
-    picture: string;
-    email: string;
+	picture: string;
+	email: string;
 }

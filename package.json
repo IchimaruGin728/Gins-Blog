@@ -1,55 +1,55 @@
 {
-  "name": "gins-blog",
-  "type": "module",
-  "version": "1.0.0",
-  "engines": {
-    "node": ">=24"
-  },
-  "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
-    "deploy": "astro build && wrangler deploy",
-    "preview": "astro preview",
-    "astro": "astro",
-    "db:push": "drizzle-kit push --config=drizzle.config.ts"
-  },
-  "dependencies": {
-    "@astrojs/check": "^0.9.6",
-    "@astrojs/cloudflare": "latest",
-    "@astrojs/preact": "latest",
-    "@astrojs/rss": "^4.0.15",
-    "@astrojs/sitemap": "^3.7.0",
-    "@fontsource-variable/inter": "^5.2.8",
-    "@fontsource-variable/jetbrains-mono": "^5.2.8",
-    "@fontsource-variable/outfit": "^5.2.8",
-    "@hono/zod-validator": "^0.7.6",
-    "@oslojs/crypto": "^1.0.1",
-    "@oslojs/encoding": "^1.1.0",
-    "@resvg/resvg-wasm": "^2.6.2",
-    "arctic": "latest",
-    "astro": "latest",
-    "astro-loading-indicator": "^0.7.1",
-    "astro-remote": "^0.3.4",
-    "drizzle-orm": "latest",
-    "hono": "latest",
-    "marked": "^17.0.1",
-    "oslo": "latest",
-    "preact": "latest",
-    "satori": "^0.19.1",
-    "typescript": "^5.9.3",
-    "ua-parser-js": "^2.0.8",
-    "zod": "^3.25.76"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "latest",
-    "@iconify-json/heroicons": "^1.2.3",
-    "@iconify-json/logos": "^1.2.10",
-    "@iconify-json/simple-icons": "^1.2.68",
-    "@types/node": "latest",
-    "dotenv": "^17.2.3",
-    "drizzle-kit": "latest",
-    "unocss": "latest",
-    "wrangler": "latest"
-  }
+	"name": "gins-blog",
+	"type": "module",
+	"version": "1.0.0",
+	"engines": {
+		"node": ">=24"
+	},
+	"scripts": {
+		"dev": "astro dev",
+		"start": "astro dev",
+		"build": "astro build",
+		"deploy": "astro build && wrangler deploy",
+		"preview": "astro preview",
+		"astro": "astro",
+		"db:push": "drizzle-kit push --config=drizzle.config.ts"
+	},
+	"dependencies": {
+		"@astrojs/check": "^0.9.6",
+		"@astrojs/cloudflare": "latest",
+		"@astrojs/preact": "latest",
+		"@astrojs/rss": "^4.0.15",
+		"@astrojs/sitemap": "^3.7.0",
+		"@fontsource-variable/inter": "^5.2.8",
+		"@fontsource-variable/jetbrains-mono": "^5.2.8",
+		"@fontsource-variable/outfit": "^5.2.8",
+		"@hono/zod-validator": "^0.7.6",
+		"@oslojs/crypto": "^1.0.1",
+		"@oslojs/encoding": "^1.1.0",
+		"@resvg/resvg-wasm": "^2.6.2",
+		"arctic": "latest",
+		"astro": "latest",
+		"astro-loading-indicator": "^0.7.1",
+		"astro-remote": "^0.3.4",
+		"drizzle-orm": "latest",
+		"hono": "latest",
+		"marked": "^17.0.1",
+		"oslo": "latest",
+		"preact": "latest",
+		"satori": "^0.19.1",
+		"typescript": "^5.9.3",
+		"ua-parser-js": "^2.0.8",
+		"zod": "^3.25.76"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "latest",
+		"@iconify-json/heroicons": "^1.2.3",
+		"@iconify-json/logos": "^1.2.10",
+		"@iconify-json/simple-icons": "^1.2.68",
+		"@types/node": "latest",
+		"dotenv": "^17.2.3",
+		"drizzle-kit": "latest",
+		"unocss": "latest",
+		"wrangler": "latest"
+	}
 }

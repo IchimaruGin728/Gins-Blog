@@ -1,17 +1,17 @@
-import type { APIRoute } from 'astro';
-import { invalidateSession } from '../lib/session';
-import { getDb } from '../lib/db';
+import type { APIRoute } from "astro";
+import { getDb } from "../lib/db";
+import { invalidateSession } from "../lib/session";
 
 export const POST: APIRoute = async ({ cookies, locals }) => {
-	const sessionToken = cookies.get('session')?.value;
-	
+	const sessionToken = cookies.get("session")?.value;
+
 	if (sessionToken) {
 		const db = getDb(locals.runtime.env);
 		await invalidateSession(sessionToken, db, locals.runtime.env);
 	}
-	
-	cookies.delete('session', { path: '/' });
-	
+
+	cookies.delete("session", { path: "/" });
+
 	// Return HTML success page instead of direct redirect
 	const html = `
 	<!DOCTYPE html>
@@ -54,10 +54,10 @@ export const POST: APIRoute = async ({ cookies, locals }) => {
 	</body>
 	</html>
 	`;
-	
+
 	return new Response(html, {
 		headers: {
-			'Content-Type': 'text/html; charset=utf-8',
-		}
+			"Content-Type": "text/html; charset=utf-8",
+		},
 	});
 };

@@ -1,86 +1,117 @@
-import { getGithub } from '../../../lib/auth';
-import { createSession, generateSessionToken, validateSessionToken } from '../../../lib/session';
-import { getDb } from '../../../lib/db';
-import { users } from '../../../../db/schema';
-import { eq } from 'drizzle-orm';
-import type { APIRoute } from 'astro';
-import type { OAuth2Tokens } from 'arctic';
+import type { OAuth2Tokens } from "arctic";
+import type { APIRoute } from "astro";
+import { eq } from "drizzle-orm";
+import { users } from "../../../../db/schema";
+import { getGithub } from "../../../lib/auth";
+import { getDb } from "../../../lib/db";
+import {
+	createSession,
+	generateSessionToken,
+	validateSessionToken,
+} from "../../../lib/session";
 
 export const GET: APIRoute = async ({ request, cookies, locals }) => {
 	const url = new URL(request.url);
-	const code = url.searchParams.get('code');
-	const state = url.searchParams.get('state');
-	const storedState = cookies.get('github_oauth_state')?.value ?? null;
+	const code = url.searchParams.get("code");
+	const state = url.searchParams.get("state");
+	const storedState = cookies.get("github_oauth_state")?.value ?? null;
 
 	if (!code || !state || !storedState || state !== storedState) {
 		return new Response(null, {
-			status: 400
+			status: 400,
 		});
 	}
 
 	try {
-        console.log("Validating GitHub code...");
-		const tokens: OAuth2Tokens = await getGithub(locals.runtime.env).validateAuthorizationCode(code);
-        const accessToken = tokens.accessToken();
-        console.log("Tokens received:", accessToken ? "Present" : "Missing");
+		console.log("Validating GitHub code...");
+		const tokens: OAuth2Tokens = await getGithub(
+			locals.runtime.env,
+		).validateAuthorizationCode(code);
+		const accessToken = tokens.accessToken();
+		console.log("Tokens received:", accessToken ? "Present" : "Missing");
 
-        let githubUser: GitHubUser;
-        try {
-            console.log("Fetching GitHub user...");
-            const githubUserResponse = await fetch('https://api.github.com/user', {
-                headers: {
-                    'Authorization': `Bearer ${accessToken.trim()}`,
-                    'User-Agent': 'Gins-Blog-OAuth-App',
-                    'Accept': 'application/vnd.github+json'
-                }
-            });
-            
-            if (!githubUserResponse.ok) {
-                const errorText = await githubUserResponse.text();
-                console.error("GitHub API error:", githubUserResponse.status, errorText);
-                throw new Error(`GitHub API returned ${githubUserResponse.status}: ${errorText.slice(0, 200)}`);
-            }
-            
-            githubUser = await githubUserResponse.json();
-            console.log("GitHub User fetched:", githubUser.login, "Avatar:", githubUser.avatar_url);
-        } catch (fetchError: any) {
-             throw new Error(`Failed to fetch GitHub user: ${fetchError.message}`);
-        }
+		let githubUser: GitHubUser;
+		try {
+			console.log("Fetching GitHub user...");
+			const githubUserResponse = await fetch("https://api.github.com/user", {
+				headers: {
+					Authorization: `Bearer ${accessToken.trim()}`,
+					"User-Agent": "Gins-Blog-OAuth-App",
+					Accept: "application/vnd.github+json",
+				},
+			});
+
+			if (!githubUserResponse.ok) {
+				const errorText = await githubUserResponse.text();
+				console.error(
+					"GitHub API error:",
+					githubUserResponse.status,
+					errorText,
+				);
+				throw new Error(
+					`GitHub API returned ${githubUserResponse.status}: ${errorText.slice(0, 200)}`,
+				);
+			}
+
+			githubUser = await githubUserResponse.json();
+			console.log(
+				"GitHub User fetched:",
+				githubUser.login,
+				"Avatar:",
+				githubUser.avatar_url,
+			);
+		} catch (fetchError: any) {
+			throw new Error(`Failed to fetch GitHub user: ${fetchError.message}`);
+		}
 
 		const db = getDb(locals.runtime.env);
 
 		// Check if user is already logged in (linking a new provider)
-		const existingSessionToken = cookies.get('session')?.value;
+		const existingSessionToken = cookies.get("session")?.value;
 		let currentUserId: string | null = null;
-		
+
 		if (existingSessionToken) {
-			const sessionResult = await validateSessionToken(existingSessionToken, db, locals.runtime.env);
+			const sessionResult = await validateSessionToken(
+				existingSessionToken,
+				db,
+				locals.runtime.env,
+			);
 			if (sessionResult.session && sessionResult.user) {
 				currentUserId = sessionResult.user.id;
-				console.log("User is already logged in, linking GitHub account to user:", currentUserId);
+				console.log(
+					"User is already logged in, linking GitHub account to user:",
+					currentUserId,
+				);
 			}
 		}
 
 		// Check if this GitHub account is already linked to a user
-		const existingUser = await db.select().from(users).where(eq(users.githubId, githubUser.id)).get();
+		const existingUser = await db
+			.select()
+			.from(users)
+			.where(eq(users.githubId, githubUser.id))
+			.get();
 
 		let userId = "";
 
 		if (currentUserId) {
 			// User is logged in - link GitHub to their current account
 			if (existingUser && existingUser.id !== currentUserId) {
-				throw new Error("This GitHub account is already linked to another user account.");
+				throw new Error(
+					"This GitHub account is already linked to another user account.",
+				);
 			}
-			
+
 			// Update current user with GitHub ID and provider info
-			await db.update(users)
-				.set({ 
+			await db
+				.update(users)
+				.set({
 					githubId: githubUser.id,
 					githubUsername: githubUser.login,
 					githubAvatar: githubUser.avatar_url,
 				})
 				.where(eq(users.id, currentUserId));
-			
+
 			userId = currentUserId;
 			console.log("GitHub account linked to existing user:", userId);
 		} else if (existingUser) {
@@ -100,7 +131,6 @@ export const GET: APIRoute = async ({ request, cookies, locals }) => {
 			console.log("Created new user with GitHub:", userId);
 		}
 
-	
 		console.log("Creating session, userId:", userId);
 		const token = generateSessionToken();
 		const session = await createSession(
@@ -108,24 +138,24 @@ export const GET: APIRoute = async ({ request, cookies, locals }) => {
 			userId,
 			db,
 			locals.runtime.env,
-			request
+			request,
 		);
-        
-        console.log("Setting session cookie...");
-		cookies.set('session', token, {
-			path: '/',
-			httpOnly: true,
-			sameSite: 'lax',
-			secure: import.meta.env.PROD,
-			expires: new Date(session.expiresAt)
-		});
-		
-		// Retrieve redirect URL from cookie or default to home
-        const redirectUrl = cookies.get('login_redirect')?.value ?? '/';
-        // Clean up the cookie
-        cookies.delete('login_redirect', { path: '/' });
 
-        const html = `
+		console.log("Setting session cookie...");
+		cookies.set("session", token, {
+			path: "/",
+			httpOnly: true,
+			sameSite: "lax",
+			secure: import.meta.env.PROD,
+			expires: new Date(session.expiresAt),
+		});
+
+		// Retrieve redirect URL from cookie or default to home
+		const redirectUrl = cookies.get("login_redirect")?.value ?? "/";
+		// Clean up the cookie
+		cookies.delete("login_redirect", { path: "/" });
+
+		const html = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -168,23 +198,30 @@ export const GET: APIRoute = async ({ request, cookies, locals }) => {
         `;
 
 		return new Response(html, {
-            headers: {
-                'Content-Type': 'text/html'
-            }
-        });
-	} catch (e: any) {
-        console.error(e);
-		return new Response(JSON.stringify({
-            error: e.message,
-            stack: e.stack
-        }, null, 2), {
-			status: 500
+			headers: {
+				"Content-Type": "text/html",
+			},
 		});
+	} catch (e: any) {
+		console.error(e);
+		return new Response(
+			JSON.stringify(
+				{
+					error: e.message,
+					stack: e.stack,
+				},
+				null,
+				2,
+			),
+			{
+				status: 500,
+			},
+		);
 	}
 };
 
 interface GitHubUser {
 	id: number;
 	login: string;
-    avatar_url: string;
+	avatar_url: string;
 }

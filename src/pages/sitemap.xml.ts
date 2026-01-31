@@ -1,18 +1,21 @@
-import type { APIRoute } from 'astro';
-import { getDb } from '../lib/db';
-import { posts } from '../../db/schema';
+import type { APIRoute } from "astro";
+import { posts } from "../../db/schema";
+import { getDb } from "../lib/db";
 
 export const GET: APIRoute = async ({ locals }) => {
 	const db = getDb(locals.runtime.env);
-	
+
 	// Fetch all published posts
-	const allPosts = await db.select({
-		slug: posts.slug,
-		updatedAt: posts.updatedAt
-	}).from(posts).all();
-	
-	const baseUrl = 'https://blog.ichimarugin728.com';
-	
+	const allPosts = await db
+		.select({
+			slug: posts.slug,
+			updatedAt: posts.updatedAt,
+		})
+		.from(posts)
+		.all();
+
+	const baseUrl = "https://blog.ichimarugin728.com";
+
 	// Generate XML sitemap
 	const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -56,9 +59,10 @@ export const GET: APIRoute = async ({ locals }) => {
 	</url>
 	
 	<!-- Blog Posts (EN & ZH) -->
-	${allPosts.map((post: { slug: string; updatedAt: number }) => {
-        const lastMod = new Date(post.updatedAt).toISOString();
-        return `
+	${allPosts
+		.map((post: { slug: string; updatedAt: number }) => {
+			const lastMod = new Date(post.updatedAt).toISOString();
+			return `
     <url>
 		<loc>${baseUrl}/blog/${post.slug}</loc>
 		<lastmod>${lastMod}</lastmod>
@@ -71,13 +75,14 @@ export const GET: APIRoute = async ({ locals }) => {
 		<changefreq>monthly</changefreq>
 		<priority>0.9</priority>
 	</url>`;
-    }).join('\n')}
+		})
+		.join("\n")}
 </urlset>`.trim();
 
 	return new Response(sitemap, {
 		headers: {
-			'Content-Type': 'application/xml; charset=utf-8',
-			'Cache-Control': 'public, max-age=3600'
-		}
+			"Content-Type": "application/xml; charset=utf-8",
+			"Cache-Control": "public, max-age=3600",
+		},
 	});
 };

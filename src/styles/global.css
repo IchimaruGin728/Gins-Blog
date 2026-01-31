@@ -1,100 +1,109 @@
 html {
-  scroll-behavior: smooth;
-  background-color: #050505;
+	scroll-behavior: smooth;
+	background-color: #050505;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased; /* Safari font rendering */
-  -moz-osx-font-smoothing: grayscale;
+	margin: 0;
+	padding: 0;
+	overflow-x: hidden;
+	-webkit-font-smoothing: antialiased; /* Safari font rendering */
+	-moz-osx-font-smoothing: grayscale;
 }
 
 /* P3 Color Support */
 @media (color-gamut: p3) {
-  :root {
-    --brand-primary: color(display-p3 0.345 0.11 0.529); /* Deep Purple #581C87 */
-    --brand-accent: color(display-p3 0.753 0.518 0.988); /* Accent #C084FC */
-  }
+	:root {
+		--brand-primary: color(
+			display-p3 0.345 0.11 0.529
+		); /* Deep Purple #581C87 */
+		--brand-accent: color(display-p3 0.753 0.518 0.988); /* Accent #C084FC */
+	}
 }
 
 /* Performance Optimizations */
 .optimize-visibility {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 1000px; /* Estimate height to prevent scrollbar jumping */
+	content-visibility: auto;
+	contain-intrinsic-size: 1px 1000px; /* Estimate height to prevent scrollbar jumping */
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
+	width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #050505;
+	background: #050505;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 5px;
+	background: #333;
+	border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+	background: #555;
 }
 
 /* Selection Color */
 ::selection {
-  background-color: #581C87; /* Brand Primary */
-  color: white;
+	background-color: #581c87; /* Brand Primary */
+	color: white;
 }
 
 /* Custom Navigation Loading Bar */
 ._astro_loading_indicator {
-  background: linear-gradient(90deg, #581C87 0%, #C084FC 50%, #581C87 100%) !important;
-  background-size: 200% 100% !important;
-  box-shadow: 0 0 15px #C084FC, 0 0 30px #581C87 !important;
-  height: 3px !important;
-  z-index: 9999 !important;
-  animation: shimmer 2s linear infinite;
+	background: linear-gradient(
+		90deg,
+		#581c87 0%,
+		#c084fc 50%,
+		#581c87 100%
+	) !important;
+	background-size: 200% 100% !important;
+	box-shadow:
+		0 0 15px #c084fc,
+		0 0 30px #581c87 !important;
+	height: 3px !important;
+	z-index: 9999 !important;
+	animation: shimmer 2s linear infinite;
 }
 
 @keyframes shimmer {
-  0% {
-    background-position: 100% 0;
-  }
-  100% {
-    background-position: -100% 0;
-  }
+	0% {
+		background-position: 100% 0;
+	}
+	100% {
+		background-position: -100% 0;
+	}
 }
 
 /* Custom Page Transition Keyframes */
 @keyframes fade-enter {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
 }
 @keyframes fade-exit {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
 }
 
 /* Page Transition: Slide Up */
 .main-content {
-  view-transition-name: main-content;
+	view-transition-name: main-content;
 }
 
 ::view-transition-old(main-content) {
-  animation: 0.1s ease-in both fade-exit;
+	animation: 0.1s ease-in both fade-exit;
 }
 
 ::view-transition-new(main-content) {
-  animation: 0.2s ease-out both fade-enter;
+	animation: 0.2s ease-out both fade-enter;
 }

@@ -1,6 +1,6 @@
 ---
-import Layout from "../layouts/Layout.astro";
 import { useTranslations } from "../i18n/utils";
+import Layout from "../layouts/Layout.astro";
 
 const lang = "en-SG";
 const t = useTranslations(lang);
@@ -13,20 +13,21 @@ if (!user) return Astro.redirect("/login");
 // We should probably rely on the user object being complete or fetch fresh here.
 // For now, let's assume we fetch fresh data to be safe.
 const env = Astro.locals.runtime.env;
-import { getDb } from "../lib/db";
-import { users } from "../../db/schema";
+
 import { eq } from "drizzle-orm";
+import { users } from "../../db/schema";
+import { getDb } from "../lib/db";
 
 const db = getDb(env);
 const userProfile = await db
-  .select()
-  .from(users)
-  .where(eq(users.id, user.id))
-  .get();
+	.select()
+	.from(users)
+	.where(eq(users.id, user.id))
+	.get();
 
 const socialLinks = userProfile?.socialLinks
-  ? JSON.parse(userProfile.socialLinks as string)
-  : {};
+	? JSON.parse(userProfile.socialLinks as string)
+	: {};
 ---
 
 <Layout title={t("profile.title")}>

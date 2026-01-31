@@ -1,13 +1,13 @@
 ---
-import Layout from "../../../layouts/Layout.astro";
-import { getDb } from "../../../lib/db";
-import { posts } from "../../../../db/schema";
-import { eq, and, lte, gt, lt, desc, sql } from "drizzle-orm";
-import Comments from "../../../components/Comments";
 import { Markdown } from "astro-remote";
+import { and, desc, eq, gt, lt, lte, sql } from "drizzle-orm";
+import { posts } from "../../../../db/schema";
+import Comments from "../../../components/Comments";
 import MarkdownImage from "../../../components/MarkdownImage.astro";
 import ShareButtons from "../../../components/ShareButtons.astro";
 import { getLangFromUrl, useTranslations } from "../../../i18n/utils";
+import Layout from "../../../layouts/Layout.astro";
+import { getDb } from "../../../lib/db";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -15,7 +15,7 @@ const t = useTranslations(lang);
 const { slug } = Astro.params;
 
 if (!slug) {
-  return Astro.redirect("/404");
+	return Astro.redirect("/404");
 }
 
 const { env } = Astro.locals.runtime;
@@ -24,120 +24,120 @@ const CACHE_KEY = `post:${slug}`;
 let result: typeof posts.$inferSelect | null | undefined = null;
 
 try {
-  const cached = await env.GINS_CACHE.get(CACHE_KEY, "json");
-  if (cached) {
-    result = cached as typeof posts.$inferSelect;
-  }
+	const cached = await env.GINS_CACHE.get(CACHE_KEY, "json");
+	if (cached) {
+		result = cached as typeof posts.$inferSelect;
+	}
 } catch (e) {
-  console.warn("KV Cache Miss/Error:", e);
+	console.warn("KV Cache Miss/Error:", e);
 }
 
 // Fallback to D1 if not in Cache
 if (!result) {
-  const db = getDb(env);
-  result = await db
-    .select()
-    .from(posts)
-    .where(and(eq(posts.slug, slug), lte(posts.publishedAt, Date.now())))
-    .get();
+	const db = getDb(env);
+	result = await db
+		.select()
+		.from(posts)
+		.where(and(eq(posts.slug, slug), lte(posts.publishedAt, Date.now())))
+		.get();
 
-  // Hydrate Cache if found (Background non-blocking)
-  if (result) {
-    try {
-      await env.GINS_CACHE.put(CACHE_KEY, JSON.stringify(result), {
-        expirationTtl: 60 * 60 * 24 * 7, // 7 Days Cache
-      });
-    } catch (e) {
-      console.warn("Failed to write to KV:", e);
-    }
-  }
+	// Hydrate Cache if found (Background non-blocking)
+	if (result) {
+		try {
+			await env.GINS_CACHE.put(CACHE_KEY, JSON.stringify(result), {
+				expirationTtl: 60 * 60 * 24 * 7, // 7 Days Cache
+			});
+		} catch (e) {
+			console.warn("Failed to write to KV:", e);
+		}
+	}
 }
 
 if (!result) {
-  return Astro.redirect("/404");
+	return Astro.redirect("/404");
 }
 
 // Increment View Count (Fire and forget to not block rendering too much, but for consistent read we might want to await)
 // For simple blog, we can await it.
 const db = getDb(env);
 try {
-  const updated = await db
-    .update(posts)
-    .set({ views: sql`views + 1` })
-    .where(eq(posts.slug, slug))
-    .returning({ views: posts.views })
-    .get();
+	const updated = await db
+		.update(posts)
+		.set({ views: sql`views + 1` })
+		.where(eq(posts.slug, slug))
+		.returning({ views: posts.views })
+		.get();
 
-  // OVERRIDE CACHE: Ensure we show the fresh DB view count, not the stale KV cached one
-  if (updated && result) {
-    result.views = updated.views;
-  }
+	// OVERRIDE CACHE: Ensure we show the fresh DB view count, not the stale KV cached one
+	if (updated && result) {
+		result.views = updated.views;
+	}
 } catch (e) {
-  console.error("Failed to increment view count", e);
+	console.error("Failed to increment view count", e);
 }
 const currentPublishedAt = result.publishedAt || 0;
 
 const prevPost = await db
-  .select({ title: posts.title, slug: posts.slug })
-  .from(posts)
-  .where(
-    and(
-      lt(posts.publishedAt, currentPublishedAt),
-      lte(posts.publishedAt, Date.now()),
-    ),
-  )
-  .orderBy(desc(posts.publishedAt))
-  .limit(1)
-  .get();
+	.select({ title: posts.title, slug: posts.slug })
+	.from(posts)
+	.where(
+		and(
+			lt(posts.publishedAt, currentPublishedAt),
+			lte(posts.publishedAt, Date.now()),
+		),
+	)
+	.orderBy(desc(posts.publishedAt))
+	.limit(1)
+	.get();
 
 const nextPost = await db
-  .select({ title: posts.title, slug: posts.slug })
-  .from(posts)
-  .where(
-    and(
-      gt(posts.publishedAt, currentPublishedAt),
-      lte(posts.publishedAt, Date.now()),
-    ),
-  )
-  .orderBy(posts.publishedAt)
-  .limit(1)
-  .get();
+	.select({ title: posts.title, slug: posts.slug })
+	.from(posts)
+	.where(
+		and(
+			gt(posts.publishedAt, currentPublishedAt),
+			lte(posts.publishedAt, Date.now()),
+		),
+	)
+	.orderBy(posts.publishedAt)
+	.limit(1)
+	.get();
 
 // Extract description from content (first 160 chars)
 const contentPreview =
-  result.content
-    .replace(/<[^>]*>/g, "")
-    .slice(0, 160)
-    .trim() + "...";
+	result.content
+		.replace(/<[^>]*>/g, "")
+		.slice(0, 160)
+		.trim() + "...";
 const publishedTime = new Date(
-  result.publishedAt || result.createdAt,
+	result.publishedAt || result.createdAt,
 ).toISOString();
 
 // JSON-LD Structured Data
 const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  headline: result.title,
-  description: contentPreview,
-  author: {
-    "@type": "Person",
-    name: "IchimaruGin728",
-    url: "https://blog.ichimarugin728.com/about",
-  },
-  datePublished: publishedTime,
-  dateModified: new Date(result.updatedAt).toISOString(),
-  publisher: {
-    "@type": "Organization",
-    name: "Gin's Blog",
-    logo: {
-      "@type": "ImageObject",
-      url: "https://blog.ichimarugin728.com/favicon.png",
-    },
-  },
-  mainEntityOfPage: {
-    "@type": "WebPage",
-    "@id": `https://blog.ichimarugin728.com/zh/blog/${slug}`,
-  },
+	"@context": "https://schema.org",
+	"@type": "BlogPosting",
+	headline: result.title,
+	description: contentPreview,
+	author: {
+		"@type": "Person",
+		name: "IchimaruGin728",
+		url: "https://blog.ichimarugin728.com/about",
+	},
+	datePublished: publishedTime,
+	dateModified: new Date(result.updatedAt).toISOString(),
+	publisher: {
+		"@type": "Organization",
+		name: "Gin's Blog",
+		logo: {
+			"@type": "ImageObject",
+			url: "https://blog.ichimarugin728.com/favicon.png",
+		},
+	},
+	mainEntityOfPage: {
+		"@type": "WebPage",
+		"@id": `https://blog.ichimarugin728.com/zh/blog/${slug}`,
+	},
 };
 
 // Smart Caching Strategy (Stale-While-Revalidate)
@@ -145,8 +145,8 @@ const structuredData = {
 // s-maxage=60: Cloudflare caches for 60s
 // stale-while-revalidate=600: Serving stale content for up to 10 mins while background updating
 Astro.response.headers.set(
-  "Cache-Control",
-  "public, max-age=0, s-maxage=60, stale-while-revalidate=600",
+	"Cache-Control",
+	"public, max-age=0, s-maxage=60, stale-while-revalidate=600",
 );
 ---
 

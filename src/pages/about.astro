@@ -1,6 +1,6 @@
 ---
-import Layout from "../layouts/Layout.astro";
 import SocialLinks from "../components/SocialLinks";
+import Layout from "../layouts/Layout.astro";
 
 const gravatarHash = "60eb98ab51a815a519feeca028e08573"; // IchimaruGin728
 
@@ -10,85 +10,85 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 let socialLinks: {
-  label: string;
-  url: string;
-  icon: string;
-  color?: string;
+	label: string;
+	url: string;
+	icon: string;
+	color?: string;
 }[] = [];
 
 try {
-  const res = await fetch(`https://en.gravatar.com/${gravatarHash}.json`, {
-    headers: { "User-Agent": "Mozilla/5.0 (compatible; GinBlog/1.0)" },
-  });
+	const res = await fetch(`https://en.gravatar.com/${gravatarHash}.json`, {
+		headers: { "User-Agent": "Mozilla/5.0 (compatible; GinBlog/1.0)" },
+	});
 
-  if (res.ok) {
-    const data = (await res.json()) as any;
-    const entry = data.entry[0];
+	if (res.ok) {
+		const data = (await res.json()) as any;
+		const entry = data.entry[0];
 
-    // Helper to map service to icon
-    const getServiceIcon = (service: string) => {
-      const map: Record<string, string> = {
-        github: "i-simple-icons-github",
-        twitter: "i-simple-icons-x",
-        facebook: "i-simple-icons-facebook",
-        instagram: "i-simple-icons-instagram",
-        linkedin: "i-simple-icons-linkedin",
-        discord: "i-simple-icons-discord",
-        youtube: "i-simple-icons-youtube",
-        reddit: "i-simple-icons-reddit",
-        medium: "i-simple-icons-medium",
-        stackoverflow: "i-simple-icons-stackoverflow",
-        twitch: "i-simple-icons-twitch",
-        steam: "i-simple-icons-steam",
-        telegram: "i-simple-icons-telegram",
-      };
-      return map[service] || "i-heroicons-link";
-    };
+		// Helper to map service to icon
+		const getServiceIcon = (service: string) => {
+			const map: Record<string, string> = {
+				github: "i-simple-icons-github",
+				twitter: "i-simple-icons-x",
+				facebook: "i-simple-icons-facebook",
+				instagram: "i-simple-icons-instagram",
+				linkedin: "i-simple-icons-linkedin",
+				discord: "i-simple-icons-discord",
+				youtube: "i-simple-icons-youtube",
+				reddit: "i-simple-icons-reddit",
+				medium: "i-simple-icons-medium",
+				stackoverflow: "i-simple-icons-stackoverflow",
+				twitch: "i-simple-icons-twitch",
+				steam: "i-simple-icons-steam",
+				telegram: "i-simple-icons-telegram",
+			};
+			return map[service] || "i-heroicons-link";
+		};
 
-    // 1. Verified Accounts
-    if (entry.accounts) {
-      entry.accounts.forEach((acc: any) => {
-        socialLinks.push({
-          label: acc.display || acc.username || acc.shortname,
-          url: acc.url,
-          icon: getServiceIcon(acc.shortname),
-          color: "hover:text-white", // Default white on hover
-        });
-      });
-    }
+		// 1. Verified Accounts
+		if (entry.accounts) {
+			entry.accounts.forEach((acc: any) => {
+				socialLinks.push({
+					label: acc.display || acc.username || acc.shortname,
+					url: acc.url,
+					icon: getServiceIcon(acc.shortname),
+					color: "hover:text-white", // Default white on hover
+				});
+			});
+		}
 
-    // 2. Custom URLs
-    if (entry.urls) {
-      entry.urls.forEach((link: any) => {
-        // Simple heuristic for icons based on URL if needed, or fallback
-        let icon = "i-heroicons-globe-alt";
-        let label = link.title;
-        const url = link.value;
+		// 2. Custom URLs
+		if (entry.urls) {
+			entry.urls.forEach((link: any) => {
+				// Simple heuristic for icons based on URL if needed, or fallback
+				let icon = "i-heroicons-globe-alt";
+				const label = link.title;
+				const url = link.value;
 
-        if (url.includes("github.com")) icon = "i-simple-icons-github";
-        else if (url.includes("twitter.com") || url.includes("x.com"))
-          icon = "i-simple-icons-x";
-        else if (url.includes("linkedin.com")) icon = "i-simple-icons-linkedin";
+				if (url.includes("github.com")) icon = "i-simple-icons-github";
+				else if (url.includes("twitter.com") || url.includes("x.com"))
+					icon = "i-simple-icons-x";
+				else if (url.includes("linkedin.com")) icon = "i-simple-icons-linkedin";
 
-        socialLinks.push({ label, url, icon });
-      });
-    }
-  }
+				socialLinks.push({ label, url, icon });
+			});
+		}
+	}
 } catch (e) {
-  console.error("Failed to fetch Gravatar profile", e);
-  // Fallback links if fetch fails (or just keep empty)
-  socialLinks = [
-    {
-      label: "GitHub",
-      url: "https://github.com/IchimaruGin728",
-      icon: "i-simple-icons-github",
-    },
-    {
-      label: "X (Twitter)",
-      url: "https://x.com/IchimaruGin728",
-      icon: "i-simple-icons-x",
-    },
-  ];
+	console.error("Failed to fetch Gravatar profile", e);
+	// Fallback links if fetch fails (or just keep empty)
+	socialLinks = [
+		{
+			label: "GitHub",
+			url: "https://github.com/IchimaruGin728",
+			icon: "i-simple-icons-github",
+		},
+		{
+			label: "X (Twitter)",
+			url: "https://x.com/IchimaruGin728",
+			icon: "i-simple-icons-x",
+		},
+	];
 }
 ---
 

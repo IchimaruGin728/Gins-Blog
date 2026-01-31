@@ -1,7 +1,7 @@
 ---
-import Layout from "../../layouts/Layout.astro";
 import SocialLinks from "../../components/SocialLinks";
 import { getLangFromUrl, useTranslations } from "../../i18n/utils";
+import Layout from "../../layouts/Layout.astro";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);

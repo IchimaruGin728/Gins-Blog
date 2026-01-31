@@ -1,0 +1,102 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="隐私政策">
+  <div class="max-w-3xl mx-auto py-12">
+    <div class="glass-panel p-8 md:p-12 rounded-3xl">
+      <h1
+        class="text-4xl font-display font-bold mb-8 bg-gradient-to-r from-brand-accent to-brand-primary bg-clip-text text-transparent"
+      >
+        隐私政策
+      </h1>
+
+      <div
+        class="prose prose-invert prose-lg max-w-none prose-headings:font-display prose-a:text-brand-accent hover:prose-a:text-brand-primary"
+      >
+        <p class="text-sm text-gray-400 mb-8 border-b border-white/10 pb-4">
+          最后更新: 2026-01-31
+        </p>
+
+        <p>
+          感谢您访问 Gin
+          的博客。我们尊重您的隐私并致力于保护您的个人数据。本隐私政策说明了我们收集的信息及其用途。
+        </p>
+
+        <h3>1. 我们收集的信息</h3>
+
+        <h4>1.1 自动收集的数据</h4>
+        <p>
+          当您访问我们的网站时，我们可能会收集最少量的技术数据以优化您的体验并确保安全：
+        </p>
+        <ul class="list-disc pl-5 space-y-2">
+          <li>
+            <strong>网络信息</strong>: IP 地址、ISP、连接类型（如
+            WiFi/4G），用于路由优化。
+          </li>
+          <li>
+            <strong>体验优化指标</strong>:
+            屏幕分辨率、设备内存和连接质量，用于决定最佳的内容渲染质量。
+          </li>
+          <li>
+            <strong>位置数据</strong>: 基于 IP
+            地址的大致位置（城市/国家），用于统计分析。
+          </li>
+        </ul>
+
+        <h4>1.2 用户账户数据</h4>
+        <p>
+          如果您选择通过第三方 OAuth
+          提供商（GitHub、Google、Discord）登录，我们仅存储其提供的公开信息：
+        </p>
+        <ul class="list-disc pl-5 space-y-2">
+          <li>用户名</li>
+          <li>公开电子邮件地址</li>
+          <li>头像链接</li>
+          <li>第三方用户 ID</li>
+        </ul>
+
+        <h3>2. 我们如何使用您的数据</h3>
+        <ul class="list-disc pl-5 space-y-2">
+          <li>
+            <strong>性能优化</strong>:
+            设备指标帮助我们为慢速连接或低端设备提供更轻量的内容。
+          </li>
+          <li>
+            <strong>安全防护</strong>: IP 地址用于检测路由异常并防止滥用。
+          </li>
+          <li>
+            <strong>社交功能</strong>:
+            您的账户数据使您能够发表评论并与内容互动。
+          </li>
+        </ul>
+        <div
+          class="bg-brand-primary/10 border-l-4 border-brand-primary p-4 my-4"
+        >
+          <p class="font-bold m-0 p-0 text-white">
+            我们不会与广告商或第三方共享您的个人数据。
+          </p>
+        </div>
+
+        <h3>3. 数据存储</h3>
+        <p>
+          您的数据安全地存储在 <strong>Cloudflare D1 & KV</strong> 基础设施上。我们采取行业标准的安全措施，包括严格的访问控制（零信任）和加密。
+        </p>
+
+        <h3>4. 您的权利</h3>
+        <p>
+          您拥有对自己数据的完全控制权。通过请求或使用用户界面中的“注销并清除会话”功能，您可以管理您的会话数据。
+        </p>
+
+        <hr class="border-white/10 my-8" />
+
+        <p class="text-sm text-gray-500">
+          本项目是开源的。您可以在 <a
+            href="https://github.com/IchimaruGin728/Gins-Blog"
+            target="_blank">GitHub 仓库</a
+          > 审计代码。
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>

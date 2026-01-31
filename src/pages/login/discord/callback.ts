@@ -1,78 +1,107 @@
-import { getDiscord } from '../../../lib/auth';
-import { createSession, generateSessionToken, validateSessionToken } from '../../../lib/session';
-import { getDb } from '../../../lib/db';
-import { users } from '../../../../db/schema';
-import { eq } from 'drizzle-orm';
-import type { APIRoute } from 'astro';
-import type { OAuth2Tokens } from 'arctic';
+import type { OAuth2Tokens } from "arctic";
+import type { APIRoute } from "astro";
+import { eq } from "drizzle-orm";
+import { users } from "../../../../db/schema";
+import { getDiscord } from "../../../lib/auth";
+import { getDb } from "../../../lib/db";
+import {
+	createSession,
+	generateSessionToken,
+	validateSessionToken,
+} from "../../../lib/session";
 
 export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 	const url = new URL(request.url);
-	const code = url.searchParams.get('code');
-	const state = url.searchParams.get('state');
-	const storedState = cookies.get('discord_oauth_state')?.value ?? null;
-    const codeVerifier = cookies.get('discord_code_verifier')?.value ?? null;
+	const code = url.searchParams.get("code");
+	const state = url.searchParams.get("state");
+	const storedState = cookies.get("discord_oauth_state")?.value ?? null;
+	const codeVerifier = cookies.get("discord_code_verifier")?.value ?? null;
 
-	if (!code || !state || !storedState || state !== storedState || !codeVerifier) {
+	if (
+		!code ||
+		!state ||
+		!storedState ||
+		state !== storedState ||
+		!codeVerifier
+	) {
 		return new Response(null, {
-			status: 400
+			status: 400,
 		});
 	}
 
 	try {
-        console.log("Validating Discord code...");
-		const tokens: OAuth2Tokens = await getDiscord(locals.runtime.env).validateAuthorizationCode(code, codeVerifier);
-        const accessToken = tokens.accessToken();
-        console.log("Tokens received:", accessToken ? "Present" : "Missing");
+		console.log("Validating Discord code...");
+		const tokens: OAuth2Tokens = await getDiscord(
+			locals.runtime.env,
+		).validateAuthorizationCode(code, codeVerifier);
+		const accessToken = tokens.accessToken();
+		console.log("Tokens received:", accessToken ? "Present" : "Missing");
 
-        let discordUser: DiscordUser;
-        try {
-            console.log("Fetching Discord user...");
-            const discordUserResponse = await fetch('https://discord.com/api/users/@me', {
-                headers: {
-                    Authorization: `Bearer ${accessToken.trim()}`
-                }
-            });
-            discordUser = await discordUserResponse.json();
-            console.log("Discord User fetched:", discordUser.username);
-        } catch (fetchError: any) {
-             throw new Error(`Failed to fetch Discord user: ${fetchError.message}`);
-        }
+		let discordUser: DiscordUser;
+		try {
+			console.log("Fetching Discord user...");
+			const discordUserResponse = await fetch(
+				"https://discord.com/api/users/@me",
+				{
+					headers: {
+						Authorization: `Bearer ${accessToken.trim()}`,
+					},
+				},
+			);
+			discordUser = await discordUserResponse.json();
+			console.log("Discord User fetched:", discordUser.username);
+		} catch (fetchError: any) {
+			throw new Error(`Failed to fetch Discord user: ${fetchError.message}`);
+		}
 
 		const db = getDb(locals.runtime.env);
 
 		// Check if user is already logged in (linking a new provider)
-		const existingSessionToken = cookies.get('session')?.value;
+		const existingSessionToken = cookies.get("session")?.value;
 		let currentUserId: string | null = null;
-		
+
 		if (existingSessionToken) {
-			const sessionResult = await validateSessionToken(existingSessionToken, db, locals.runtime.env);
+			const sessionResult = await validateSessionToken(
+				existingSessionToken,
+				db,
+				locals.runtime.env,
+			);
 			if (sessionResult.session && sessionResult.user) {
 				currentUserId = sessionResult.user.id;
-				console.log("User is already logged in, linking Discord account to user:", currentUserId);
+				console.log(
+					"User is already logged in, linking Discord account to user:",
+					currentUserId,
+				);
 			}
 		}
 
 		// Check if this Discord account is already linked to a user
-		const existingUser = await db.select().from(users).where(eq(users.discordId, discordUser.id)).get();
+		const existingUser = await db
+			.select()
+			.from(users)
+			.where(eq(users.discordId, discordUser.id))
+			.get();
 
 		let userId = "";
 
 		if (currentUserId) {
 			// User is logged in - link Discord to their current account
 			if (existingUser && existingUser.id !== currentUserId) {
-				throw new Error("This Discord account is already linked to another user account.");
+				throw new Error(
+					"This Discord account is already linked to another user account.",
+				);
 			}
-			
+
 			// Update current user with Discord ID and provider info
-			await db.update(users)
-				.set({ 
+			await db
+				.update(users)
+				.set({
 					discordId: discordUser.id,
 					discordUsername: discordUser.username,
 					discordAvatar: `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`,
 				})
 				.where(eq(users.id, currentUserId));
-			
+
 			userId = currentUserId;
 			console.log("Discord account linked to existing user:", userId);
 		} else if (existingUser) {
@@ -100,33 +129,40 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 			userId,
 			db,
 			locals.runtime.env,
-			request
+			request,
 		);
-		
-        console.log("Setting session cookie...");
-        cookies.set('session', token, {
-			path: '/',
+
+		console.log("Setting session cookie...");
+		cookies.set("session", token, {
+			path: "/",
 			httpOnly: true,
-			sameSite: 'lax',
+			sameSite: "lax",
 			secure: import.meta.env.PROD,
-			expires: new Date(session.expiresAt)
+			expires: new Date(session.expiresAt),
 		});
 
-		return redirect('/');
+		return redirect("/");
 	} catch (e: any) {
-        console.error(e);
-		return new Response(JSON.stringify({
-            error: e.message,
-            stack: e.stack
-        }, null, 2), {
-			status: 500
-		});
+		console.error(e);
+		return new Response(
+			JSON.stringify(
+				{
+					error: e.message,
+					stack: e.stack,
+				},
+				null,
+				2,
+			),
+			{
+				status: 500,
+			},
+		);
 	}
 };
 
 interface DiscordUser {
 	id: string;
 	username: string;
-    avatar: string;
-    email: string;
+	avatar: string;
+	email: string;
 }
