@@ -2,22 +2,13 @@
 import type { APIRoute } from "astro";
 import { getDb } from "../../../lib/db";
 import { sessions } from "../../../../db/schema";
-import { eq } from "drizzle-orm";
-import { getZeroTrustUser } from "../../../lib/zerotrust";
 
-// Disable prerendering and CSRF for this admin API
+// Disable prerendering for this admin API
+// Note: This route is already protected by Zero Trust middleware at /api/admin level
 export const prerender = false;
 
-export const DELETE: APIRoute = async ({ locals, request }) => {
-  // Verify Zero Trust authentication
-  const ztUser = getZeroTrustUser(request);
-  if (!ztUser) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), { 
-      status: 401,
-      headers: { "Content-Type": "application/json" }
-    });
-  }
-  
+export const DELETE: APIRoute = async ({ locals }) => {
+  // No need to verify ZT here - middleware already enforces it for /api/admin/*
   const env = locals.runtime.env;
   const db = getDb(env);
 
