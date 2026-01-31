@@ -73,20 +73,31 @@
 
 ### 📊 **Analytics & Insights**
 - **Real-time View Counts** - Hybrid D1+KV architecture using `UPDATE ... RETURNING` for zero-latency, fresh view stats.
-- **Edge Analytics Dashboard** - Monitor 100+ global Cloudflare nodes with real-time RTT metrics
-  - **Global Coverage** - 35+ North American nodes (SJC, LAX, SEA, ORD, IAD...), 35+ European nodes (LHR, FRA, CDG, AMS...), 20+ Asia-Pacific nodes (NRT, SIN, HKG, SYD...)
-  - **Performance Monitoring** - Automatic routing anomaly detection and latency analysis (e.g., detects when Singapore users are routed to SJC instead of SIN)
-  - **Visual Distribution** - Interactive node map showing session count, average RTT (Round-Trip Time), and performance ratings per node
-  - **Real-time Metrics** - Live view of which node you're connected to and connection quality (Excellent < 50ms / Good < 150ms / Poor > 150ms)
-  - **Example Use Case** - Identify why StarHub ISP users in Singapore are experiencing high latency due to wrong datacenter routing
-- **Enhanced Session Tracking** - Comprehensive metadata including ISP name, ASN, geolocation (city/country/coordinates), TLS version (1.2/1.3), HTTP protocol (HTTP/2, HTTP/3), client trust score, and TCP RTT
-- **Device Intelligence** - Track screen resolution, device memory (GB), CPU cores, connection type (4g/5g/wifi/slow-2g) via `navigator` APIs (client-side collection infrastructure ready)
-- **Unified Modal UX** - All admin modals support backdrop click-to-close, consistent 300ms fade+scale animations, and standardized close buttons with red hover effects
+- **Edge Analytics Dashboard** - Monitor **100+ global Cloudflare nodes** with real-time RTT metrics.
+  - 🌍 **Global Coverage**
+    - **North America**: 35+ nodes (SJC, LAX, SEA, ORD, IAD...)
+    - **Europe**: 35+ nodes (LHR, FRA, CDG, AMS...)
+    - **Asia-Pacific**: 20+ nodes (NRT, SIN, HKG, SYD...)
+  - ⚡ **Performance Monitoring** - Automatic routing anomaly detection (e.g., Singapore users routed to US West).
+  - 🗺️ **Visual Distribution** - Interactive node map with session counts, avg RTT, and performance ratings.
+  - 🟢 **Real-time Metrics** - Live connection quality indicators:
+    - **Excellent**: < 50ms
+    - **Good**: < 150ms
+    - **Poor**: > 150ms
+  - 🔍 **Use Case**: Identify ISP routing issues (e.g., StarHub routing to wrong colo).
+- **Enhanced Session Tracking** - Metadata includes:
+  - **Network**: ISP name, ASN, HTTP Protocol (h2/h3), TCP RTT
+  - **Security**: TLS Version (1.2/1.3), Client Trust Score
+  - **Location**: City, Country, Coordinates
+- **Device Intelligence** - Ready-to-use schema for client-side collection:
+  - **Hardware**: Screen resolution, Device Memory (GB), CPU Cores
+  - **Connection**: Network type (4g/5g/wifi) via `navigator` APIs
+- **Unified Modal UX** - Backdrop click-to-close, 300ms fade+scale animations, consistent red-hover close buttons.
 
 ### 🎨 **Icon System Optimization**
-- **Maximum Quality** - SVG geometric precision rendering (`shape-rendering: geometricPrecision`) + GPU hardware acceleration for crisp, sharp edges
-- **Zero Latency** - Local inline SVG icons with safelist preloading for instant rendering (eliminates FOUC - Flash of Unstyled Content)
-- **Performance** - Hardware-accelerated transforms (`transform: translateZ(0)`, `will-change: transform`) + anti-aliasing smoothing + backface-visibility hidden to prevent flickering
+- ✨ **Maximum Quality** - `shape-rendering: geometricPrecision` + GPU acceleration for crisp edges.
+- 🚀 **Zero Latency** - Local inline SVGs with **Safelist Preloading** (No FOUC).
+- 💨 **Performance** - `translateZ(0)` hardware acceleration + `will-change: transform` to prevent layout thrashing.
 
 ---
 
