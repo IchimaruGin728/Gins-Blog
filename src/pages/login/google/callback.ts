@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 import type { APIRoute } from 'astro';
 import type { OAuth2Tokens } from 'arctic';
 
-export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
+export const GET: APIRoute = async ({ request, cookies, locals }) => {
 	const url = new URL(request.url);
 	const code = url.searchParams.get('code');
 	const state = url.searchParams.get('state');

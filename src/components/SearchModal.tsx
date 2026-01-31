@@ -1,4 +1,3 @@
-import { h, Fragment } from 'preact';
 import { useState, useEffect, useRef } from 'preact/hooks';
 
 interface SearchResult {

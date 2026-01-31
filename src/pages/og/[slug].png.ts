@@ -4,23 +4,12 @@ import { Resvg } from '@resvg/resvg-wasm';
 import { getDb } from '../../lib/db';
 import { posts } from '../../../db/schema';
 import { eq } from 'drizzle-orm';
-import { initWasm } from '@resvg/resvg-wasm';
 
 // We need to initialize the WASM
 // In generic Node/Cloudflare workers, dynamic imports might be needed or just init once.
 // For Astro Cloudflare adapter, usually it just works or we pass the wasm module.
 // However, @resvg/resvg-wasm might need manual init if mostly used in Node.
 // Let's try standard import first.
-
-// Font loader
-async function loadGoogleFont(font: string, weight: number) {
-  const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`;
-  const css = await (await fetch(url)).text();
-  const resource = css.match(/src: url\((.+)\) format\('(opentype|truetype)'\)/);
-  if (!resource) return null;
-  const res = await fetch(resource[1]);
-  return await res.arrayBuffer();
-}
 
 export const GET: APIRoute = async ({ params, locals }) => {
     const { slug } = params;
