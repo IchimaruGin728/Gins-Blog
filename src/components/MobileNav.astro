@@ -9,10 +9,10 @@ const currentPath = Astro.url.pathname;
 
 // Helper to strip locale from path for comparison
 const getPathWithoutLocale = (path: string) => {
-  if (path.startsWith("/zh-SG/")) {
-    return path.replace("/zh-SG", "") || "/";
+  if (path.startsWith("/zh/")) {
+    return path.replace("/zh", "") || "/";
   }
-  if (path === "/zh-SG") {
+  if (path === "/zh") {
     return "/";
   }
   return path;

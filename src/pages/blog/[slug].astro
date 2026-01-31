@@ -17,7 +17,7 @@ if (!slug) {
 const { env } = Astro.locals.runtime;
 // CACHE LIFT: Check KV Layer first (Speed optimization)
 const CACHE_KEY = `post:${slug}`;
-let result = null;
+let result: typeof posts.$inferSelect | null | undefined = null;
 
 try {
   const cached = await env.GINS_CACHE.get(CACHE_KEY, "json");

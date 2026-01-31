@@ -21,7 +21,7 @@ if (!slug) {
 const { env } = Astro.locals.runtime;
 // CACHE LIFT: Check KV Layer first (Speed optimization)
 const CACHE_KEY = `post:${slug}`;
-let result = null;
+let result: typeof posts.$inferSelect | null | undefined = null;
 
 try {
   const cached = await env.GINS_CACHE.get(CACHE_KEY, "json");
@@ -121,7 +121,7 @@ const structuredData = {
   },
   mainEntityOfPage: {
     "@type": "WebPage",
-    "@id": `https://blog.ichimarugin728.com/zh-SG/blog/${slug}`,
+    "@id": `https://blog.ichimarugin728.com/zh/blog/${slug}`,
   },
 };
 
@@ -181,7 +181,7 @@ Astro.response.headers.set(
       {
         prevPost ? (
           <a
-            href={`/zh-SG/blog/${prevPost.slug}`}
+            href={`/zh/blog/${prevPost.slug}`}
             class="group glass-panel p-6 rounded-2xl border border-white/5 hover:border-white/20 transition-all text-left"
           >
             <div class="text-xs font-mono text-gray-500 mb-2 group-hover:text-brand-accent transition-colors">
@@ -199,7 +199,7 @@ Astro.response.headers.set(
       {
         nextPost ? (
           <a
-            href={`/zh-SG/blog/${nextPost.slug}`}
+            href={`/zh/blog/${nextPost.slug}`}
             class="group glass-panel p-6 rounded-2xl border border-white/5 hover:border-white/20 transition-all text-right"
           >
             <div class="text-xs font-mono text-gray-500 mb-2 group-hover:text-brand-accent transition-colors">
@@ -226,7 +226,7 @@ Astro.response.headers.set(
 
     <div class="mt-12 text-center">
       <a
-        href="/zh-SG/blog"
+        href="/zh/blog"
         class="inline-flex items-center gap-2 text-brand-accent hover:text-white transition-colors"
       >
         <span class="i-heroicons-arrow-left"></span>

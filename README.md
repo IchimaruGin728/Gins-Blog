@@ -1,4 +1,4 @@
-# Gin's Blog - Neo-Aesthetics Edition 💎
+# Gin's Blog 💎
 
 <div align="center">
 
@@ -33,15 +33,13 @@
 
 ### 🎨 **Neo-Aesthetics Design**
 - **Glassmorphism UI** - Frosted glass effects with backdrop blur
-- **Display-P3 Wide Color Gamut** - Vibrant colors beyond sRGB
 - **Fluid Animations** - Smooth transitions and micro-interactions
-- **Adaptive Theme** - Intelligent dark mode with system preference detection
 - **Safari-Style Mobile Nav** - Shrinking navigation bar with holographic text effects
 
 ### 🌐 **Internationalization (i18n)**
 - **Multi-Language Support** - English (SG) and Chinese (Simplified)
 - **Dynamic Locale Routing** - SEO-optimized with `og:locale` and `html lang`
-- **Localized RSS Feeds** - Separate feeds for each language (`/rss.xml`, `/zh-SG/rss.xml`)
+- **Localized RSS Feeds** - Separate feeds for each language (`/rss.xml`, `/zh/rss.xml`)
 - **Smart Language Detection** - Automatic URL-based language switching
 
 ### 🔐 **Authentication & Authorization**
@@ -407,7 +405,7 @@ export default defineConfig({
 ## 📜 License
 
 - **Code**: Licensed under the [MIT License](LICENSE).
-- **Content & Design**: All articles, media, and unique **Neo-Aesthetics UI designs** are licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+- **Content & Design**: All articles, media, and unique **Neo-Aesthetics UI designs** are licensed under. [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 You're free to use the code, but please credit me if you reference my articles or design work. Commercial use of the visual identity requires permission.
 

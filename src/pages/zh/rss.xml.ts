@@ -26,8 +26,8 @@ export async function GET(context: APIContext) {
       // @ts-ignore
       pubDate: new Date(post.publishedAt || post.createdAt),
       description: post.content ? (post.content.substring(0, 200) + '...') : '',
-      link: `/zh-SG/blog/${post.slug}`,
+      link: `/zh/blog/${post.slug}`,
     })),
-    customData: `<language>zh-SG</language>`,
+    customData: `<language>zh</language>`,
   });
 }
