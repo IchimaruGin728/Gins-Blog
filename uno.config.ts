@@ -54,18 +54,24 @@ export default defineConfig({
   presets: [
     presetUno(),
     presetIcons({
-      scale: 1.2, // Slightly larger for crisper rendering
+      // No scale - use original size for consistency
       warn: true, // Warn about missing icons in dev
-      cdn: 'https://esm.sh/', // Use CDN for icon data
+      // Use local inline icons for instant loading (no network requests)
       extraProperties: {
-        // SVG optimization for better quality
+        // SVG optimization for maximum quality
         'display': 'inline-block',
         'vertical-align': 'middle',
-        // Anti-aliasing for smoother edges  
+        // Geometric precision for crisp edges
         'shape-rendering': 'geometricPrecision',
-        // Better text rendering
+        // Subpixel antialiasing for clarity
         '-webkit-font-smoothing': 'antialiased',
         '-moz-osx-font-smoothing': 'grayscale',
+      },
+      // Optimize collection loading
+      collections: {
+        // Only load collections we actually use
+        heroicons: () => import('@iconify-json/heroicons/icons.json').then(i => i.default),
+        'simple-icons': () => import('@iconify-json/simple-icons/icons.json').then(i => i.default),
       },
     }),
     presetTypography(),
