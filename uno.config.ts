@@ -54,30 +54,14 @@ export default defineConfig({
   presets: [
     presetUno(),
     presetIcons({
-      // No scale - original size for sharpness
+      // Use proper scaling default
+      scale: 1.2,
       warn: true,
-      // Local inline = zero network latency
       extraProperties: {
-        // Layout & positioning
         'display': 'inline-block',
         'vertical-align': 'middle',
-        
-        // SVG rendering quality (CRITICAL)
-        'shape-rendering': 'geometricPrecision', // Best edge quality
-        'text-rendering': 'geometricPrecision', // Crisp text in icons
-        'image-rendering': 'crisp-edges', // Prevent blur on resize
-        
-        // Font antialiasing (macOS/Safari)
-        '-webkit-font-smoothing': 'antialiased',
-        '-moz-osx-font-smoothing': 'grayscale',
-        
-        // GPU acceleration for smooth animations
-        'transform': 'translateZ(0)', // Force GPU layer
-        'will-change': 'transform', // Hint browser for optimization
-        
-        // Prevent flickering
-        'backface-visibility': 'hidden',
-        '-webkit-backface-visibility': 'hidden',
+        // Keep essential quality settings only
+        'shape-rendering': 'geometricPrecision',
       },
     }),
     presetTypography(),
