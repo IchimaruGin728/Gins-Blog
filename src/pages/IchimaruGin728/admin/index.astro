@@ -41,10 +41,44 @@ Astro.response.headers.set("Pragma", "no-cache");
 Astro.response.headers.set("Expires", "0");
 const recentPosts = await safeFetch(
   env.DB.prepare(
-    "SELECT * FROM posts ORDER BY publishedAt DESC LIMIT 10",
+    "SELECT * FROM posts ORDER BY published_at DESC LIMIT 10",
   ).all(),
   // @ts-ignore
   { results: [], success: false, meta: {} },
+);
+
+// Detailed Lists for Modals
+const activeSessionsList = await safeFetch(
+  env.DB.prepare(
+    `
+    SELECT 
+      sessions.id as session_id,
+      sessions.ip_address, 
+      sessions.user_agent, 
+      sessions.last_active, 
+      sessions.created_at as session_created,
+      users.username, 
+      users.avatar,
+      users.id as user_id,
+      users.github_username,
+      users.google_username,
+      users.discord_username
+    FROM sessions 
+    LEFT JOIN users ON sessions.user_id = users.id 
+    WHERE sessions.expires_at > ? 
+    ORDER BY sessions.last_active DESC
+  `,
+  )
+    .bind(Date.now())
+    .all(),
+  // @ts-ignore
+  { results: [] },
+);
+
+const usersList = await safeFetch(
+  env.DB.prepare("SELECT * FROM users ORDER BY rowid DESC LIMIT 100").all(), // valid sqlite
+  // @ts-ignore
+  { results: [] },
 );
 ---
 
@@ -108,22 +142,63 @@ const recentPosts = await safeFetch(
         </div>
         <div class="text-4xl font-bold font-display">{postCount}</div>
       </div>
-      <div class="glass-panel p-6 rounded-2xl">
+
+      <!-- Users Card (Clickable) -->
+      <div
+        class="glass-panel p-6 rounded-2xl cursor-pointer hover:bg-white/5 transition-colors group relative"
+        onclick="document.getElementById('users-modal').classList.remove('hidden')"
+      >
+        <div
+          class="absolute top-4 right-4 text-gray-500 group-hover:text-white transition-colors"
+        >
+          <span class="i-heroicons-users w-5 h-5"></span>
+        </div>
         <div
           class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-2"
         >
           Total Users
         </div>
-        <div class="text-4xl font-bold font-display">{userCount}</div>
+        <div
+          class="text-4xl font-bold font-display group-hover:text-brand-accent transition-colors"
+        >
+          {userCount}
+        </div>
+        <div
+          class="text-xs text-gray-500 mt-2 flex items-center gap-1 group-hover:text-brand-accent/70 transition-colors"
+        >
+          <span>View Details</span>
+          <span class="i-heroicons-arrow-right w-3 h-3"></span>
+        </div>
       </div>
-      <div class="glass-panel p-6 rounded-2xl">
+
+      <!-- Sessions Card (Clickable) -->
+      <div
+        class="glass-panel p-6 rounded-2xl cursor-pointer hover:bg-white/5 transition-colors group relative"
+        onclick="document.getElementById('sessions-modal').classList.remove('hidden')"
+      >
+        <div
+          class="absolute top-4 right-4 text-gray-500 group-hover:text-white transition-colors"
+        >
+          <span class="i-heroicons-globe-alt w-5 h-5"></span>
+        </div>
         <div
           class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-2"
         >
           Active Sessions
         </div>
-        <div class="text-4xl font-bold font-display">{activeSessionCount}</div>
+        <div
+          class="text-4xl font-bold font-display group-hover:text-green-400 transition-colors"
+        >
+          {activeSessionCount}
+        </div>
+        <div
+          class="text-xs text-gray-500 mt-2 flex items-center gap-1 group-hover:text-green-400/70 transition-colors"
+        >
+          <span>Inspect Traffic</span>
+          <span class="i-heroicons-arrow-right w-3 h-3"></span>
+        </div>
       </div>
+
       <div
         class="glass-panel p-6 rounded-2xl bg-gradient-to-br from-brand-primary/20 to-transparent border-brand-primary/30"
       >
@@ -522,11 +597,337 @@ const recentPosts = await safeFetch(
       </div>
     </div>
   </div>
+  <!-- Users Modal -->
+  <div
+    id="users-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md hidden transition-opacity duration-300"
+  >
+    <div
+      class="glass-panel w-full max-w-5xl max-h-[85vh] flex flex-col rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative"
+    >
+      <!-- Close Button -->
+      <button
+        onclick="document.getElementById('users-modal').classList.add('hidden')"
+        class="absolute top-6 right-6 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+      >
+        <span class="i-heroicons-x-mark w-6 h-6"></span>
+      </button>
+
+      <div class="p-8 border-b border-white/10">
+        <h2 class="text-2xl font-bold flex items-center gap-3">
+          <span class="i-heroicons-users text-brand-accent"></span>
+          User Database
+        </h2>
+        <p class="text-gray-400 text-sm mt-1">
+          Found {(usersList.results || []).length} records (showing latest 100)
+        </p>
+      </div>
+
+      <div class="overflow-y-auto p-0 scrollbar-hide">
+        <table class="w-full text-left border-collapse">
+          <thead
+            class="sticky top-0 bg-black/95 backdrop-blur-xl z-10 box-decoration-clone"
+          >
+            <tr
+              class="text-gray-400 text-xs uppercase tracking-wider font-mono border-b border-white/10"
+            >
+              <th class="p-6 font-normal">User</th>
+              <th class="p-6 font-normal">Identity Provider</th>
+              <th class="p-6 font-normal">IDs</th>
+              <th class="p-6 font-normal text-right">Joined</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm divide-y divide-white/5">
+            {
+              (usersList.results || []).map((u: any) => (
+                <tr class="hover:bg-white/5 transition-colors">
+                  <td class="p-6">
+                    <div class="flex items-center gap-3">
+                      <img
+                        src={
+                          u.avatar ||
+                          `https://ui-avatars.com/api/?name=${u.username}&background=random`
+                        }
+                        class="w-10 h-10 rounded-full object-cover border border-white/10"
+                      />
+                      <div>
+                        <div class="font-bold text-white mb-0.5">
+                          {u.username}
+                        </div>
+                        <div class="text-xs text-brand-accent/80 font-mono">
+                          {u.id.substring(0, 8)}...
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="p-6">
+                    <div class="flex gap-2">
+                      {u.github_id && (
+                        <span class="px-2 py-1 rounded bg-[#24292e]/50 border border-[#24292e]/50 text-xs text-gray-300 flex items-center gap-1">
+                          <span class="i-simple-icons-github" /> GitHub
+                        </span>
+                      )}
+                      {u.google_id && (
+                        <span class="px-2 py-1 rounded bg-[#DB4437]/20 border border-[#DB4437]/30 text-xs text-red-200 flex items-center gap-1">
+                          <span class="i-simple-icons-google" /> Google
+                        </span>
+                      )}
+                      {u.discord_id && (
+                        <span class="px-2 py-1 rounded bg-[#5865F2]/20 border border-[#5865F2]/30 text-xs text-indigo-200 flex items-center gap-1">
+                          <span class="i-simple-icons-discord" /> Discord
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td class="p-6 font-mono text-xs text-gray-500 space-y-1">
+                    {u.github_username && <div>GH: {u.github_username}</div>}
+                    {u.discord_username && <div>DS: {u.discord_username}</div>}
+                  </td>
+                  <td class="p-6 text-right text-gray-400 font-mono text-xs">
+                    {/* Try to parse if it is number or string */}
+                    {u.created_at
+                      ? new Date(
+                          typeof u.created_at === "number"
+                            ? u.created_at
+                            : parseInt(u.created_at) || 0,
+                        ).toLocaleDateString()
+                      : "N/A"}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sessions Modal -->
+  <div
+    id="sessions-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md hidden transition-opacity duration-300"
+  >
+    <div
+      class="glass-panel w-full max-w-6xl max-h-[85vh] flex flex-col rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative"
+    >
+      <!-- Close Button -->
+      <button
+        onclick="document.getElementById('sessions-modal').classList.add('hidden')"
+        class="absolute top-6 right-6 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+      >
+        <span class="i-heroicons-x-mark w-6 h-6"></span>
+      </button>
+
+      <div class="p-8 border-b border-white/10">
+        <h2 class="text-2xl font-bold flex items-center gap-3">
+          <span class="i-heroicons-globe-alt text-green-400"></span>
+          Active Network Sessions
+        </h2>
+        <p class="text-gray-400 text-sm mt-1">
+          Monitoring {(activeSessionsList.results || []).length} active connections
+        </p>
+      </div>
+
+      <div class="overflow-y-auto p-0 scrollbar-hide">
+        <table class="w-full text-left border-collapse">
+          <thead class="sticky top-0 bg-black/95 backdrop-blur-xl z-10">
+            <tr
+              class="text-gray-400 text-xs uppercase tracking-wider font-mono border-b border-white/10"
+            >
+              <th class="p-6 font-normal">User Identity</th>
+              <th class="p-6 font-normal">Network (IP/Loc)</th>
+              <th class="p-6 font-normal">Device Fingerprint</th>
+              <th class="p-6 font-normal text-right">Last Echo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm divide-y divide-white/5">
+            {
+              (activeSessionsList.results || []).map((s: any) => (
+                <tr class="hover:bg-white/5 transition-colors">
+                  <td class="p-6">
+                    <div class="flex items-center gap-3">
+                      <img
+                        src={
+                          s.avatar ||
+                          `https://ui-avatars.com/api/?name=${s.username || "?"}&background=random`
+                        }
+                        class="w-8 h-8 rounded-full border border-white/10"
+                      />
+                      <div>
+                        <div class="font-bold text-white">
+                          {s.username || "Unknown"}
+                        </div>
+                        <div class="text-xs text-gray-500 font-mono">
+                          SID: {s.session_id.substring(0, 8)}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="p-6">
+                    <div class="flex flex-col gap-1">
+                      <div class="flex items-center gap-2">
+                        <span class="text-green-300 font-mono bg-green-500/10 px-1.5 py-0.5 rounded border border-green-500/20">
+                          {s.ip_address || "Hidden"}
+                        </span>
+                        {/* Location Badge (Populated via JS) */}
+                        <span
+                          class="ip-geo-badge text-[10px] uppercase font-bold text-gray-500 border border-white/10 px-1.5 py-0.5 rounded cursor-help"
+                          data-ip={s.ip_address}
+                        >
+                          Locating...
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="p-6">
+                    <div
+                      class="ua-parser-container text-xs text-gray-300 space-y-1"
+                      data-ua={s.user_agent}
+                    >
+                      <div class="opacity-50">
+                        Raw:{" "}
+                        {s.user_agent
+                          ? s.user_agent.substring(0, 30) + "..."
+                          : "N/A"}
+                      </div>
+                    </div>
+                  </td>
+                  <td class="p-6 text-right">
+                    <div class="text-white font-mono">
+                      {s.last_active
+                        ? new Date(s.last_active).toLocaleTimeString()
+                        : "N/A"}
+                    </div>
+                    <div class="text-xs text-gray-500">
+                      First:{" "}
+                      {s.session_created
+                        ? new Date(s.session_created).toLocaleDateString()
+                        : "?"}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </Layout>
 
 <script>
   import { hc } from "hono/client";
   import type { AppType } from "../../api/[...path]";
+  import { UAParser } from "ua-parser-js";
+
+  // Initialize UA Parser for all sessions
+  document.querySelectorAll(".ua-parser-container").forEach((el) => {
+    const ua = (el as HTMLElement).dataset.ua;
+    if (ua) {
+      const parser = new UAParser(ua);
+      const result = parser.getResult();
+      const osIcon = result.os.name?.toLowerCase().includes("mac")
+        ? "i-simple-icons-apple"
+        : result.os.name?.toLowerCase().includes("win")
+          ? "i-simple-icons-windows"
+          : result.os.name?.toLowerCase().includes("android")
+            ? "i-simple-icons-android"
+            : "i-heroicons-cpu-chip";
+
+      el.innerHTML = `
+        <div class="flex items-center gap-2">
+          <span class="${osIcon} w-4 h-4"></span>
+          <span class="font-bold">${result.os.name || "Unknown OS"} ${result.os.version || ""}</span>
+        </div>
+        <div class="flex items-center gap-2 text-gray-400">
+           <span class="i-heroicons-computer-desktop w-4 h-4"></span>
+           <span>${result.browser.name || "Unknown Browser"} ${result.browser.version || ""}</span>
+        </div>
+        ${result.device.type ? `<div class="text-xs text-gray-500 uppercase tracking-wide border border-white/10 inline-block px-1 rounded">${result.device.vendor || ""} ${result.device.model || ""}</div>` : ""}
+      `;
+    }
+  });
+
+  // Lazy load IP Geo Data (Batching could be better but this is simple for admin)
+  const fetchGeoData = async () => {
+    const badges = document.querySelectorAll(".ip-geo-badge");
+    const seenIPs = new Set();
+
+    // Create a simple local cache
+    const cache = new Map();
+
+    for (const badge of badges) {
+      const ip = (badge as HTMLElement).dataset.ip;
+      if (!ip || ip === "null") {
+        badge.innerHTML = "Localhost";
+        continue;
+      }
+
+      // If we already have data for this IP in this valid session
+      if (cache.has(ip)) {
+        populateBadge(badge as HTMLElement, cache.get(ip));
+        continue;
+      }
+
+      if (seenIPs.has(ip)) {
+        // Should technically wait for the first promise but simple poll is fine for now
+        continue;
+      }
+      seenIPs.add(ip);
+
+      try {
+        // Use ipapi.co for detailed info
+        const res = await fetch(`https://ipapi.co/${ip}/json/`);
+        if (res.ok) {
+          const data = await res.json();
+          cache.set(ip, data);
+          // Find all badges with this IP and update
+          document
+            .querySelectorAll(`.ip-geo-badge[data-ip="${ip}"]`)
+            .forEach((b) => populateBadge(b as HTMLElement, data));
+        } else {
+          badge.innerHTML = "Unk";
+        }
+      } catch (e) {
+        console.error("Geo fetch failed", e);
+        badge.innerHTML = "Err";
+      }
+
+      // Rate limit protection (1 rps)
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+  };
+
+  function populateBadge(el: HTMLElement, data: any) {
+    if (data.error) {
+      el.innerHTML = "Private/Reserved";
+      return;
+    }
+    el.innerHTML = `
+       <span class="mr-1">${data.country_code || "??"}</span>
+       <span class="text-gray-400 font-normal">${data.city || data.region || "Unknown"}</span>
+    `;
+    el.title = `${data.city}, ${data.region}, ${data.country_name} (${data.org})`;
+    el.classList.remove("text-gray-500");
+    el.classList.add("text-brand-accent");
+  }
+
+  // Trigger geo fetch when modal opens
+  const sessionsModal = document.getElementById("sessions-modal");
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (
+        mutation.type === "attributes" &&
+        mutation.attributeName === "class"
+      ) {
+        if (!sessionsModal?.classList.contains("hidden")) {
+          // Modal opened
+          fetchGeoData();
+        }
+      }
+    });
+  });
+  if (sessionsModal) observer.observe(sessionsModal, { attributes: true });
 
   const client = hc<AppType>(window.location.origin) as any;
   const form = document.getElementById("create-post-form") as HTMLFormElement;

@@ -38,6 +38,7 @@
     "preact": "latest",
     "satori": "^0.19.1",
     "typescript": "^5.9.3",
+    "ua-parser-js": "^2.0.8",
     "zod": "^3.25.76"
   },
   "devDependencies": {
