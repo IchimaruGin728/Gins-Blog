@@ -74,17 +74,19 @@
 ### 📊 **Analytics & Insights**
 - **Real-time View Counts** - Hybrid D1+KV architecture using `UPDATE ... RETURNING` for zero-latency, fresh view stats.
 - **Edge Analytics Dashboard** - Monitor 100+ global Cloudflare nodes with real-time RTT metrics
-  - **Global Coverage** - 35+ North American, 35+ European, 20+ Asia-Pacific nodes
-  - **Performance Monitoring** - Automatic routing anomaly detection and latency analysis
-  - **Visual Distribution** - Interactive node map with session counts and performance ratings
-- **Enhanced Session Tracking** - Comprehensive metadata including ISP, geolocation, TLS version, trust score
-- **Device Intelligence** - Screen resolution, memory, CPU cores, connection type tracking (ready for client-side collection)
-- **Unified Modal UX** - Backdrop click-to-close, consistent animations, and streamlined interactions
+  - **Global Coverage** - 35+ North American nodes (SJC, LAX, SEA, ORD, IAD...), 35+ European nodes (LHR, FRA, CDG, AMS...), 20+ Asia-Pacific nodes (NRT, SIN, HKG, SYD...)
+  - **Performance Monitoring** - Automatic routing anomaly detection and latency analysis (e.g., detects when Singapore users are routed to SJC instead of SIN)
+  - **Visual Distribution** - Interactive node map showing session count, average RTT (Round-Trip Time), and performance ratings per node
+  - **Real-time Metrics** - Live view of which node you're connected to and connection quality (Excellent < 50ms / Good < 150ms / Poor > 150ms)
+  - **Example Use Case** - Identify why StarHub ISP users in Singapore are experiencing high latency due to wrong datacenter routing
+- **Enhanced Session Tracking** - Comprehensive metadata including ISP name, ASN, geolocation (city/country/coordinates), TLS version (1.2/1.3), HTTP protocol (HTTP/2, HTTP/3), client trust score, and TCP RTT
+- **Device Intelligence** - Track screen resolution, device memory (GB), CPU cores, connection type (4g/5g/wifi/slow-2g) via `navigator` APIs (client-side collection infrastructure ready)
+- **Unified Modal UX** - All admin modals support backdrop click-to-close, consistent 300ms fade+scale animations, and standardized close buttons with red hover effects
 
 ### 🎨 **Icon System Optimization**
-- **Maximum Quality** - SVG geometric precision rendering with GPU acceleration
-- **Zero Latency** - Local inline icons with safelist preloading for instant rendering
-- **Performance** - Hardware-accelerated transforms (`translateZ(0)`) with anti-flicker optimizations
+- **Maximum Quality** - SVG geometric precision rendering (`shape-rendering: geometricPrecision`) + GPU hardware acceleration for crisp, sharp edges
+- **Zero Latency** - Local inline SVG icons with safelist preloading for instant rendering (eliminates FOUC - Flash of Unstyled Content)
+- **Performance** - Hardware-accelerated transforms (`transform: translateZ(0)`, `will-change: transform`) + anti-aliasing smoothing + backface-visibility hidden to prevent flickering
 
 ---
 
