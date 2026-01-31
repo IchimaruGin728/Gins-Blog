@@ -437,6 +437,7 @@ export default defineConfig({
 
 - **Code**: Licensed under the [MIT License](LICENSE).
 - **Content & Design**: All articles, media, and unique **Neo-Aesthetics UI designs** are licensed under. [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+- **Privacy**: Please refer to our [Privacy Policy](PRIVACY.md).
 
 You're free to use the code, but please credit me if you reference my articles or design work. Commercial use of the visual identity requires permission.
 

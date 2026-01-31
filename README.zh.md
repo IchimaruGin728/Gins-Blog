@@ -436,6 +436,7 @@ export default defineConfig({
 
 - **代码**：根据 [MIT 许可证](LICENSE) 授权。
 - **内容与设计**：所有文章、媒体和独特的**新美学 UI 设计**根据 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 授权。
+- **隐私**：请参阅我们的 [隐私政策](PRIVACY.md)。
 
 您可以自由使用代码，但如果引用我的文章或设计作品，请注明出处。视觉标识的商业用途需要许可。
 
