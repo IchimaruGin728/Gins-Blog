@@ -114,7 +114,7 @@ app.post(
 
 // Get Single Post (for Admin Editor)
 app.get("/posts/:slug", async (c) => {
-	const db = getDb(c.env);
+	const db = getDb(c.env as Env);
 	const slug = c.req.param("slug");
 	const post = await db.select().from(posts).where(eq(posts.slug, slug)).get();
 
@@ -124,7 +124,7 @@ app.get("/posts/:slug", async (c) => {
 
 // Get Recent Posts (for Admin List)
 app.get("/posts", async (c) => {
-	const db = getDb(c.env);
+	const db = getDb(c.env as Env);
 	const limitParam = c.req.query("limit");
 
 	let query = db
@@ -139,7 +139,7 @@ app.get("/posts", async (c) => {
 		.orderBy(desc(posts.publishedAt));
 
 	if (limitParam !== "all") {
-		query = query.limit(limitParam ? parseInt(limitParam) : 20);
+		query = (query as any).limit(limitParam ? parseInt(limitParam) : 20);
 	}
 
 	const allPosts = await query.all();
@@ -148,7 +148,7 @@ app.get("/posts", async (c) => {
 
 // Search Posts (Admin)
 app.get("/search", async (c) => {
-	const db = getDb(c.env);
+	const db = getDb(c.env as Env);
 	const query = c.req.query("q");
 
 	if (!query) return c.json([]);
@@ -211,7 +211,7 @@ app.patch(
 		}),
 	),
 	async (c) => {
-		const db = getDb(c.env);
+		const db = getDb(c.env as Env);
 		const slug = c.req.param("slug");
 		const { action } = c.req.valid("json");
 
@@ -234,7 +234,7 @@ app.patch(
 
 // Delete Post
 app.delete("/posts/:slug", async (c) => {
-	const db = getDb(c.env);
+	const db = getDb(c.env as Env);
 	const slug = c.req.param("slug");
 	const env = c.env as Env;
 
@@ -283,7 +283,7 @@ app.post(
 		if (!userId) return c.json({ error: "Unauthorized" }, 401);
 
 		const { title, artist, url, cover } = c.req.valid("form");
-		const db = getDb(c.env);
+		const db = getDb(c.env as Env);
 
 		const id = crypto.randomUUID();
 		await db.insert(schema.music).values({
@@ -300,7 +300,7 @@ app.post(
 );
 
 app.get("/music", async (c) => {
-	const db = getDb(c.env);
+	const db = getDb(c.env as Env);
 	const tracks = await db
 		.select()
 		.from(schema.music)
