@@ -1073,16 +1073,24 @@ const usersList = await safeFetch(
     (logoutAllBtn as HTMLButtonElement).disabled = true;
 
     try {
-      const res = await fetch("/api/admin/sessions", { method: "DELETE" });
+      const res = await fetch("/api/admin/sessions", {
+        method: "DELETE",
+        credentials: "same-origin",
+      });
       if (res.ok) {
         alert("All sessions terminated. The grid will now reboot.");
         window.location.reload();
       } else {
-        alert("Failed to terminate sessions.");
-        logoutAllBtn.innerHTML =
-          '<span class="i-heroicons-power w-4 h-4"></span> Logout All Users';
-        (logoutAllBtn as HTMLButtonElement).disabled = false;
+        const errorData = await res
+          .json()
+          .catch(() => ({ error: "Unknown error" }));
+        alert(
+          `Failed to terminate sessions: ${errorData.error || res.statusText}`,
+        );
       }
+      logoutAllBtn.innerHTML =
+        '<span class="i-heroicons-power w-4 h-4"></span> Logout All Users';
+      (logoutAllBtn as HTMLButtonElement).disabled = false;
     } catch (e) {
       console.error(e);
       alert("Network Error");
