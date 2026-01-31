@@ -70,15 +70,6 @@ const t = useTranslations(lang);
               class="text-brand-accent hover:text-white underline underline-offset-4"
               >Privacy Policy</a
             >
-            <br />
-            <span class="opacity-80"
-              >我同意 <a
-                href="/zh/privacy"
-                target="_blank"
-                class="text-brand-accent hover:text-white underline underline-offset-4"
-                >隐私政策</a
-              ></span
-            >
           </span>
         </label>
       </div>
@@ -90,7 +81,7 @@ const t = useTranslations(lang);
         const buttons = document.getElementById("login-buttons");
 
         if (checkbox && buttons) {
-          // Check initial state (browser might remember checked state)
+          // Check initial state
           if (checkbox.checked) {
             buttons.classList.remove("opacity-50", "pointer-events-none");
           }
