@@ -146,7 +146,7 @@ const usersList = await safeFetch(
       <!-- Users Card (Clickable) -->
       <div
         class="glass-panel p-6 rounded-2xl cursor-pointer hover:bg-white/5 transition-colors group relative"
-        onclick="document.getElementById('users-modal').classList.remove('hidden')"
+        onclick="openInspector('users')"
       >
         <div
           class="absolute top-4 right-4 text-gray-500 group-hover:text-white transition-colors"
@@ -174,7 +174,7 @@ const usersList = await safeFetch(
       <!-- Sessions Card (Clickable) -->
       <div
         class="glass-panel p-6 rounded-2xl cursor-pointer hover:bg-white/5 transition-colors group relative"
-        onclick="document.getElementById('sessions-modal').classList.remove('hidden')"
+        onclick="openInspector('sessions')"
       >
         <div
           class="absolute top-4 right-4 text-gray-500 group-hover:text-white transition-colors"
@@ -597,221 +597,225 @@ const usersList = await safeFetch(
       </div>
     </div>
   </div>
-  <!-- Users Modal -->
+  <!-- Data Inspector Modal (Unified) -->
   <div
-    id="users-modal"
+    id="data-inspector-modal"
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300"
-    onclick="if(event.target === this) this.classList.add('hidden')"
-  >
-    <div
-      class="glass-panel w-full max-w-5xl max-h-[85vh] flex flex-col rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative"
-    >
-      <!-- Close Button -->
-      <button
-        onclick="document.getElementById('users-modal').classList.add('hidden')"
-        class="absolute top-6 right-6 p-2 rounded-lg bg-black/20 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors border border-white/5 hover:border-red-500/30 z-20"
-      >
-        <span class="i-heroicons-x-mark w-6 h-6"></span>
-      </button>
-
-      <div class="p-8 border-b border-white/10">
-        <h2 class="text-2xl font-bold flex items-center gap-3">
-          <span class="i-heroicons-users text-brand-accent"></span>
-          User Database
-        </h2>
-        <p class="text-gray-400 text-sm mt-1">
-          Found {(usersList.results || []).length} records (showing latest 100)
-        </p>
-      </div>
-
-      <div class="overflow-y-auto p-0 scrollbar-hide">
-        <table class="w-full text-left border-collapse">
-          <thead
-            class="sticky top-0 bg-black/95 backdrop-blur-xl z-10 box-decoration-clone"
-          >
-            <tr
-              class="text-gray-400 text-xs uppercase tracking-wider font-mono border-b border-white/10"
-            >
-              <th class="p-6 font-normal">User</th>
-              <th class="p-6 font-normal">Identity Provider</th>
-              <th class="p-6 font-normal">IDs</th>
-              <th class="p-6 font-normal text-right">Joined</th>
-            </tr>
-          </thead>
-          <tbody class="text-sm divide-y divide-white/5">
-            {
-              (usersList.results || []).map((u: any) => (
-                <tr class="hover:bg-white/5 transition-colors">
-                  <td class="p-6">
-                    <div class="flex items-center gap-3">
-                      <img
-                        src={
-                          u.avatar ||
-                          `https://ui-avatars.com/api/?name=${u.username}&background=random`
-                        }
-                        class="w-10 h-10 rounded-full object-cover border border-white/10"
-                      />
-                      <div>
-                        <div class="font-bold text-white mb-0.5">
-                          {u.username}
-                        </div>
-                        <div class="text-xs text-brand-accent/80 font-mono">
-                          {u.id.substring(0, 8)}...
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="p-6">
-                    <div class="flex gap-2">
-                      {u.github_id && (
-                        <span class="px-2 py-1 rounded bg-[#24292e]/50 border border-[#24292e]/50 text-xs text-gray-300 flex items-center gap-1">
-                          <span class="i-simple-icons-github" /> GitHub
-                        </span>
-                      )}
-                      {u.google_id && (
-                        <span class="px-2 py-1 rounded bg-[#DB4437]/20 border border-[#DB4437]/30 text-xs text-red-200 flex items-center gap-1">
-                          <span class="i-simple-icons-google" /> Google
-                        </span>
-                      )}
-                      {u.discord_id && (
-                        <span class="px-2 py-1 rounded bg-[#5865F2]/20 border border-[#5865F2]/30 text-xs text-indigo-200 flex items-center gap-1">
-                          <span class="i-simple-icons-discord" /> Discord
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td class="p-6 font-mono text-xs text-gray-500 space-y-1">
-                    {u.github_username && <div>GH: {u.github_username}</div>}
-                    {u.discord_username && <div>DS: {u.discord_username}</div>}
-                  </td>
-                  <td class="p-6 text-right text-gray-400 font-mono text-xs">
-                    {/* Try to parse if it is number or string */}
-                    {u.created_at
-                      ? new Date(
-                          typeof u.created_at === "number"
-                            ? u.created_at
-                            : parseInt(u.created_at) || 0,
-                        ).toLocaleDateString()
-                      : "N/A"}
-                  </td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Sessions Modal -->
-  <div
-    id="sessions-modal"
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300"
-    onclick="if(event.target === this) this.classList.add('hidden')"
+    onclick="if(event.target === this) closeInspector()"
   >
     <div
       class="glass-panel w-full max-w-6xl max-h-[85vh] flex flex-col rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative"
     >
       <!-- Close Button -->
       <button
-        onclick="document.getElementById('sessions-modal').classList.add('hidden')"
+        onclick="closeInspector()"
         class="absolute top-6 right-6 p-2 rounded-lg bg-black/20 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors border border-white/5 hover:border-red-500/30 z-20"
       >
         <span class="i-heroicons-x-mark w-6 h-6"></span>
       </button>
 
-      <div class="p-8 border-b border-white/10">
-        <h2 class="text-2xl font-bold flex items-center gap-3">
-          <span class="i-heroicons-globe-alt text-green-400"></span>
-          Active Network Sessions
-        </h2>
-        <p class="text-gray-400 text-sm mt-1">
-          Monitoring {(activeSessionsList.results || []).length} active connections
-        </p>
+      <!-- Modal Header & Tabs -->
+      <div class="p-0 border-b border-white/10 bg-black/40">
+        <div class="flex items-center px-8 pt-6 gap-8">
+          <button
+            class="tab-btn pb-4 border-b-2 font-bold transition-colors flex items-center gap-2 text-gray-400 border-transparent hover:text-white"
+            data-tab="sessions"
+            onclick="switchTab('sessions')"
+          >
+            <span class="i-heroicons-globe-alt w-5 h-5"></span>
+            Active Network Sessions
+          </button>
+          <button
+            class="tab-btn pb-4 border-b-2 font-bold transition-colors flex items-center gap-2 text-gray-400 border-transparent hover:text-white"
+            data-tab="users"
+            onclick="switchTab('users')"
+          >
+            <span class="i-heroicons-users w-5 h-5"></span>
+            User Database
+          </button>
+        </div>
       </div>
 
-      <div class="overflow-y-auto p-0 scrollbar-hide">
-        <table class="w-full text-left border-collapse">
-          <thead class="sticky top-0 bg-black/95 backdrop-blur-xl z-10">
-            <tr
-              class="text-gray-400 text-xs uppercase tracking-wider font-mono border-b border-white/10"
-            >
-              <th class="p-6 font-normal">User Identity</th>
-              <th class="p-6 font-normal">Network (IP/Loc)</th>
-              <th class="p-6 font-normal">Device Fingerprint</th>
-              <th class="p-6 font-normal text-right">Last Echo</th>
-            </tr>
-          </thead>
-          <tbody class="text-sm divide-y divide-white/5">
-            {
-              (activeSessionsList.results || []).map((s: any) => (
-                <tr class="hover:bg-white/5 transition-colors">
-                  <td class="p-6">
-                    <div class="flex items-center gap-3">
-                      <img
-                        src={
-                          s.avatar ||
-                          `https://ui-avatars.com/api/?name=${s.username || "?"}&background=random`
-                        }
-                        class="w-8 h-8 rounded-full border border-white/10"
-                      />
-                      <div>
-                        <div class="font-bold text-white">
-                          {s.username || "Unknown"}
-                        </div>
-                        <div class="text-xs text-gray-500 font-mono">
-                          SID: {s.session_id.substring(0, 8)}
+      <!-- Tab Content Area -->
+      <div
+        class="overflow-y-auto p-0 scrollbar-hide flex-1 bg-black/20 relative"
+      >
+        <!-- Sessions Tab -->
+        <div id="tab-sessions" class="tab-content hidden">
+          <div
+            class="p-6 bg-brand-primary/5 border-b border-white/5 text-sm text-gray-400 font-mono"
+          >
+            Monitoring <span class="text-white font-bold"
+              >{(activeSessionsList.results || []).length}</span
+            > active connections
+          </div>
+          <table class="w-full text-left border-collapse">
+            <thead class="sticky top-0 bg-black/95 backdrop-blur-xl z-10">
+              <tr
+                class="text-gray-400 text-xs uppercase tracking-wider font-mono border-b border-white/10"
+              >
+                <th class="p-6 font-normal">User Identity</th>
+                <th class="p-6 font-normal">Network (IP/Loc)</th>
+                <th class="p-6 font-normal">Device Fingerprint</th>
+                <th class="p-6 font-normal text-right">Last Echo</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm divide-y divide-white/5">
+              {
+                (activeSessionsList.results || []).map((s: any) => (
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-6">
+                      <div class="flex items-center gap-3">
+                        <img
+                          src={
+                            s.avatar ||
+                            `https://ui-avatars.com/api/?name=${s.username || "?"}&background=random`
+                          }
+                          class="w-8 h-8 rounded-full border border-white/10"
+                        />
+                        <div>
+                          <div class="font-bold text-white">
+                            {s.username || "Unknown"}
+                          </div>
+                          <div class="text-xs text-gray-500 font-mono">
+                            SID: {s.session_id.substring(0, 8)}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td class="p-6">
-                    <div class="flex flex-col gap-1">
-                      <div class="flex items-center gap-2">
-                        <span class="text-green-300 font-mono bg-green-500/10 px-1.5 py-0.5 rounded border border-green-500/20">
-                          {s.ip_address || "Hidden"}
-                        </span>
-                        {/* Location Badge (Populated via JS) */}
-                        <span
-                          class="ip-geo-badge text-[10px] uppercase font-bold text-gray-500 border border-white/10 px-1.5 py-0.5 rounded cursor-help"
-                          data-ip={s.ip_address}
-                        >
-                          Locating...
-                        </span>
+                    </td>
+                    <td class="p-6">
+                      <div class="flex flex-col gap-1">
+                        <div class="flex items-center gap-2">
+                          <span class="text-green-300 font-mono bg-green-500/10 px-1.5 py-0.5 rounded border border-green-500/20">
+                            {s.ip_address || "Hidden"}
+                          </span>
+                          <span
+                            class="ip-geo-badge text-[10px] uppercase font-bold text-gray-500 border border-white/10 px-1.5 py-0.5 rounded cursor-help"
+                            data-ip={s.ip_address}
+                          >
+                            Locating...
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td class="p-6">
-                    <div
-                      class="ua-parser-container text-xs text-gray-300 space-y-1"
-                      data-ua={s.user_agent}
-                    >
-                      <div class="opacity-50">
-                        Raw:{" "}
-                        {s.user_agent
-                          ? s.user_agent.substring(0, 30) + "..."
+                    </td>
+                    <td class="p-6">
+                      <div
+                        class="ua-parser-container text-xs text-gray-300 space-y-1"
+                        data-ua={s.user_agent}
+                      >
+                        <div class="opacity-50">
+                          Raw:{" "}
+                          {s.user_agent
+                            ? s.user_agent.substring(0, 30) + "..."
+                            : "N/A"}
+                        </div>
+                      </div>
+                    </td>
+                    <td class="p-6 text-right">
+                      <div class="text-white font-mono">
+                        {s.last_active
+                          ? new Date(s.last_active).toLocaleTimeString()
                           : "N/A"}
                       </div>
-                    </div>
-                  </td>
-                  <td class="p-6 text-right">
-                    <div class="text-white font-mono">
-                      {s.last_active
-                        ? new Date(s.last_active).toLocaleTimeString()
+                      <div class="text-xs text-gray-500">
+                        First:{" "}
+                        {s.session_created
+                          ? new Date(s.session_created).toLocaleDateString()
+                          : "?"}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="tab-users" class="tab-content hidden">
+          <div
+            class="p-6 bg-brand-accent/5 border-b border-white/5 text-sm text-gray-400 font-mono"
+          >
+            Found <span class="text-white font-bold"
+              >{(usersList.results || []).length}</span
+            > records (showing latest 100)
+          </div>
+          <table class="w-full text-left border-collapse">
+            <thead
+              class="sticky top-0 bg-black/95 backdrop-blur-xl z-10 box-decoration-clone"
+            >
+              <tr
+                class="text-gray-400 text-xs uppercase tracking-wider font-mono border-b border-white/10"
+              >
+                <th class="p-6 font-normal">User</th>
+                <th class="p-6 font-normal">Identity Provider</th>
+                <th class="p-6 font-normal">IDs</th>
+                <th class="p-6 font-normal text-right">Joined</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm divide-y divide-white/5">
+              {
+                (usersList.results || []).map((u: any) => (
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-6">
+                      <div class="flex items-center gap-3">
+                        <img
+                          src={
+                            u.avatar ||
+                            `https://ui-avatars.com/api/?name=${u.username}&background=random`
+                          }
+                          class="w-10 h-10 rounded-full object-cover border border-white/10"
+                        />
+                        <div>
+                          <div class="font-bold text-white mb-0.5">
+                            {u.username}
+                          </div>
+                          <div class="text-xs text-brand-accent/80 font-mono">
+                            {u.id.substring(0, 8)}...
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="p-6">
+                      <div class="flex gap-2">
+                        {u.github_id && (
+                          <span class="px-2 py-1 rounded bg-[#24292e]/50 border border-[#24292e]/50 text-xs text-gray-300 flex items-center gap-1">
+                            <span class="i-simple-icons-github" /> GitHub
+                          </span>
+                        )}
+                        {u.google_id && (
+                          <span class="px-2 py-1 rounded bg-[#DB4437]/20 border border-[#DB4437]/30 text-xs text-red-200 flex items-center gap-1">
+                            <span class="i-simple-icons-google" /> Google
+                          </span>
+                        )}
+                        {u.discord_id && (
+                          <span class="px-2 py-1 rounded bg-[#5865F2]/20 border border-[#5865F2]/30 text-xs text-indigo-200 flex items-center gap-1">
+                            <span class="i-simple-icons-discord" /> Discord
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td class="p-6 font-mono text-xs text-gray-500 space-y-1">
+                      {u.github_username && <div>GH: {u.github_username}</div>}
+                      {u.discord_username && (
+                        <div>DS: {u.discord_username}</div>
+                      )}
+                    </td>
+                    <td class="p-6 text-right text-gray-400 font-mono text-xs">
+                      {u.created_at
+                        ? new Date(
+                            typeof u.created_at === "number"
+                              ? u.created_at
+                              : parseInt(u.created_at) || 0,
+                          ).toLocaleDateString()
                         : "N/A"}
-                    </div>
-                    <div class="text-xs text-gray-500">
-                      First:{" "}
-                      {s.session_created
-                        ? new Date(s.session_created).toLocaleDateString()
-                        : "?"}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -914,8 +918,52 @@ const usersList = await safeFetch(
     el.classList.add("text-brand-accent");
   }
 
+  // Tab Switcher Logic
+  // @ts-ignore
+  window.openInspector = (tab) => {
+    const modal = document.getElementById("data-inspector-modal");
+    if (modal) {
+      modal.classList.remove("hidden");
+      // @ts-ignore
+      window.switchTab(tab);
+    }
+  };
+
+  // @ts-ignore
+  window.closeInspector = () => {
+    document.getElementById("data-inspector-modal")?.classList.add("hidden");
+  };
+
+  // @ts-ignore
+  window.switchTab = (tabName) => {
+    // Update Tabs
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      // @ts-ignore
+      if (btn.dataset.tab === tabName) {
+        btn.classList.add("text-white", "border-brand-primary");
+        btn.classList.remove("text-gray-400", "border-transparent");
+        // Specific header colors per tab
+        // btn.classList.add(tabName === 'sessions' ? 'border-green-400' : 'border-brand-accent');
+      } else {
+        btn.classList.remove("text-white", "border-brand-primary");
+        btn.classList.add("text-gray-400", "border-transparent");
+      }
+    });
+
+    // Update Content
+    document.querySelectorAll(".tab-content").forEach((content) => {
+      content.classList.add("hidden");
+    });
+    document.getElementById(`tab-${tabName}`)?.classList.remove("hidden");
+
+    // Trigger Geo Fetch if sessions
+    if (tabName === "sessions") {
+      fetchGeoData();
+    }
+  };
+
   // Trigger geo fetch when modal opens
-  const sessionsModal = document.getElementById("sessions-modal");
+  const sessionsModal = document.getElementById("data-inspector-modal");
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       if (
@@ -923,8 +971,8 @@ const usersList = await safeFetch(
         mutation.attributeName === "class"
       ) {
         if (!sessionsModal?.classList.contains("hidden")) {
-          // Modal opened
-          fetchGeoData();
+          // Modal opened, check active tab?
+          // Handled by switchTab
         }
       }
     });
