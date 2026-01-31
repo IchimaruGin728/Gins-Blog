@@ -37,10 +37,10 @@
 - **Fluid Animations** - Smooth transitions and micro-interactions
 - **Safari-Style Mobile Nav** - Shrinking navigation bar with holographic text effects
 
-### 🌐 **Smart Internationalization**
-- **Hybrid Locale Strategy** - Internal `zh-SG` formatting with clean `/zh/` URLs for users
-- **Dynamic Routing** - Custom mapped routing for seamless language switching
-- **Localized RSS** - Dedicated feeds for English (`/rss.xml`) and Chinese (`/zh/rss.xml`)
+### 🌐 **Internationalization (i18n)**
+- **Multi-Language Support** - Seamless English and Chinese (Simplified) experience
+- **Dynamic Routing** - Smart routing for smooth language switching
+- **Localized RSS** - Dedicated feeds for each language
 
 ### 🔍 **Advanced SEO**
 - **Bilingual indexing** - `sitemap.xml` covers full English and Chinese content trees
