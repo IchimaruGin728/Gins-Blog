@@ -1,6 +1,6 @@
 export const languages = {
   'en-SG': 'English',
-  'zh': '中文（简体）',
+  'zh-SG': '中文（简体）',
 };
 
 export const defaultLang = 'en-SG';
@@ -71,7 +71,7 @@ export const ui = {
     '404.subtitle': 'You lost or what? This signal is transmission dead. Valid coordinates are required for teleportation.',
     '404.home': 'Balik Kampung (Home)',
   },
-  'zh': {
+  'zh-SG': {
     'nav.home': '首页',
     'nav.blog': '博客',
     'nav.about': '关于',
