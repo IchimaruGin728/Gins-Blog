@@ -130,26 +130,6 @@ const edgeNodeStats = await safeFetch(
   { results: [] },
 );
 
-const geographicDistribution = await safeFetch(
-  env.DB.prepare(
-    `
-    SELECT 
-      country,
-      continent,
-      COUNT(*) as count
-    FROM sessions
-    WHERE expires_at > ? AND country IS NOT NULL
-    GROUP BY country, continent
-    ORDER BY count DESC
-    LIMIT 15
-  `,
-  )
-    .bind(Date.now())
-    .all(),
-  // @ts-ignore
-  { results: [] },
-);
-
 const performanceSummary = await safeFetch(
   env.DB.prepare(
     `
