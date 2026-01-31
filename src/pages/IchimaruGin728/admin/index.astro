@@ -167,36 +167,155 @@ const performanceSummary = await safeFetch(
   null,
 );
 
-// Edge Node Location Mapping
+// Edge Node Location Mapping (100+ Major Cloudflare Nodes)
 const COLO_LOCATIONS: Record<
   string,
   { city: string; country: string; region: string; flag: string }
 > = {
+  // North America - US West
   SJC: { city: "San Jose", country: "US", region: "California", flag: "🇺🇸" },
-  NRT: { city: "Tokyo", country: "JP", region: "Kanto", flag: "🇯🇵" },
-  SIN: { city: "Singapore", country: "SG", region: "Singapore", flag: "🇸🇬" },
-  HKG: { city: "Hong Kong", country: "HK", region: "Hong Kong", flag: "🇭🇰" },
   LAX: { city: "Los Angeles", country: "US", region: "California", flag: "🇺🇸" },
+  SFO: {
+    city: "San Francisco",
+    country: "US",
+    region: "California",
+    flag: "🇺🇸",
+  },
   SEA: { city: "Seattle", country: "US", region: "Washington", flag: "🇺🇸" },
+  PDX: { city: "Portland", country: "US", region: "Oregon", flag: "🇺🇸" },
+  SAN: { city: "San Diego", country: "US", region: "California", flag: "🇺🇸" },
+  PHX: { city: "Phoenix", country: "US", region: "Arizona", flag: "🇺🇸" },
+  LAS: { city: "Las Vegas", country: "US", region: "Nevada", flag: "🇺🇸" },
+  DEN: { city: "Denver", country: "US", region: "Colorado", flag: "🇺🇸" },
+  SLC: { city: "Salt Lake City", country: "US", region: "Utah", flag: "🇺🇸" },
+  // US Central
   ORD: { city: "Chicago", country: "US", region: "Illinois", flag: "🇺🇸" },
+  DFW: { city: "Dallas", country: "US", region: "Texas", flag: "🇺🇸" },
+  IAH: { city: "Houston", country: "US", region: "Texas", flag: "🇺🇸" },
+  AUS: { city: "Austin", country: "US", region: "Texas", flag: "🇺🇸" },
+  MSP: { city: "Minneapolis", country: "US", region: "Minnesota", flag: "🇺🇸" },
+  MCI: { city: "Kansas City", country: "US", region: "Missouri", flag: "🇺🇸" },
+  DTW: { city: "Detroit", country: "US", region: "Michigan", flag: "🇺🇸" },
+  CMH: { city: "Columbus", country: "US", region: "Ohio", flag: "🇺🇸" },
+  BNA: { city: "Nashville", country: "US", region: "Tennessee", flag: "🇺🇸" },
+  // US East
+  IAD: { city: "Ashburn", country: "US", region: "Virginia", flag: "🇺🇸" },
+  EWR: { city: "Newark", country: "US", region: "New Jersey", flag: "🇺🇸" },
+  BOS: { city: "Boston", country: "US", region: "Massachusetts", flag: "🇺🇸" },
+  PHL: {
+    city: "Philadelphia",
+    country: "US",
+    region: "Pennsylvania",
+    flag: "🇺🇸",
+  },
+  ATL: { city: "Atlanta", country: "US", region: "Georgia", flag: "🇺🇸" },
+  MIA: { city: "Miami", country: "US", region: "Florida", flag: "🇺🇸" },
+  MCO: { city: "Orlando", country: "US", region: "Florida", flag: "🇺🇸" },
+  CLT: { city: "Charlotte", country: "US", region: "N. Carolina", flag: "🇺🇸" },
+  // Canada
+  YYZ: { city: "Toronto", country: "CA", region: "Ontario", flag: "🇨🇦" },
+  YVR: { city: "Vancouver", country: "CA", region: "BC", flag: "🇨🇦" },
+  YUL: { city: "Montreal", country: "CA", region: "Quebec", flag: "🇨🇦" },
+  // Mexico
+  MEX: { city: "Mexico City", country: "MX", region: "CDMX", flag: "🇲🇽" },
+  GDL: { city: "Guadalajara", country: "MX", region: "Jalisco", flag: "🇲🇽" },
+  MTY: { city: "Monterrey", country: "MX", region: "Nuevo León", flag: "🇲🇽" },
+
+  // Europe - West
   LHR: { city: "London", country: "GB", region: "England", flag: "🇬🇧" },
-  FRA: { city: "Frankfurt", country: "DE", region: "Hesse", flag: "🇩🇪" },
-  CDG: { city: "Paris", country: "FR", region: "Île-de-France", flag: "🇫🇷" },
+  MAN: { city: "Manchester", country: "GB", region: "England", flag: "🇬🇧" },
+  DUB: { city: "Dublin", country: "IE", region: "Leinster", flag: "🇮🇪" },
   AMS: {
     city: "Amsterdam",
     country: "NL",
     region: "North Holland",
     flag: "🇳🇱",
   },
-  SYD: { city: "Sydney", country: "AU", region: "New South Wales", flag: "🇦🇺" },
+  BRU: { city: "Brussels", country: "BE", region: "Brussels", flag: "🇧🇪" },
+  CDG: { city: "Paris", country: "FR", region: "Île-de-France", flag: "🇫🇷" },
+  MRS: { city: "Marseille", country: "FR", region: "PACA", flag: "🇫🇷" },
+  LYS: { city: "Lyon", country: "FR", region: "Auvergne", flag: "🇫🇷" },
+  FRA: { city: "Frankfurt", country: "DE", region: "Hesse", flag: "🇩🇪" },
+  MUC: { city: "Munich", country: "DE", region: "Bavaria", flag: "🇩🇪" },
+  HAM: { city: "Hamburg", country: "DE", region: "Hamburg", flag: "🇩🇪" },
+  ZRH: { city: "Zurich", country: "CH", region: "Zurich", flag: "🇨🇭" },
+  // Europe - South
+  MAD: { city: "Madrid", country: "ES", region: "Madrid", flag: "🇪🇸" },
+  BCN: { city: "Barcelona", country: "ES", region: "Catalonia", flag: "🇪🇸" },
+  LIS: { city: "Lisbon", country: "PT", region: "Lisbon", flag: "🇵🇹" },
+  MXP: { city: "Milan", country: "IT", region: "Lombardy", flag: "🇮🇹" },
+  FCO: { city: "Rome", country: "IT", region: "Lazio", flag: "🇮🇹" },
+  ATH: { city: "Athens", country: "GR", region: "Attica", flag: "🇬🇷" },
+  // Europe - North & East
+  ARN: { city: "Stockholm", country: "SE", region: "Stockholm", flag: "🇸🇪" },
+  CPH: { city: "Copenhagen", country: "DK", region: "Capital", flag: "🇩🇰" },
+  OSL: { city: "Oslo", country: "NO", region: "Oslo", flag: "🇳🇴" },
+  HEL: { city: "Helsinki", country: "FI", region: "Uusimaa", flag: "🇫🇮" },
+  VIE: { city: "Vienna", country: "AT", region: "Vienna", flag: "🇦🇹" },
+  WAW: { city: "Warsaw", country: "PL", region: "Mazovia", flag: "🇵🇱" },
+  PRG: { city: "Prague", country: "CZ", region: "Prague", flag: "🇨🇿" },
+  BUD: { city: "Budapest", country: "HU", region: "Budapest", flag: "🇭🇺" },
+  SOF: { city: "Sofia", country: "BG", region: "Sofia", flag: "🇧🇬" },
+  DME: { city: "Moscow", country: "RU", region: "Moscow", flag: "🇷🇺" },
+  LED: {
+    city: "St. Petersburg",
+    country: "RU",
+    region: "Leningrad",
+    flag: "🇷🇺",
+  },
+  IST: { city: "Istanbul", country: "TR", region: "Istanbul", flag: "🇹🇷" },
+
+  // Asia - East Asia
+  NRT: { city: "Tokyo", country: "JP", region: "Kanto", flag: "🇯🇵" },
+  KIX: { city: "Osaka", country: "JP", region: "Kansai", flag: "🇯🇵" },
   ICN: { city: "Seoul", country: "KR", region: "Seoul", flag: "🇰🇷" },
-  BOM: { city: "Mumbai", country: "IN", region: "Maharashtra", flag: "🇮🇳" },
-  GRU: { city: "São Paulo", country: "BR", region: "São Paulo", flag: "🇧🇷" },
-  YYZ: { city: "Toronto", country: "CA", region: "Ontario", flag: "🇨🇦" },
-  DXB: { city: "Dubai", country: "AE", region: "Dubai", flag: "🇦🇪" },
+  HKG: { city: "Hong Kong", country: "HK", region: "Hong Kong", flag: "🇭🇰" },
   TPE: { city: "Taipei", country: "TW", region: "Taipei", flag: "🇹🇼" },
+  // Southeast Asia
+  SIN: { city: "Singapore", country: "SG", region: "Singapore", flag: "🇸🇬" },
   KUL: { city: "Kuala Lumpur", country: "MY", region: "Selangor", flag: "🇲🇾" },
+  BKK: { city: "Bangkok", country: "TH", region: "Bangkok", flag: "🇹🇭" },
   MNL: { city: "Manila", country: "PH", region: "Metro Manila", flag: "🇵🇭" },
+  CGK: { city: "Jakarta", country: "ID", region: "Jakarta", flag: "🇮🇩" },
+  HAN: { city: "Hanoi", country: "VN", region: "Hanoi", flag: "🇻🇳" },
+  SGN: { city: "Ho Chi Minh", country: "VN", region: "HCMC", flag: "🇻🇳" },
+  // South Asia
+  BOM: { city: "Mumbai", country: "IN", region: "Maharashtra", flag: "🇮🇳" },
+  DEL: { city: "Delhi", country: "IN", region: "Delhi", flag: "🇮🇳" },
+  BLR: { city: "Bangalore", country: "IN", region: "Karnataka", flag: "🇮🇳" },
+  HYD: { city: "Hyderabad", country: "IN", region: "Telangana", flag: "🇮🇳" },
+  MAA: { city: "Chennai", country: "IN", region: "Tamil Nadu", flag: "🇮🇳" },
+  // Oceania
+  SYD: { city: "Sydney", country: "AU", region: "NSW", flag: "🇦🇺" },
+  MEL: { city: "Melbourne", country: "AU", region: "Victoria", flag: "🇦🇺" },
+  BNE: { city: "Brisbane", country: "AU", region: "Queensland", flag: "🇦🇺" },
+  PER: { city: "Perth", country: "AU", region: "WA", flag: "🇦🇺" },
+  AKL: { city: "Auckland", country: "NZ", region: "Auckland", flag: "🇳🇿" },
+
+  // Middle East & Africa
+  DXB: { city: "Dubai", country: "AE", region: "Dubai", flag: "🇦🇪" },
+  BAH: { city: "Bahrain", country: "BH", region: "Manama", flag: "🇧🇭" },
+  DOH: { city: "Doha", country: "QA", region: "Doha", flag: "🇶🇦" },
+  AMM: { city: "Amman", country: "JO", region: "Amman", flag: "🇯🇴" },
+  TLV: { city: "Tel Aviv", country: "IL", region: "Tel Aviv", flag: "🇮🇱" },
+  CAI: { city: "Cairo", country: "EG", region: "Cairo", flag: "🇪🇬" },
+  JNB: { city: "Johannesburg", country: "ZA", region: "Gauteng", flag: "🇿🇦" },
+  CPT: { city: "Cape Town", country: "ZA", region: "Western Cape", flag: "🇿🇦" },
+  NBO: { city: "Nairobi", country: "KE", region: "Nairobi", flag: "🇰🇪" },
+  LOS: { city: "Lagos", country: "NG", region: "Lagos", flag: "🇳🇬" },
+
+  // South America
+  GRU: { city: "São Paulo", country: "BR", region: "São Paulo", flag: "🇧🇷" },
+  GIG: { city: "Rio de Janeiro", country: "BR", region: "Rio", flag: "🇧🇷" },
+  SCL: { city: "Santiago", country: "CL", region: "Santiago", flag: "🇨🇱" },
+  BOG: { city: "Bogotá", country: "CO", region: "Bogotá", flag: "🇨🇴" },
+  LIM: { city: "Lima", country: "PE", region: "Lima", flag: "🇵🇪" },
+  EZE: {
+    city: "Buenos Aires",
+    country: "AR",
+    region: "Buenos Aires",
+    flag: "🇦🇷",
+  },
 };
 ---
 
