@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { getDb } from '../../../lib/db';
 import { users, sessions } from '../../../../db/schema';
 
-export const POST: APIRoute = async ({ locals, request }) => {
+export const POST: APIRoute = async ({ locals }) => {
 	// Admin only
 	const user = locals.user;
 	if (!user || user.id !== 'e948c115-a7cf-4571-9d2c-5ed43b96bb93') {

@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { getDb } from "../../../lib/db";
 import { posts } from "../../../../db/schema";
-import { eq } from "drizzle-orm";
+// import { eq } from "drizzle-orm";
 
 function slugify(text: string) {
   return text

@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getDb } from '../../lib/db';
-import { sessions, users, type Session } from '../../../db/schema';
+import { sessions, type Session } from '../../../db/schema';
 import { eq } from 'drizzle-orm';
 
 export const GET: APIRoute = async ({ locals, request, cookies }) => {
@@ -69,7 +69,7 @@ export const GET: APIRoute = async ({ locals, request, cookies }) => {
 	});
 };
 
-export const DELETE: APIRoute = async ({ locals, params, request, cookies }) => {
+export const DELETE: APIRoute = async ({ locals, request, cookies }) => {
 	const { user } = locals;
 	if (!user) {
 		return new Response(JSON.stringify({ error: 'Unauthorized' }), {
