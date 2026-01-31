@@ -4,8 +4,9 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) 
 ![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)
-![Node: 24+](https://img.shields.io/badge/Node-24%2B-green.svg)
-![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-orange.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-blue.svg)
+![Astro](https://img.shields.io/badge/Astro-5.0%2B-orange.svg)
+![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020.svg)
 
 **一个基于现代 Web 技术构建的高性能边缘优先博客平台**
 
@@ -36,16 +37,19 @@
 - **流畅动画** - 平滑的过渡效果和微交互
 - **Safari 风格移动导航** - 滚动时收缩的导航栏，带全息文字效果
 
-### 🌐 **国际化 (i18n)**
-- **多语言支持** - 英语（新加坡）和简体中文
-- **动态语言路由** - SEO 优化，支持 `og:locale` 和 `html lang`
-- **本地化 RSS 订阅** - 每种语言独立的订阅源（`/rss.xml`、`/zh/rss.xml`）
-- **智能语言检测** - 基于 URL 的自动语言切换
+### 🌐 **智能国际化**
+- **混合语言策略** - 内部使用 `zh-SG` 格式，对外呈现简洁的 `/zh/` 链接
+- **动态路由映射** - 自定义路由逻辑实现无缝语言切换
+- **本地化 RSS** - 英语 (`/rss.xml`) 与中文 (`/zh/rss.xml`) 独立订阅源
 
-### 🔐 **认证与授权**
+### 🔍 **SEO 深度优化**
+- **双语索引** - `sitemap.xml` 完整覆盖中英文内容树
+- **Hreflang 支持** - 精准的语言目标定位 (`en-SG`, `zh`)，助力搜索引擎识别
+- **Meta 增强** - 动态 `og:locale`、关键词支持及丰富的社交分享卡片
+
+### 🔐 **认证与安全**
 - **OAuth 集成** - 通过 Arctic + Oslo 支持 GitHub、Google、Discord
-- **会话管理** - 基于 Cloudflare KV 的安全 Cookie 会话
-- **个人资料自定义** - 在已连接的供应商之间切换身份或上传自定义头像
+- **智能会话** - 支持设备感知的会话追踪与自动去重
 - **零信任管理员** - 受 Cloudflare Access 保护的管理路由
 
 ### 📝 **内容管理**
@@ -62,7 +66,7 @@
 - **PWA 支持** - 可在移动端和桌面端作为原生应用安装
 - **智能路由** - Cloudflare Smart Placement 优化延迟
 
-### 🔍 **AI 驱动搜索**
+### 🤖 **AI 驱动搜索**
 - **语义搜索** - 使用 Cloudflare Vectorize + Workers AI 实现智能内容发现
 - **多语言支持** - 跨英文和中文内容搜索
 - **即时结果** - 快速的边缘向量搜索

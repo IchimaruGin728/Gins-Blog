@@ -4,8 +4,9 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) 
 ![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)
-![Node: 24+](https://img.shields.io/badge/Node-24%2B-green.svg)
-![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-orange.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-blue.svg)
+![Astro](https://img.shields.io/badge/Astro-5.0%2B-orange.svg)
+![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020.svg)
 
 **A high-performance, edge-first blog platform built with modern web technologies**
 
@@ -36,16 +37,19 @@
 - **Fluid Animations** - Smooth transitions and micro-interactions
 - **Safari-Style Mobile Nav** - Shrinking navigation bar with holographic text effects
 
-### 🌐 **Internationalization (i18n)**
-- **Multi-Language Support** - English (SG) and Chinese (Simplified)
-- **Dynamic Locale Routing** - SEO-optimized with `og:locale` and `html lang`
-- **Localized RSS Feeds** - Separate feeds for each language (`/rss.xml`, `/zh/rss.xml`)
-- **Smart Language Detection** - Automatic URL-based language switching
+### 🌐 **Smart Internationalization**
+- **Hybrid Locale Strategy** - Internal `zh-SG` formatting with clean `/zh/` URLs for users
+- **Dynamic Routing** - Custom mapped routing for seamless language switching
+- **Localized RSS** - Dedicated feeds for English (`/rss.xml`) and Chinese (`/zh/rss.xml`)
 
-### 🔐 **Authentication & Authorization**
+### 🔍 **Advanced SEO**
+- **Bilingual indexing** - `sitemap.xml` covers full English and Chinese content trees
+- **Hreflang Support** - Precise language targeting (`en-SG`, `zh`) for search engines
+- **Meta Optimization** - Dynamic `og:locale`, `keywords`, and rich social cards
+
+### 🔐 **Authentication & Security**
 - **OAuth Integration** - GitHub, Google, Discord via Arctic + Oslo
-- **Session Management** - Secure cookie-based sessions with Cloudflare KV
-- **Profile Customization** - Switch identity between connected providers or upload custom avatar
+- **Smart Sessions** - Device-aware tracking with automatic deduplication
 - **Zero Trust Admin** - Protected admin routes with Cloudflare Access integration
 
 ### 📝 **Content Management**
@@ -62,7 +66,7 @@
 - **PWA Support** - Installable as a native app on mobile and desktop
 - **Smart Routing** - Cloudflare Smart Placement for optimal latency
 
-### 🔍 **AI-Powered Search**
+### 🤖 **AI-Powered Search**
 - **Semantic Search** - Cloudflare Vectorize + Workers AI for intelligent content discovery
 - **Multi-Language Support** - Search across both English and Chinese content
 - **Instant Results** - Fast, edge-based vector search
