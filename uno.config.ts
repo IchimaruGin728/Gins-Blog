@@ -9,7 +9,8 @@ export default defineConfig({
     'btn-animated': 'transition-transform active:scale-95 hover:-translate-y-0.5 will-change-transform',
   },
   safelist: [
-    // Preload all heroicons used in admin panel to prevent FOUC
+    // Preload ALL heroicons used across app to prevent FOUC
+    // Main icons
     'i-heroicons-musical-note',
     'i-heroicons-users',
     'i-heroicons-arrow-right',
@@ -36,13 +37,37 @@ export default defineConfig({
     'i-heroicons-check',
     'i-heroicons-pencil-square',
     'i-heroicons-eye-slash',
+    // Additional icons
+    'i-heroicons-exclamation-triangle',
+    'i-heroicons-arrow-left',
+    'i-heroicons-plus',
+    'i-heroicons-arrow-up-tray',
+    'i-heroicons-play',
+    // Simple icons
     'i-simple-icons-apple',
     'i-simple-icons-windows',
     'i-simple-icons-android',
+    'i-simple-icons-github',
+    'i-simple-icons-google',
+    'i-simple-icons-discord',
   ],
   presets: [
     presetUno(),
-    presetIcons(),
+    presetIcons({
+      scale: 1.2, // Slightly larger for crisper rendering
+      warn: true, // Warn about missing icons in dev
+      cdn: 'https://esm.sh/', // Use CDN for icon data
+      extraProperties: {
+        // SVG optimization for better quality
+        'display': 'inline-block',
+        'vertical-align': 'middle',
+        // Anti-aliasing for smoother edges  
+        'shape-rendering': 'geometricPrecision',
+        // Better text rendering
+        '-webkit-font-smoothing': 'antialiased',
+        '-moz-osx-font-smoothing': 'grayscale',
+      },
+    }),
     presetTypography(),
   ],
   theme: {
