@@ -1066,21 +1066,29 @@ const COLO_LOCATIONS: Record<
                             Trust: {trustScore}/99
                           </div>
                         )}
-                        
+
                         {/* Device Intelligence */}
-                        {(s.screen_resolution || s.device_memory || s.cpu_cores) && (
+                        {(s.screen_resolution ||
+                          s.device_memory ||
+                          s.cpu_cores) && (
                           <div class="pt-2 mt-2 border-t border-white/5 space-y-1">
-                             {s.screen_resolution && (
-                               <div class="flex items-center gap-1.5 text-gray-400">
-                                 <span class="i-heroicons-computer-desktop w-3 h-3" />
-                                 <span>{s.screen_resolution}</span>
-                               </div>
-                             )}
-                             <div class="flex items-center gap-2 text-gray-500 font-mono text-[10px]">
-                               {s.cpu_cores && <span>{s.cpu_cores} Cores</span>}
-                               {s.device_memory && <span>{s.device_memory}GB RAM</span>}
-                               {s.connection_type && <span class="uppercase border border-white/10 px-1 rounded">{s.connection_type}</span>}
-                             </div>
+                            {s.screen_resolution && (
+                              <div class="flex items-center gap-1.5 text-gray-400">
+                                <span class="i-heroicons-computer-desktop w-3 h-3" />
+                                <span>{s.screen_resolution}</span>
+                              </div>
+                            )}
+                            <div class="flex items-center gap-2 text-gray-500 font-mono text-[10px]">
+                              {s.cpu_cores && <span>{s.cpu_cores} Cores</span>}
+                              {s.device_memory && (
+                                <span>{s.device_memory}GB RAM</span>
+                              )}
+                              {s.connection_type && (
+                                <span class="uppercase border border-white/10 px-1 rounded">
+                                  {s.connection_type}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -1838,11 +1846,11 @@ const COLO_LOCATIONS: Record<
         status!.className = "hidden";
       }
     });
-    
+
     // --- Device Intelligence Collection ---
     const reportDeviceInfo = async () => {
       // Don't report if already done this session (optional, but good for performance)
-      if (sessionStorage.getItem('gins_device_reported')) return;
+      if (sessionStorage.getItem("gins_device_reported")) return;
 
       const info = {
         screenResolution: `${window.screen.width}x${window.screen.height}`,
@@ -1850,56 +1858,24 @@ const COLO_LOCATIONS: Record<
         deviceMemory: navigator.deviceMemory,
         cpuCores: navigator.hardwareConcurrency,
         // @ts-ignore
-        connectionType: navigator.connection?.effectiveType
+        connectionType: navigator.connection?.effectiveType,
       };
 
       try {
-        await fetch('/api/session/device-info', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(info)
+        await fetch("/api/session/device-info", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(info),
         });
-        sessionStorage.setItem('gins_device_reported', 'true');
-        console.log('📡 Device Intelligence Reported:', info);
+        sessionStorage.setItem("gins_device_reported", "true");
+        console.log("📡 Device Intelligence Reported:", info);
       } catch (e) {
-        console.error('Device info report failed', e);
+        console.error("Device info report failed", e);
       }
     };
-    
+
     // Report on load
     reportDeviceInfo();
-          modal?.querySelector(".glass-panel")?.classList.remove("scale-95");
-          modal?.querySelector(".glass-panel")?.classList.add("scale-100");
-
-          form.reset();
-          document
-            .getElementById("delete-current-btn")
-            ?.classList.add("hidden");
-          document.querySelector('button[type="submit"]')!.innerHTML =
-            "BROADCAST SIGNAL";
-
-          returnBtn?.addEventListener("click", () => {
-            modal?.classList.add("opacity-0", "pointer-events-none");
-            modal?.querySelector(".glass-panel")?.classList.add("scale-95");
-            setTimeout(() => modal?.classList.add("hidden"), 300);
-            window.location.reload();
-          });
-        } else {
-          const errorData = (await res
-            .json()
-            .catch(() => ({ error: res.statusText }))) as any;
-          console.error("Transmission Error:", errorData);
-          status!.innerText = `Transmission Failed: ${errorData.error || "Unknown Error"} (${res.status})`;
-          status!.classList.remove("hidden");
-          status!.classList.add("bg-red-500/20", "text-red-200");
-        }
-      } catch (err) {
-        console.error(err);
-        status!.innerText = "Network Error.";
-        status!.classList.remove("hidden");
-        status!.classList.add("bg-red-500/20", "text-red-200");
-      }
-    });
 
     // Handle Delete from Editor
     const deleteCurrentBtn = document.getElementById("delete-current-btn");

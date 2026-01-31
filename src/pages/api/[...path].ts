@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
 import { getDb } from '../../lib/db';
-import { posts, music } from '../../../db/schema';
+import { posts } from '../../../db/schema';
 import * as schema from '../../../db/schema';
 import { eq, desc } from 'drizzle-orm';
 import type { APIRoute } from 'astro';
