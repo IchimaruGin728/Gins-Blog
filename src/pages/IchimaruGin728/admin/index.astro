@@ -1225,182 +1225,183 @@ const COLO_LOCATIONS: Record<
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 pointer-events-none"
   >
     <div
-      class="glass-panel p-8 rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-y-auto scale-95 transition-transform duration-300"
+      class="glass-panel p-0 rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col scale-95 transition-transform duration-300 relative"
     >
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h2 class="text-3xl font-display font-bold flex items-center gap-3">
-            <span class="i-heroicons-server w-8 h-8 text-blue-400"></span>
-            Edge Analytics
-          </h2>
-          <p class="text-gray-400 mt-1">
-            Cloudflare node distribution & routing
-          </p>
-        </div>
-        <button
-          class="close-inspect-btn p-2 rounded-lg hover:bg-white/10 transition-colors"
-        >
-          <span class="i-heroicons-x-mark w-6 h-6"></span>
-        </button>
+      <!-- Close Button (Consistent with other modals) -->
+      <button
+        class="close-inspect-btn absolute top-6 right-6 p-2 rounded-lg bg-black/20 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors border border-white/5 hover:border-red-500/30 z-20"
+      >
+        <span class="i-heroicons-x-mark w-6 h-6"></span>
+      </button>
+
+      <!-- Header -->
+      <div class="p-6 border-b border-white/10 bg-black/40">
+        <h2 class="text-3xl font-display font-bold flex items-center gap-3">
+          <span class="i-heroicons-server w-8 h-8 text-blue-400"></span>
+          Edge Analytics
+        </h2>
+        <p class="text-gray-400 mt-1">Cloudflare node distribution & routing</p>
       </div>
 
-      <div class="grid grid-cols-4 gap-4 mb-8">
-        <div class="glass-panel p-4 rounded-xl">
-          <div class="text-xs text-gray-400 mb-1">Active Nodes</div>
-          <div class="text-2xl font-bold text-blue-400">
-            {performanceSummary?.active_nodes || 0}
+      <!-- Content -->
+      <div class="overflow-y-auto p-6 scrollbar-hide flex-1 bg-black/20">
+        <div class="grid grid-cols-4 gap-4 mb-8">
+          <div class="glass-panel p-4 rounded-xl">
+            <div class="text-xs text-gray-400 mb-1">Active Nodes</div>
+            <div class="text-2xl font-bold text-blue-400">
+              {performanceSummary?.active_nodes || 0}
+            </div>
+          </div>
+          <div class="glass-panel p-4 rounded-xl">
+            <div class="text-xs text-gray-400 mb-1">Avg RTT</div>
+            <div class="text-2xl font-bold text-green-400">
+              {Math.round(performanceSummary?.global_avg_rtt || 0)}ms
+            </div>
+          </div>
+          <div class="glass-panel p-4 rounded-xl">
+            <div class="text-xs text-gray-400 mb-1">Min RTT</div>
+            <div class="text-2xl font-bold text-green-300">
+              {Math.round(performanceSummary?.min_rtt || 0)}ms
+            </div>
+          </div>
+          <div class="glass-panel p-4 rounded-xl">
+            <div class="text-xs text-gray-400 mb-1">Max RTT</div>
+            <div class="text-2xl font-bold text-orange-400">
+              {Math.round(performanceSummary?.max_rtt || 0)}ms
+            </div>
           </div>
         </div>
-        <div class="glass-panel p-4 rounded-xl">
-          <div class="text-xs text-gray-400 mb-1">Avg RTT</div>
-          <div class="text-2xl font-bold text-green-400">
-            {Math.round(performanceSummary?.global_avg_rtt || 0)}ms
-          </div>
-        </div>
-        <div class="glass-panel p-4 rounded-xl">
-          <div class="text-xs text-gray-400 mb-1">Min RTT</div>
-          <div class="text-2xl font-bold text-green-300">
-            {Math.round(performanceSummary?.min_rtt || 0)}ms
-          </div>
-        </div>
-        <div class="glass-panel p-4 rounded-xl">
-          <div class="text-xs text-gray-400 mb-1">Max RTT</div>
-          <div class="text-2xl font-bold text-orange-400">
-            {Math.round(performanceSummary?.max_rtt || 0)}ms
-          </div>
-        </div>
-      </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="border-b border-white/10">
-            <tr
-              class="text-left text-xs uppercase tracking-wider text-gray-400"
-            >
-              <th class="p-4">Node</th>
-              <th class="p-4">Location</th>
-              <th class="p-4 text-right">Sessions</th>
-              <th class="p-4 text-right">Avg RTT</th>
-              <th class="p-4 text-right">Performance</th>
-            </tr>
-          </thead>
-          <tbody class="text-sm divide-y divide-white/5">
-            {
-              (edgeNodeStats.results || []).map((node: any) => {
-                const location = COLO_LOCATIONS[node.colo] || {
-                  city: node.colo,
-                  country: "??",
-                  flag: "🌐",
-                  region: "",
-                };
-                const avgRtt = Math.round(node.avg_rtt || 0);
-                const rttColor =
-                  avgRtt < 50
-                    ? "text-green-400"
-                    : avgRtt < 150
-                      ? "text-yellow-400"
-                      : "text-red-400";
-                const percentage = (
-                  (node.session_count / activeSessionCount) *
-                  100
-                ).toFixed(1);
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="border-b border-white/10">
+              <tr
+                class="text-left text-xs uppercase tracking-wider text-gray-400"
+              >
+                <th class="p-4">Node</th>
+                <th class="p-4">Location</th>
+                <th class="p-4 text-right">Sessions</th>
+                <th class="p-4 text-right">Avg RTT</th>
+                <th class="p-4 text-right">Performance</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm divide-y divide-white/5">
+              {
+                (edgeNodeStats.results || []).map((node: any) => {
+                  const location = COLO_LOCATIONS[node.colo] || {
+                    city: node.colo,
+                    country: "??",
+                    flag: "🌐",
+                    region: "",
+                  };
+                  const avgRtt = Math.round(node.avg_rtt || 0);
+                  const rttColor =
+                    avgRtt < 50
+                      ? "text-green-400"
+                      : avgRtt < 150
+                        ? "text-yellow-400"
+                        : "text-red-400";
+                  const percentage = (
+                    (node.session_count / activeSessionCount) *
+                    100
+                  ).toFixed(1);
 
-                return (
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="p-4">
-                      <div class="font-mono font-bold text-blue-400">
-                        {node.colo}
-                      </div>
-                    </td>
-                    <td class="p-4">
-                      <div class="flex items-center gap-2">
-                        <span class="text-2xl">{location.flag}</span>
-                        <div>
-                          <div class="font-semibold">{location.city}</div>
-                          <div class="text-xs text-gray-500">
-                            {location.region}, {location.country}
+                  return (
+                    <tr class="hover:bg-white/5 transition-colors">
+                      <td class="p-4">
+                        <div class="font-mono font-bold text-blue-400">
+                          {node.colo}
+                        </div>
+                      </td>
+                      <td class="p-4">
+                        <div class="flex items-center gap-2">
+                          <span class="text-2xl">{location.flag}</span>
+                          <div>
+                            <div class="font-semibold">{location.city}</div>
+                            <div class="text-xs text-gray-500">
+                              {location.region}, {location.country}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td class="p-4 text-right">
-                      <div class="font-bold">{node.session_count}</div>
-                      <div class="text-xs text-gray-500">{percentage}%</div>
-                    </td>
-                    <td
-                      class={`p-4 text-right font-mono font-bold ${rttColor}`}
-                    >
-                      {avgRtt}ms
-                    </td>
-                    <td class="p-4 text-right">
-                      {avgRtt < 50 && (
-                        <span class="px-2 py-1 rounded bg-green-500/20 text-green-300 text-xs">
-                          Excellent
-                        </span>
-                      )}
-                      {avgRtt >= 50 && avgRtt < 150 && (
-                        <span class="px-2 py-1 rounded bg-yellow-500/20 text-yellow-300 text-xs">
-                          Good
-                        </span>
-                      )}
-                      {avgRtt >= 150 && (
-                        <span class="px-2 py-1 rounded bg-red-500/20 text-red-300 text-xs">
-                          Poor
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })
-            }
-          </tbody>
-        </table>
-      </div>
+                      </td>
+                      <td class="p-4 text-right">
+                        <div class="font-bold">{node.session_count}</div>
+                        <div class="text-xs text-gray-500">{percentage}%</div>
+                      </td>
+                      <td
+                        class={`p-4 text-right font-mono font-bold ${rttColor}`}
+                      >
+                        {avgRtt}ms
+                      </td>
+                      <td class="p-4 text-right">
+                        {avgRtt < 50 && (
+                          <span class="px-2 py-1 rounded bg-green-500/20 text-green-300 text-xs">
+                            Excellent
+                          </span>
+                        )}
+                        {avgRtt >= 50 && avgRtt < 150 && (
+                          <span class="px-2 py-1 rounded bg-yellow-500/20 text-yellow-300 text-xs">
+                            Good
+                          </span>
+                        )}
+                        {avgRtt >= 150 && (
+                          <span class="px-2 py-1 rounded bg-red-500/20 text-red-300 text-xs">
+                            Poor
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              }
+            </tbody>
+          </table>
+        </div>
 
-      {
-        (edgeNodeStats.results || []).some(
-          (node: any) => Math.round(node.avg_rtt || 0) > 150,
-        ) && (
-          <div class="mt-6 p-4 rounded-xl bg-orange-500/10 border border-orange-500/30">
-            <div class="flex items-start gap-3">
-              <span class="i-heroicons-exclamation-triangle w-6 h-6 text-orange-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <div class="font-bold text-orange-300 mb-1">
-                  Routing Anomalies Detected
-                </div>
-                <div class="text-sm text-gray-300">
-                  High latency detected (&gt;150ms). Possible causes: suboptimal
-                  routing, VPN usage, or network congestion.
+        {
+          (edgeNodeStats.results || []).some(
+            (node: any) => Math.round(node.avg_rtt || 0) > 150,
+          ) && (
+            <div class="mt-6 p-4 rounded-xl bg-orange-500/10 border border-orange-500/30">
+              <div class="flex items-start gap-3">
+                <span class="i-heroicons-exclamation-triangle w-6 h-6 text-orange-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div class="font-bold text-orange-300 mb-1">
+                    Routing Anomalies Detected
+                  </div>
+                  <div class="text-sm text-gray-300">
+                    High latency detected (&gt;150ms). Possible causes:
+                    suboptimal routing, VPN usage, or network congestion.
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )
-      }
+          )
+        }
+      </div>
     </div>
   </div>
-</Layout>
 
-<script>
-  import { hc } from "hono/client";
-  import type { AppType } from "../../api/[...path]";
-  import { UAParser } from "ua-parser-js";
+  <script>
+    import { hc } from "hono/client";
+    import type { AppType } from "../../api/[...path]";
+    import { UAParser } from "ua-parser-js";
 
-  // Initialize UA Parser for all sessions
-  document.querySelectorAll(".ua-parser-container").forEach((el) => {
-    const ua = (el as HTMLElement).dataset.ua;
-    if (ua) {
-      const parser = new UAParser(ua);
-      const result = parser.getResult();
-      const osIcon = result.os.name?.toLowerCase().includes("mac")
-        ? "i-simple-icons-apple"
-        : result.os.name?.toLowerCase().includes("win")
-          ? "i-simple-icons-windows"
-          : result.os.name?.toLowerCase().includes("android")
-            ? "i-simple-icons-android"
-            : "i-heroicons-cpu-chip";
+    // Initialize UA Parser for all sessions
+    document.querySelectorAll(".ua-parser-container").forEach((el) => {
+      const ua = (el as HTMLElement).dataset.ua;
+      if (ua) {
+        const parser = new UAParser(ua);
+        const result = parser.getResult();
+        const osIcon = result.os.name?.toLowerCase().includes("mac")
+          ? "i-simple-icons-apple"
+          : result.os.name?.toLowerCase().includes("win")
+            ? "i-simple-icons-windows"
+            : result.os.name?.toLowerCase().includes("android")
+              ? "i-simple-icons-android"
+              : "i-heroicons-cpu-chip";
 
-      el.innerHTML = `
+        el.innerHTML = `
         <div class="flex items-center gap-2">
           <span class="${osIcon} w-4 h-4"></span>
           <span class="font-bold">${result.os.name || "Unknown OS"} ${result.os.version || ""}</span>
@@ -1411,586 +1412,604 @@ const COLO_LOCATIONS: Record<
         </div>
         ${result.device.type ? `<div class="text-xs text-gray-500 uppercase tracking-wide border border-white/10 inline-block px-1 rounded">${result.device.vendor || ""} ${result.device.model || ""}</div>` : ""}
       `;
-    }
-  });
+      }
+    });
 
-  // No-op for compatibility if referenced elsewhere, or remove entirely if safe.
-  // Legacy fetchGeoData removed as per user request to rely on DB data.
+    // No-op for compatibility if referenced elsewhere, or remove entirely if safe.
+    // Legacy fetchGeoData removed as per user request to rely on DB data.
 
-  // Tab Switcher Logic
-  // @ts-ignore
-  // --- Modals Logic ---
-  const activeSessionsModal = document.getElementById("active-sessions-modal");
-  const userDatabaseModal = document.getElementById("user-database-modal");
-  const edgeAnalyticsModal = document.getElementById("edge-analytics-modal");
-
-  const closeModals = () => {
-    activeSessionsModal?.classList.add("opacity-0");
-    userDatabaseModal?.classList.add("opacity-0");
-    edgeAnalyticsModal?.classList.add("opacity-0");
-    setTimeout(() => {
-      activeSessionsModal?.classList.add("hidden", "pointer-events-none");
-      userDatabaseModal?.classList.add("hidden", "pointer-events-none");
-      edgeAnalyticsModal?.classList.add("hidden", "pointer-events-none");
-    }, 300);
-    activeSessionsModal
-      ?.querySelector(".glass-panel")
-      ?.classList.remove("scale-100");
-    activeSessionsModal
-      ?.querySelector(".glass-panel")
-      ?.classList.add("scale-95");
-    userDatabaseModal
-      ?.querySelector(".glass-panel")
-      ?.classList.remove("scale-100");
-    userDatabaseModal?.querySelector(".glass-panel")?.classList.add("scale-95");
-    edgeAnalyticsModal
-      ?.querySelector(".glass-panel")
-      ?.classList.remove("scale-100");
-    edgeAnalyticsModal
-      ?.querySelector(".glass-panel")
-      ?.classList.add("scale-95");
-  };
-
-  document.querySelectorAll(".close-inspect-btn").forEach((btn) => {
-    btn.addEventListener("click", closeModals);
-  });
-
-  // Close on click outside
-  activeSessionsModal?.addEventListener("click", (e) => {
-    if (e.target === activeSessionsModal) closeModals();
-  });
-  userDatabaseModal?.addEventListener("click", (e) => {
-    if (e.target === userDatabaseModal) closeModals();
-  });
-
-  // Open Handlers
-  // @ts-ignore
-  window.openInspector = (type) => {
-    if (type === "sessions") {
-      activeSessionsModal?.classList.remove("hidden", "pointer-events-none");
-      void activeSessionsModal?.offsetWidth;
-      activeSessionsModal?.classList.remove("opacity-0");
-      activeSessionsModal
-        ?.querySelector(".glass-panel")
-        ?.classList.remove("scale-95");
-      activeSessionsModal
-        ?.querySelector(".glass-panel")
-        ?.classList.add("scale-100");
-    } else if (type === "edge") {
-      edgeAnalyticsModal?.classList.remove("hidden", "pointer-events-none");
-      void edgeAnalyticsModal?.offsetWidth;
-      edgeAnalyticsModal?.classList.remove("opacity-0");
-      edgeAnalyticsModal
-        ?.querySelector(".glass-panel")
-        ?.classList.remove("scale-95");
-      edgeAnalyticsModal
-        ?.querySelector(".glass-panel")
-        ?.classList.add("scale-100");
-    } else {
-      userDatabaseModal?.classList.remove("hidden", "pointer-events-none");
-      void userDatabaseModal?.offsetWidth;
-      userDatabaseModal?.classList.remove("opacity-0");
-      userDatabaseModal
-        ?.querySelector(".glass-panel")
-        ?.classList.remove("scale-95");
-      userDatabaseModal
-        ?.querySelector(".glass-panel")
-        ?.classList.add("scale-100");
-    }
-  };
-
-  // Logout All Users Logic
-  const logoutAllBtn = document.getElementById("logout-all-btn");
-  logoutAllBtn?.addEventListener("click", async () => {
-    const confirmed = confirm(
-      "CRITICAL: This will log out every active user (including you if you are using a session). Are you sure?",
+    // Tab Switcher Logic
+    // @ts-ignore
+    // --- Modals Logic ---
+    const activeSessionsModal = document.getElementById(
+      "active-sessions-modal",
     );
-    if (!confirmed) return;
+    const userDatabaseModal = document.getElementById("user-database-modal");
+    const edgeAnalyticsModal = document.getElementById("edge-analytics-modal");
 
-    logoutAllBtn.innerText = "Terminating...";
-    (logoutAllBtn as HTMLButtonElement).disabled = true;
+    const closeModals = () => {
+      activeSessionsModal?.classList.add("opacity-0");
+      userDatabaseModal?.classList.add("opacity-0");
+      edgeAnalyticsModal?.classList.add("opacity-0");
+      setTimeout(() => {
+        activeSessionsModal?.classList.add("hidden", "pointer-events-none");
+        userDatabaseModal?.classList.add("hidden", "pointer-events-none");
+        edgeAnalyticsModal?.classList.add("hidden", "pointer-events-none");
+      }, 300);
+      activeSessionsModal
+        ?.querySelector(".glass-panel")
+        ?.classList.remove("scale-100");
+      activeSessionsModal
+        ?.querySelector(".glass-panel")
+        ?.classList.add("scale-95");
+      userDatabaseModal
+        ?.querySelector(".glass-panel")
+        ?.classList.remove("scale-100");
+      userDatabaseModal
+        ?.querySelector(".glass-panel")
+        ?.classList.add("scale-95");
+      edgeAnalyticsModal
+        ?.querySelector(".glass-panel")
+        ?.classList.remove("scale-100");
+      edgeAnalyticsModal
+        ?.querySelector(".glass-panel")
+        ?.classList.add("scale-95");
+    };
 
-    try {
-      const res = await fetch("/api/admin/sessions", {
-        method: "DELETE",
-        credentials: "same-origin",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    document.querySelectorAll(".close-inspect-btn").forEach((btn) => {
+      btn.addEventListener("click", closeModals);
+    });
 
-      const responseText = await res.text();
-      console.log("Logout All Response:", res.status, responseText);
+    // Close on backdrop click (all modals)
+    activeSessionsModal?.addEventListener("click", (e) => {
+      if (e.target === activeSessionsModal) closeModals();
+    });
+    userDatabaseModal?.addEventListener("click", (e) => {
+      if (e.target === userDatabaseModal) closeModals();
+    });
+    edgeAnalyticsModal?.addEventListener("click", (e) => {
+      if (e.target === edgeAnalyticsModal) closeModals();
+    });
 
-      if (res.ok) {
-        alert("All sessions terminated. The grid will now reboot.");
-        window.location.reload();
+    // Open Handlers
+    // @ts-ignore
+    window.openInspector = (type) => {
+      if (type === "sessions") {
+        activeSessionsModal?.classList.remove("hidden", "pointer-events-none");
+        void activeSessionsModal?.offsetWidth;
+        activeSessionsModal?.classList.remove("opacity-0");
+        activeSessionsModal
+          ?.querySelector(".glass-panel")
+          ?.classList.remove("scale-95");
+        activeSessionsModal
+          ?.querySelector(".glass-panel")
+          ?.classList.add("scale-100");
+      } else if (type === "edge") {
+        edgeAnalyticsModal?.classList.remove("hidden", "pointer-events-none");
+        void edgeAnalyticsModal?.offsetWidth;
+        edgeAnalyticsModal?.classList.remove("opacity-0");
+        edgeAnalyticsModal
+          ?.querySelector(".glass-panel")
+          ?.classList.remove("scale-95");
+        edgeAnalyticsModal
+          ?.querySelector(".glass-panel")
+          ?.classList.add("scale-100");
       } else {
-        let errorMsg = `Failed (${res.status})`;
-        try {
-          const errorData = JSON.parse(responseText);
-          errorMsg = errorData.error || errorData.message || responseText;
-        } catch (e) {
-          console.error("Failed to parse error response:", e);
-        }
-        alert(`Failed to terminate sessions: ${errorMsg}`);
+        userDatabaseModal?.classList.remove("hidden", "pointer-events-none");
+        void userDatabaseModal?.offsetWidth;
+        userDatabaseModal?.classList.remove("opacity-0");
+        userDatabaseModal
+          ?.querySelector(".glass-panel")
+          ?.classList.remove("scale-95");
+        userDatabaseModal
+          ?.querySelector(".glass-panel")
+          ?.classList.add("scale-100");
       }
-      logoutAllBtn.innerHTML =
-        '<span class="i-heroicons-power w-4 h-4"></span> Logout All Users';
-      (logoutAllBtn as HTMLButtonElement).disabled = false;
-    } catch (e) {
-      console.error(e);
-      alert("Network Error");
-      logoutAllBtn.innerHTML =
-        '<span class="i-heroicons-power w-4 h-4"></span> Logout All Users';
-      (logoutAllBtn as HTMLButtonElement).disabled = false;
-    }
-  });
+    };
 
-  const client = hc<AppType>(window.location.origin) as any;
-  const form = document.getElementById("create-post-form") as HTMLFormElement;
-
-  // Bind Edit Buttons (Recent List)
-  const bindActionButtons = () => {
-    document.querySelectorAll(".edit-post-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        const slug = (e.currentTarget as HTMLElement).dataset.slug;
-        if (slug) {
-          loadPostForEdit(slug);
-        }
-      });
-    });
-
-    document.querySelectorAll(".toggle-status-btn").forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
-        const target = e.currentTarget as HTMLElement;
-        const slug = target.dataset.slug;
-        const currentStatus = target.dataset.status;
-        const action = currentStatus === "published" ? "unpublish" : "publish";
-
-        if (!confirm(`Are you sure you want to ${action} this signal?`)) return;
-
-        try {
-          const res = await fetch(`/api/posts/${slug}/status`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action }),
-          });
-          if (res.ok) {
-            window.location.reload(); // Refresh to show status change
-          } else {
-            alert("Failed to update status");
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      });
-    });
-
-    document.querySelectorAll(".delete-post-btn").forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
-        const slug = (e.currentTarget as HTMLElement).dataset.slug;
-        if (
-          !confirm("WARNING: This will permanently delete the signal. Proceed?")
-        )
-          return;
-
-        try {
-          const res = await fetch(`/api/posts/${slug}`, { method: "DELETE" });
-          if (res.ok) {
-            window.location.reload();
-          } else {
-            alert("Failed to delete signal");
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      });
-    });
-  };
-
-  bindActionButtons();
-
-  // Ensure fresh state on navigation (fix BFCache)
-  window.addEventListener("pageshow", () => {
-    form.reset();
-    document.getElementById("post-id")?.setAttribute("value", "");
-    // Reset button text
-    const btn = document.querySelector('button[type="submit"]');
-    if (btn) btn.innerHTML = "BROADCAST SIGNAL";
-  });
-  const status = document.getElementById("status");
-  const fileInput = document.getElementById("file-input") as HTMLInputElement;
-  const uploadBtn = document.getElementById("upload-btn");
-  const autoUpdateToggle = document.getElementById(
-    "auto-update-toggle",
-  ) as HTMLInputElement;
-  const updatedAtInput = document.getElementById(
-    "updated-at-input",
-  ) as HTMLInputElement;
-
-  autoUpdateToggle?.addEventListener("change", () => {
-    updatedAtInput.disabled = autoUpdateToggle.checked;
-    if (autoUpdateToggle.checked) {
-      updatedAtInput.value = "";
-    } else {
-      // Set current time as default when unlocking
-      const now = new Date();
-      updatedAtInput.value = new Date(
-        now.getTime() - now.getTimezoneOffset() * 60000,
-      )
-        .toISOString()
-        .slice(0, 16);
-    }
-  });
-  // @ts-ignore
-  const textarea = document.getElementById(
-    "content-area",
-  ) as HTMLTextAreaElement;
-
-  // File Upload Handler
-  uploadBtn?.addEventListener("click", () => fileInput.click());
-
-  fileInput.addEventListener("change", async (e) => {
-    const file = (e.target as HTMLInputElement).files?.[0];
-    if (!file) return;
-
-    uploadBtn!.innerText = "Uploading...";
-
-    try {
-      const res = await fetch(
-        `/api/upload?filename=${encodeURIComponent(file.name)}`,
-        {
-          method: "PUT",
-          body: file,
-        },
+    // Logout All Users Logic
+    const logoutAllBtn = document.getElementById("logout-all-btn");
+    logoutAllBtn?.addEventListener("click", async () => {
+      const confirmed = confirm(
+        "CRITICAL: This will log out every active user (including you if you are using a session). Are you sure?",
       );
+      if (!confirmed) return;
 
-      if (res.ok) {
-        const data = (await res.json()) as any;
-        // Insert Markdown Image syntax
-        const cursorPosition = textarea.selectionStart;
-        const textBefore = textarea.value.substring(0, cursorPosition);
-        const textAfter = textarea.value.substring(
-          cursorPosition,
-          textarea.value.length,
-        );
-        const imageMarkdown = `\n![${file.name}](${data.url})\n`;
+      logoutAllBtn.innerText = "Terminating...";
+      (logoutAllBtn as HTMLButtonElement).disabled = true;
 
-        textarea.value = textBefore + imageMarkdown + textAfter;
-        uploadBtn!.innerHTML =
-          '<span class="i-heroicons-check"></span> Uploaded';
-        setTimeout(() => {
-          uploadBtn!.innerHTML =
-            '<span class="i-heroicons-photo"></span> Upload Media';
-        }, 2000);
-      }
-    } catch (err) {
-      console.error(err);
-      uploadBtn!.innerText = "Failed";
-    }
-  });
-
-  // Quick Publish Logic
-  const quickPublishBtn = document.getElementById("quick-publish-btn");
-  const quickPublishFile = document.getElementById(
-    "quick-publish-file",
-  ) as HTMLInputElement;
-  const quickPublishStatus = document.getElementById("quick-publish-status");
-
-  quickPublishBtn?.addEventListener("click", async () => {
-    const file = quickPublishFile?.files?.[0];
-    if (!file) {
-      alert("Please select a file first.");
-      return;
-    }
-
-    if (!confirm(`Ready to broadcast ${file.name}?`)) return;
-
-    quickPublishBtn.innerHTML =
-      '<span class="animate-spin i-heroicons-arrow-path"></span> Broadcasting...';
-    (quickPublishBtn as HTMLButtonElement).disabled = true;
-    quickPublishStatus!.classList.add("hidden");
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await fetch("/api/posts/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = (await res.json()) as any;
-
-      if (res.ok) {
-        quickPublishStatus!.innerHTML = `<span class="text-green-400">✓ Signal Live: <a href="/blog/${result.slug}" target="_blank" class="underline hover:text-white">${result.slug}</a></span>`;
-        quickPublishStatus!.classList.remove("hidden");
-        quickPublishFile.value = "";
-
-        // Reload list after short delay
-        setTimeout(() => window.location.reload(), 1500);
-      } else {
-        throw new Error(result.error || "Upload failed");
-      }
-    } catch (e: any) {
-      console.error(e);
-      quickPublishStatus!.innerHTML = `<span class="text-red-400">⚠ Transmission Error: ${e.message}</span>`;
-      quickPublishStatus!.classList.remove("hidden");
-    } finally {
-      quickPublishBtn.innerHTML =
-        '<span class="i-heroicons-paper-airplane"></span> Publish';
-      (quickPublishBtn as HTMLButtonElement).disabled = false;
-    }
-  });
-
-  // Post Submission
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(form);
-    status!.className = "hidden p-4 rounded-xl text-center text-sm";
-
-    // Validation Check
-    if (!formData.get("title") || !formData.get("slug")) {
-      alert("Missing Critical Data: Title or Slug required.");
-      return;
-    }
-
-    // Verify FormData capture
-    console.log("📦 Form Payload:", Object.fromEntries(formData));
-
-    try {
-      const res = await client.api.posts.$post({
-        form: {
-          id: formData.get("id") as string,
-          title: formData.get("title") as string,
-          slug: formData.get("slug") as string,
-          content: formData.get("content") as string,
-          publishedAt: formData.get("publishedAt") as string,
-          updatedAt: formData.get("updatedAt") as string,
-        },
-      });
-
-      if (res.ok) {
-        // ... (success logic remains the same)
-        const modal = document.getElementById("success-modal");
-        const verifyBtn = document.getElementById(
-          "verify-signal-btn",
-        ) as HTMLAnchorElement;
-        const returnBtn = document.getElementById("return-uplink-btn");
-        const slug = formData.get("slug") as string;
-
-        verifyBtn.href = `/blog/${slug}`;
-
-        modal?.classList.remove("hidden", "pointer-events-none");
-        void modal?.offsetWidth;
-        modal?.classList.remove("opacity-0");
-        modal?.querySelector(".glass-panel")?.classList.remove("scale-95");
-        modal?.querySelector(".glass-panel")?.classList.add("scale-100");
-
-        form.reset();
-        document.getElementById("delete-current-btn")?.classList.add("hidden");
-        document.querySelector('button[type="submit"]')!.innerHTML =
-          "BROADCAST SIGNAL";
-
-        returnBtn?.addEventListener("click", () => {
-          modal?.classList.add("opacity-0", "pointer-events-none");
-          modal?.querySelector(".glass-panel")?.classList.add("scale-95");
-          setTimeout(() => modal?.classList.add("hidden"), 300);
-          window.location.reload();
+      try {
+        const res = await fetch("/api/admin/sessions", {
+          method: "DELETE",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
-      } else {
-        const errorData = (await res
-          .json()
-          .catch(() => ({ error: res.statusText }))) as any;
-        console.error("Transmission Error:", errorData);
-        status!.innerText = `Transmission Failed: ${errorData.error || "Unknown Error"} (${res.status})`;
-        status!.classList.remove("hidden");
-        status!.classList.add("bg-red-500/20", "text-red-200");
-      }
-    } catch (err) {
-      console.error(err);
-      status!.innerText = "Network Error.";
-      status!.classList.remove("hidden");
-      status!.classList.add("bg-red-500/20", "text-red-200");
-    }
-  });
 
-  // Handle Delete from Editor
-  const deleteCurrentBtn = document.getElementById("delete-current-btn");
-  deleteCurrentBtn?.addEventListener("click", async () => {
-    const slug = (document.getElementById("slug-input") as HTMLInputElement)
-      .value;
-    if (!slug) return;
+        const responseText = await res.text();
+        console.log("Logout All Response:", res.status, responseText);
 
-    if (
-      !confirm(
-        "CRITICAL WARNING: This will permanently purge this signal from the database. This action is irreversible. Proceed?",
-      )
-    )
-      return;
-
-    try {
-      const res = await fetch(`/api/posts/${slug}`, { method: "DELETE" });
-      if (res.ok) {
-        window.location.reload();
-      } else {
-        alert("Failed to delete signal");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Network Error");
-    }
-  });
-
-  // --- Global Search Logic ---
-  const searchInput = document.getElementById(
-    "admin-search-input",
-  ) as HTMLInputElement;
-  const resultsContainer = document.getElementById("admin-search-results");
-  let debounceTimer: ReturnType<typeof setTimeout>;
-
-  async function loadPostForEdit(slug: string) {
-    try {
-      const res = await fetch(`/api/posts/${slug}`);
-      if (res.ok) {
-        const post = (await res.json()) as any;
-        // Populate Form
-        (document.getElementById("post-id") as HTMLInputElement).value =
-          post.id;
-        (document.getElementById("title-input") as HTMLInputElement).value =
-          post.title;
-        (document.getElementById("slug-input") as HTMLInputElement).value =
-          post.slug;
-        (document.getElementById("content-area") as HTMLTextAreaElement).value =
-          post.content;
-
-        if (post.publishedAt) {
-          const date = new Date(post.publishedAt);
-          const iso = new Date(
-            date.getTime() - date.getTimezoneOffset() * 60000,
-          )
-            .toISOString()
-            .slice(0, 16);
-          (
-            document.getElementById("published-at-input") as HTMLInputElement
-          ).value = iso;
-        }
-
-        if (post.updatedAt) {
-          const date = new Date(post.updatedAt);
-          const iso = new Date(
-            date.getTime() - date.getTimezoneOffset() * 60000,
-          )
-            .toISOString()
-            .slice(0, 16);
-          updatedAtInput.value = iso;
-          autoUpdateToggle.checked = false;
-          updatedAtInput.disabled = false;
+        if (res.ok) {
+          alert("All sessions terminated. The grid will now reboot.");
+          window.location.reload();
         } else {
-          updatedAtInput.value = "";
-          autoUpdateToggle.checked = true;
-          updatedAtInput.disabled = true;
+          let errorMsg = `Failed (${res.status})`;
+          try {
+            const errorData = JSON.parse(responseText);
+            errorMsg = errorData.error || errorData.message || responseText;
+          } catch (e) {
+            console.error("Failed to parse error response:", e);
+          }
+          alert(`Failed to terminate sessions: ${errorMsg}`);
         }
-
-        // Scroll to editor
-        document
-          .getElementById("create-post-form")
-          ?.scrollIntoView({ behavior: "smooth" });
-
-        // Update Button Text & Show Delete
-        const btn = document.querySelector('button[type="submit"]');
-        if (btn) btn.innerHTML = "UPDATE SIGNAL";
-
-        document
-          .getElementById("delete-current-btn")
-          ?.classList.remove("hidden");
+        logoutAllBtn.innerHTML =
+          '<span class="i-heroicons-power w-4 h-4"></span> Logout All Users';
+        (logoutAllBtn as HTMLButtonElement).disabled = false;
+      } catch (e) {
+        console.error(e);
+        alert("Network Error");
+        logoutAllBtn.innerHTML =
+          '<span class="i-heroicons-power w-4 h-4"></span> Logout All Users';
+        (logoutAllBtn as HTMLButtonElement).disabled = false;
       }
-    } catch (e) {
-      console.error("Failed to load post", e);
-    }
-  }
+    });
 
-  if (searchInput && resultsContainer) {
-    searchInput.addEventListener("input", (e) => {
-      const query = (e.target as HTMLInputElement).value;
-      clearTimeout(debounceTimer);
+    const client = hc<AppType>(window.location.origin) as any;
+    const form = document.getElementById("create-post-form") as HTMLFormElement;
 
-      if (query.length < 2) {
-        resultsContainer.classList.add("hidden");
+    // Bind Edit Buttons (Recent List)
+    const bindActionButtons = () => {
+      document.querySelectorAll(".edit-post-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const slug = (e.currentTarget as HTMLElement).dataset.slug;
+          if (slug) {
+            loadPostForEdit(slug);
+          }
+        });
+      });
+
+      document.querySelectorAll(".toggle-status-btn").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+          const target = e.currentTarget as HTMLElement;
+          const slug = target.dataset.slug;
+          const currentStatus = target.dataset.status;
+          const action =
+            currentStatus === "published" ? "unpublish" : "publish";
+
+          if (!confirm(`Are you sure you want to ${action} this signal?`))
+            return;
+
+          try {
+            const res = await fetch(`/api/posts/${slug}/status`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action }),
+            });
+            if (res.ok) {
+              window.location.reload(); // Refresh to show status change
+            } else {
+              alert("Failed to update status");
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        });
+      });
+
+      document.querySelectorAll(".delete-post-btn").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+          const slug = (e.currentTarget as HTMLElement).dataset.slug;
+          if (
+            !confirm(
+              "WARNING: This will permanently delete the signal. Proceed?",
+            )
+          )
+            return;
+
+          try {
+            const res = await fetch(`/api/posts/${slug}`, { method: "DELETE" });
+            if (res.ok) {
+              window.location.reload();
+            } else {
+              alert("Failed to delete signal");
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        });
+      });
+    };
+
+    bindActionButtons();
+
+    // Ensure fresh state on navigation (fix BFCache)
+    window.addEventListener("pageshow", () => {
+      form.reset();
+      document.getElementById("post-id")?.setAttribute("value", "");
+      // Reset button text
+      const btn = document.querySelector('button[type="submit"]');
+      if (btn) btn.innerHTML = "BROADCAST SIGNAL";
+    });
+    const status = document.getElementById("status");
+    const fileInput = document.getElementById("file-input") as HTMLInputElement;
+    const uploadBtn = document.getElementById("upload-btn");
+    const autoUpdateToggle = document.getElementById(
+      "auto-update-toggle",
+    ) as HTMLInputElement;
+    const updatedAtInput = document.getElementById(
+      "updated-at-input",
+    ) as HTMLInputElement;
+
+    autoUpdateToggle?.addEventListener("change", () => {
+      updatedAtInput.disabled = autoUpdateToggle.checked;
+      if (autoUpdateToggle.checked) {
+        updatedAtInput.value = "";
+      } else {
+        // Set current time as default when unlocking
+        const now = new Date();
+        updatedAtInput.value = new Date(
+          now.getTime() - now.getTimezoneOffset() * 60000,
+        )
+          .toISOString()
+          .slice(0, 16);
+      }
+    });
+    // @ts-ignore
+    const textarea = document.getElementById(
+      "content-area",
+    ) as HTMLTextAreaElement;
+
+    // File Upload Handler
+    uploadBtn?.addEventListener("click", () => fileInput.click());
+
+    fileInput.addEventListener("change", async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      uploadBtn!.innerText = "Uploading...";
+
+      try {
+        const res = await fetch(
+          `/api/upload?filename=${encodeURIComponent(file.name)}`,
+          {
+            method: "PUT",
+            body: file,
+          },
+        );
+
+        if (res.ok) {
+          const data = (await res.json()) as any;
+          // Insert Markdown Image syntax
+          const cursorPosition = textarea.selectionStart;
+          const textBefore = textarea.value.substring(0, cursorPosition);
+          const textAfter = textarea.value.substring(
+            cursorPosition,
+            textarea.value.length,
+          );
+          const imageMarkdown = `\n![${file.name}](${data.url})\n`;
+
+          textarea.value = textBefore + imageMarkdown + textAfter;
+          uploadBtn!.innerHTML =
+            '<span class="i-heroicons-check"></span> Uploaded';
+          setTimeout(() => {
+            uploadBtn!.innerHTML =
+              '<span class="i-heroicons-photo"></span> Upload Media';
+          }, 2000);
+        }
+      } catch (err) {
+        console.error(err);
+        uploadBtn!.innerText = "Failed";
+      }
+    });
+
+    // Quick Publish Logic
+    const quickPublishBtn = document.getElementById("quick-publish-btn");
+    const quickPublishFile = document.getElementById(
+      "quick-publish-file",
+    ) as HTMLInputElement;
+    const quickPublishStatus = document.getElementById("quick-publish-status");
+
+    quickPublishBtn?.addEventListener("click", async () => {
+      const file = quickPublishFile?.files?.[0];
+      if (!file) {
+        alert("Please select a file first.");
         return;
       }
 
-      debounceTimer = setTimeout(async () => {
-        try {
-          const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-          const matches = (await res.json()) as any[];
+      if (!confirm(`Ready to broadcast ${file.name}?`)) return;
 
-          if (matches.length > 0) {
-            resultsContainer.innerHTML = matches
-              .map(
-                (match: any) => `
+      quickPublishBtn.innerHTML =
+        '<span class="animate-spin i-heroicons-arrow-path"></span> Broadcasting...';
+      (quickPublishBtn as HTMLButtonElement).disabled = true;
+      quickPublishStatus!.classList.add("hidden");
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch("/api/posts/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = (await res.json()) as any;
+
+        if (res.ok) {
+          quickPublishStatus!.innerHTML = `<span class="text-green-400">✓ Signal Live: <a href="/blog/${result.slug}" target="_blank" class="underline hover:text-white">${result.slug}</a></span>`;
+          quickPublishStatus!.classList.remove("hidden");
+          quickPublishFile.value = "";
+
+          // Reload list after short delay
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          throw new Error(result.error || "Upload failed");
+        }
+      } catch (e: any) {
+        console.error(e);
+        quickPublishStatus!.innerHTML = `<span class="text-red-400">⚠ Transmission Error: ${e.message}</span>`;
+        quickPublishStatus!.classList.remove("hidden");
+      } finally {
+        quickPublishBtn.innerHTML =
+          '<span class="i-heroicons-paper-airplane"></span> Publish';
+        (quickPublishBtn as HTMLButtonElement).disabled = false;
+      }
+    });
+
+    // Post Submission
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      status!.className = "hidden p-4 rounded-xl text-center text-sm";
+
+      // Validation Check
+      if (!formData.get("title") || !formData.get("slug")) {
+        alert("Missing Critical Data: Title or Slug required.");
+        return;
+      }
+
+      // Verify FormData capture
+      console.log("📦 Form Payload:", Object.fromEntries(formData));
+
+      try {
+        const res = await client.api.posts.$post({
+          form: {
+            id: formData.get("id") as string,
+            title: formData.get("title") as string,
+            slug: formData.get("slug") as string,
+            content: formData.get("content") as string,
+            publishedAt: formData.get("publishedAt") as string,
+            updatedAt: formData.get("updatedAt") as string,
+          },
+        });
+
+        if (res.ok) {
+          // ... (success logic remains the same)
+          const modal = document.getElementById("success-modal");
+          const verifyBtn = document.getElementById(
+            "verify-signal-btn",
+          ) as HTMLAnchorElement;
+          const returnBtn = document.getElementById("return-uplink-btn");
+          const slug = formData.get("slug") as string;
+
+          verifyBtn.href = `/blog/${slug}`;
+
+          modal?.classList.remove("hidden", "pointer-events-none");
+          void modal?.offsetWidth;
+          modal?.classList.remove("opacity-0");
+          modal?.querySelector(".glass-panel")?.classList.remove("scale-95");
+          modal?.querySelector(".glass-panel")?.classList.add("scale-100");
+
+          form.reset();
+          document
+            .getElementById("delete-current-btn")
+            ?.classList.add("hidden");
+          document.querySelector('button[type="submit"]')!.innerHTML =
+            "BROADCAST SIGNAL";
+
+          returnBtn?.addEventListener("click", () => {
+            modal?.classList.add("opacity-0", "pointer-events-none");
+            modal?.querySelector(".glass-panel")?.classList.add("scale-95");
+            setTimeout(() => modal?.classList.add("hidden"), 300);
+            window.location.reload();
+          });
+        } else {
+          const errorData = (await res
+            .json()
+            .catch(() => ({ error: res.statusText }))) as any;
+          console.error("Transmission Error:", errorData);
+          status!.innerText = `Transmission Failed: ${errorData.error || "Unknown Error"} (${res.status})`;
+          status!.classList.remove("hidden");
+          status!.classList.add("bg-red-500/20", "text-red-200");
+        }
+      } catch (err) {
+        console.error(err);
+        status!.innerText = "Network Error.";
+        status!.classList.remove("hidden");
+        status!.classList.add("bg-red-500/20", "text-red-200");
+      }
+    });
+
+    // Handle Delete from Editor
+    const deleteCurrentBtn = document.getElementById("delete-current-btn");
+    deleteCurrentBtn?.addEventListener("click", async () => {
+      const slug = (document.getElementById("slug-input") as HTMLInputElement)
+        .value;
+      if (!slug) return;
+
+      if (
+        !confirm(
+          "CRITICAL WARNING: This will permanently purge this signal from the database. This action is irreversible. Proceed?",
+        )
+      )
+        return;
+
+      try {
+        const res = await fetch(`/api/posts/${slug}`, { method: "DELETE" });
+        if (res.ok) {
+          window.location.reload();
+        } else {
+          alert("Failed to delete signal");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Network Error");
+      }
+    });
+
+    // --- Global Search Logic ---
+    const searchInput = document.getElementById(
+      "admin-search-input",
+    ) as HTMLInputElement;
+    const resultsContainer = document.getElementById("admin-search-results");
+    let debounceTimer: ReturnType<typeof setTimeout>;
+
+    async function loadPostForEdit(slug: string) {
+      try {
+        const res = await fetch(`/api/posts/${slug}`);
+        if (res.ok) {
+          const post = (await res.json()) as any;
+          // Populate Form
+          (document.getElementById("post-id") as HTMLInputElement).value =
+            post.id;
+          (document.getElementById("title-input") as HTMLInputElement).value =
+            post.title;
+          (document.getElementById("slug-input") as HTMLInputElement).value =
+            post.slug;
+          (
+            document.getElementById("content-area") as HTMLTextAreaElement
+          ).value = post.content;
+
+          if (post.publishedAt) {
+            const date = new Date(post.publishedAt);
+            const iso = new Date(
+              date.getTime() - date.getTimezoneOffset() * 60000,
+            )
+              .toISOString()
+              .slice(0, 16);
+            (
+              document.getElementById("published-at-input") as HTMLInputElement
+            ).value = iso;
+          }
+
+          if (post.updatedAt) {
+            const date = new Date(post.updatedAt);
+            const iso = new Date(
+              date.getTime() - date.getTimezoneOffset() * 60000,
+            )
+              .toISOString()
+              .slice(0, 16);
+            updatedAtInput.value = iso;
+            autoUpdateToggle.checked = false;
+            updatedAtInput.disabled = false;
+          } else {
+            updatedAtInput.value = "";
+            autoUpdateToggle.checked = true;
+            updatedAtInput.disabled = true;
+          }
+
+          // Scroll to editor
+          document
+            .getElementById("create-post-form")
+            ?.scrollIntoView({ behavior: "smooth" });
+
+          // Update Button Text & Show Delete
+          const btn = document.querySelector('button[type="submit"]');
+          if (btn) btn.innerHTML = "UPDATE SIGNAL";
+
+          document
+            .getElementById("delete-current-btn")
+            ?.classList.remove("hidden");
+        }
+      } catch (e) {
+        console.error("Failed to load post", e);
+      }
+    }
+
+    if (searchInput && resultsContainer) {
+      searchInput.addEventListener("input", (e) => {
+        const query = (e.target as HTMLInputElement).value;
+        clearTimeout(debounceTimer);
+
+        if (query.length < 2) {
+          resultsContainer.classList.add("hidden");
+          return;
+        }
+
+        debounceTimer = setTimeout(async () => {
+          try {
+            const res = await fetch(
+              `/api/search?q=${encodeURIComponent(query)}`,
+            );
+            const matches = (await res.json()) as any[];
+
+            if (matches.length > 0) {
+              resultsContainer.innerHTML = matches
+                .map(
+                  (match: any) => `
                           <div data-slug="${match.metadata.slug}" class="search-result-item block p-3 hover:bg-white/10 rounded-xl transition-colors cursor-pointer">
                               <div class="font-bold text-white text-sm">${match.metadata.title}</div>
                               <div class="text-xs text-brand-accent mt-1">${(match.score * 100).toFixed(1)}% Match • Click to Edit</div>
                           </div>
                       `,
-              )
-              .join("");
-            resultsContainer.classList.remove("hidden");
+                )
+                .join("");
+              resultsContainer.classList.remove("hidden");
 
-            // Add click listeners to results
-            document.querySelectorAll(".search-result-item").forEach((item) => {
-              item.addEventListener("click", async (ev) => {
-                const slug = (ev.currentTarget as HTMLElement).dataset.slug;
-                console.log("Loading post:", slug);
-                loadPostForEdit(slug!);
-                resultsContainer.classList.add("hidden");
-              });
-            });
-          } else {
-            resultsContainer.innerHTML =
-              '<div class="p-3 text-sm text-gray-500 text-center">No signals found.</div>';
-            resultsContainer.classList.remove("hidden");
+              // Add click listeners to results
+              document
+                .querySelectorAll(".search-result-item")
+                .forEach((item) => {
+                  item.addEventListener("click", async (ev) => {
+                    const slug = (ev.currentTarget as HTMLElement).dataset.slug;
+                    console.log("Loading post:", slug);
+                    loadPostForEdit(slug!);
+                    resultsContainer.classList.add("hidden");
+                  });
+                });
+            } else {
+              resultsContainer.innerHTML =
+                '<div class="p-3 text-sm text-gray-500 text-center">No signals found.</div>';
+              resultsContainer.classList.remove("hidden");
+            }
+          } catch (err) {
+            console.error(err);
           }
-        } catch (err) {
-          console.error(err);
+        }, 300);
+      });
+
+      // Hide on click outside
+      document.addEventListener("click", (e) => {
+        if (
+          !searchInput.contains(e.target as Node) &&
+          !resultsContainer.contains(e.target as Node)
+        ) {
+          resultsContainer.classList.add("hidden");
         }
-      }, 300);
-    });
+      });
 
-    // Hide on click outside
-    document.addEventListener("click", (e) => {
-      if (
-        !searchInput.contains(e.target as Node) &&
-        !resultsContainer.contains(e.target as Node)
-      ) {
-        resultsContainer.classList.add("hidden");
-      }
-    });
+      // Load All Archives Logic
+      const loadAllBtn = document.getElementById("load-all-signals-btn");
+      const tableBody = document.getElementById("signal-log-body");
 
-    // Load All Archives Logic
-    const loadAllBtn = document.getElementById("load-all-signals-btn");
-    const tableBody = document.getElementById("signal-log-body");
+      loadAllBtn?.addEventListener("click", async () => {
+        loadAllBtn.innerText = "Loading Archive...";
+        loadAllBtn.setAttribute("disabled", "true");
 
-    loadAllBtn?.addEventListener("click", async () => {
-      loadAllBtn.innerText = "Loading Archive...";
-      loadAllBtn.setAttribute("disabled", "true");
+        try {
+          const res = await fetch("/api/posts?limit=all");
+          const allPosts = (await res.json()) as any[];
 
-      try {
-        const res = await fetch("/api/posts?limit=all");
-        const allPosts = (await res.json()) as any[];
+          if (tableBody) {
+            tableBody.innerHTML = allPosts
+              .map((post) => {
+                const isPublished = Date.now() >= (post.publishedAt || 0);
+                const dateStr = new Date(
+                  post.publishedAt || post.createdAt,
+                ).toLocaleDateString();
 
-        if (tableBody) {
-          tableBody.innerHTML = allPosts
-            .map((post) => {
-              const isPublished = Date.now() >= (post.publishedAt || 0);
-              const dateStr = new Date(
-                post.publishedAt || post.createdAt,
-              ).toLocaleDateString();
-
-              return `
+                return `
                     <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
                       <td class="py-4">
                         <span class="inline-block w-2 h-2 rounded-full ${isPublished ? "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]" : "bg-yellow-400"}"></span>
@@ -2015,21 +2034,22 @@ const COLO_LOCATIONS: Record<
                       </td>
                     </tr>
                     `;
-            })
-            .join("");
+              })
+              .join("");
 
-          // Re-bind buttons since DOM changed
-          bindActionButtons();
+            // Re-bind buttons since DOM changed
+            bindActionButtons();
 
-          loadAllBtn.classList.add("hidden");
-          const countEl = document.getElementById("signal-log-count");
-          if (countEl)
-            countEl.innerText = `Showing All ${allPosts.length} Signals`;
+            loadAllBtn.classList.add("hidden");
+            const countEl = document.getElementById("signal-log-count");
+            if (countEl)
+              countEl.innerText = `Showing All ${allPosts.length} Signals`;
+          }
+        } catch (e) {
+          console.error(e);
+          loadAllBtn.innerText = "Sync Failed";
         }
-      } catch (e) {
-        console.error(e);
-        loadAllBtn.innerText = "Sync Failed";
-      }
-    });
-  }
-</script>
+      });
+    }
+  </script>
+</Layout>
