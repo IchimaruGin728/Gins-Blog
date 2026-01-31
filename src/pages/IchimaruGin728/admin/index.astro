@@ -658,82 +658,169 @@ const usersList = await safeFetch(
             <tr
               class="text-gray-400 text-xs uppercase tracking-wider font-mono border-b border-white/10"
             >
-              <th class="p-6 font-normal">User Identity</th>
-              <th class="p-6 font-normal">Network (IP/Loc)</th>
-              <th class="p-6 font-normal">Device Fingerprint</th>
-              <th class="p-6 font-normal text-right">Last Echo</th>
+              <th class="p-6 font-normal">User</th>
+              <th class="p-6 font-normal">Network & ISP</th>
+              <th class="p-6 font-normal">Location</th>
+              <th class="p-6 font-normal">Connection</th>
+              <th class="p-6 font-normal text-right">Status</th>
             </tr>
           </thead>
           <tbody class="text-sm divide-y divide-white/5">
             {
-              (activeSessionsList.results || []).map((s: any) => (
-                <tr class="hover:bg-white/5 transition-colors">
-                  <td class="p-6">
-                    <div class="flex items-center gap-3">
-                      <img
-                        src={
-                          s.avatar ||
-                          `https://ui-avatars.com/api/?name=${s.username || "?"}&background=random`
-                        }
-                        class="w-8 h-8 rounded-full border border-white/10"
-                      />
-                      <div>
-                        <div class="font-bold text-white">
-                          {s.username || "Unknown"}
-                        </div>
-                        <div class="text-xs text-gray-500 font-mono">
-                          SID: {s.session_id.substring(0, 8)}
+              (activeSessionsList.results || []).map((s: any) => {
+                const trustScore = s.client_trust_score;
+                const isLowTrust = trustScore && trustScore < 30;
+                const rtt = s.client_tcp_rtt;
+                const rttClass = rtt
+                  ? rtt < 50
+                    ? "text-green-400"
+                    : rtt < 150
+                      ? "text-yellow-400"
+                      : "text-red-400"
+                  : "text-gray-500";
+
+                return (
+                  <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-6">
+                      <div class="flex items-center gap-3">
+                        <img
+                          src={
+                            s.avatar ||
+                            `https://ui-avatars.com/api/?name=${s.username || "?"}&background=random`
+                          }
+                          class="w-10 h-10 rounded-full border border-white/10"
+                        />
+                        <div>
+                          <div class="font-bold text-white flex items-center gap-2">
+                            {s.username || "Unknown"}
+                            {isLowTrust && (
+                              <span class="px-2 py-0.5 rounded text-[10px] bg-red-500/20 border border-red-500/40 text-red-300 uppercase tracking-wide font-bold">
+                                VPN?
+                              </span>
+                            )}
+                          </div>
+                          <div class="text-xs text-gray-500 font-mono">
+                            SID: {s.session_id.substring(0, 8)}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td class="p-6">
-                    <div class="flex flex-col gap-1">
-                      <div class="font-mono text-xs text-brand-accent bg-brand-accent/10 px-2 py-1 rounded inline-block border border-brand-accent/20 w-fit">
-                        {s.ip_address || "Hidden"}
+                    </td>
+
+                    <td class="p-6">
+                      <div class="space-y-2">
+                        {/* IP Address */}
+                        <div class="font-mono text-xs text-brand-accent bg-brand-accent/10 px-2 py-1 rounded inline-block border border-brand-accent/20">
+                          {s.ip_address || "Hidden"}
+                        </div>
+
+                        {/* ISP & AS Organization */}
+                        {s.as_organization && (
+                          <div class="text-xs text-white flex items-center gap-1">
+                            <span class="i-heroicons-building-office-2 w-3 h-3 text-purple-400" />
+                            <span>{s.as_organization}</span>
+                            {s.asn && (
+                              <span class="text-gray-500 ml-1">
+                                (AS{s.asn})
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Edge Node */}
+                        {s.colo && (
+                          <div class="text-xs text-gray-400 flex items-center gap-1">
+                            <span class="i-heroicons-server w-3 h-3" />
+                            <span>Edge: {s.colo}</span>
+                          </div>
+                        )}
                       </div>
-                      {s.city || s.country ? (
-                        <div class="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                          <span class="text-white font-medium">
-                            {s.country || "??"}
-                          </span>
-                          <span>{s.city}</span>
+                    </td>
+
+                    <td class="p-6">
+                      <div class="space-y-1 text-xs">
+                        {/* Country & City */}
+                        <div class="text-white font-medium flex items-center gap-1">
+                          <span class="i-heroicons-map-pin w-3 h-3 text-green-400" />
+                          {s.country || "??"} {s.city && `• ${s.city}`}
                         </div>
-                      ) : (
-                        <div class="text-xs text-gray-500 mt-1">
-                          Localhost / Unknown
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td class="p-6">
-                    <div
-                      class="ua-parser-container text-xs text-gray-300 space-y-1"
-                      data-ua={s.user_agent}
-                    >
-                      <div class="opacity-50">
-                        Raw:{" "}
-                        {s.user_agent
-                          ? s.user_agent.substring(0, 30) + "..."
+
+                        {/* Region */}
+                        {s.region && (
+                          <div class="text-gray-400">
+                            {s.region} {s.region_code && `(${s.region_code})`}
+                          </div>
+                        )}
+
+                        {/* Timezone */}
+                        {s.timezone && (
+                          <div class="text-gray-500 flex items-center gap-1">
+                            <span class="i-heroicons-clock w-3 h-3" />
+                            {s.timezone}
+                          </div>
+                        )}
+
+                        {/* Lat/Long (collapsed, monospace) */}
+                        {s.latitude && s.longitude && (
+                          <div class="text-gray-600 font-mono text-[10px]">
+                            {s.latitude}, {s.longitude}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+
+                    <td class="p-6">
+                      <div class="space-y-1.5 text-xs">
+                        {/* HTTP Protocol */}
+                        {s.http_protocol && (
+                          <div class="flex items-center gap-1.5">
+                            <span class="i-heroicons-signal w-3 h-3 text-blue-400" />
+                            <span class="text-white font-medium">
+                              {s.http_protocol}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* TLS Version */}
+                        {s.tls_version && (
+                          <div class="flex items-center gap-1.5">
+                            <span class="i-heroicons-lock-closed w-3 h-3 text-green-400" />
+                            <span class="text-gray-400">{s.tls_version}</span>
+                          </div>
+                        )}
+
+                        {/* RTT */}
+                        {rtt && (
+                          <div class={`flex items-center gap-1.5 ${rttClass}`}>
+                            <span class="i-heroicons-bolt w-3 h-3" />
+                            <span>{rtt}ms</span>
+                          </div>
+                        )}
+
+                        {/* Trust Score */}
+                        {trustScore && (
+                          <div class="text-gray-500 font-mono text-[10px]">
+                            Trust: {trustScore}/99
+                          </div>
+                        )}
+                      </div>
+                    </td>
+
+                    <td class="p-6 text-right">
+                      <div class="text-white font-mono text-sm">
+                        {s.last_active
+                          ? new Date(s.last_active).toLocaleTimeString()
                           : "N/A"}
                       </div>
-                    </div>
-                  </td>
-                  <td class="p-6 text-right">
-                    <div class="text-white font-mono">
-                      {s.last_active
-                        ? new Date(s.last_active).toLocaleTimeString()
-                        : "N/A"}
-                    </div>
-                    <div class="text-xs text-gray-500">
-                      First:{" "}
-                      {s.session_created
-                        ? new Date(s.session_created).toLocaleDateString()
-                        : "?"}
-                    </div>
-                  </td>
-                </tr>
-              ))
+                      <div class="text-xs text-gray-500 mt-1">
+                        Since:{" "}
+                        {s.session_created
+                          ? new Date(s.session_created).toLocaleDateString()
+                          : "?"}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             }
           </tbody>
         </table>

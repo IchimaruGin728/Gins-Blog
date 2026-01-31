@@ -108,12 +108,7 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 			userId,
 			db,
 			locals.runtime.env,
-			request.headers.get('user-agent') || undefined,
-			request.headers.get('cf-connecting-ip') || undefined,
-            {
-                city: (locals.runtime.cf as any)?.city,
-                country: (locals.runtime.cf as any)?.country,
-            }
+			request
 		);
         
         console.log("Setting session cookie...");

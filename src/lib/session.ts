@@ -16,12 +16,15 @@ export async function createSession(
 	userId: string,
 	db: ReturnType<typeof getDb>,
 	env: Env,
-	userAgent?: string,
-	ipAddress?: string,
-    location?: { city?: string, country?: string }
+	request: Request
 ): Promise<Session> {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 	const now = Date.now();
+	
+	// Extract comprehensive metadata
+	const userAgent = request.headers.get('User-Agent') || undefined;
+	const ipAddress = request.headers.get('CF-Connecting-IP') || undefined;
+	const cf = request.cf as any; // Cloudflare metadata object
 	
 	// Deduplication: Remove existing sessions from same device (same userAgent + ipAddress)
 	if (userAgent && ipAddress) {
@@ -51,8 +54,35 @@ export async function createSession(
 		expiresAt: now + 1000 * 60 * 60 * 24 * 30,
 		userAgent: userAgent || null,
 		ipAddress: ipAddress || null,
-        country: location?.country || null,
-        city: location?.city || null,
+		
+		// Basic Geo
+		country: cf?.country || null,
+		city: cf?.city || null,
+		
+		// Network & ISP
+		asn: cf?.asn || null,
+		asOrganization: cf?.asOrganization || null,
+		colo: cf?.colo || null,
+		continent: cf?.continent || null,
+		timezone: cf?.timezone || null,
+		
+		// Enhanced Geolocation
+		latitude: cf?.latitude || null,
+		longitude: cf?.longitude || null,
+		postalCode: cf?.postalCode || null,
+		region: cf?.region || null,
+		regionCode: cf?.regionCode || null,
+		
+		// Connection Details
+		httpProtocol: cf?.httpProtocol || null,
+		tlsVersion: cf?.tlsVersion || null,
+		tlsCipher: cf?.tlsCipher || null,
+		clientTcpRtt: cf?.clientTcpRtt || null,
+		
+		// Security & Trust
+		clientTrustScore: cf?.clientTrustScore || null,
+		isEUCountry: cf?.isEUCountry ? 1 : 0,
+		
 		createdAt: now,
 		lastActive: now,
 	};

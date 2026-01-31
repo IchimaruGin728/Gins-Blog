@@ -31,6 +31,30 @@ export const sessions = sqliteTable('sessions', {
   city: text('city'),
   createdAt: integer('created_at'),
   lastActive: integer('last_active'),
+  
+  // Network & ISP Information
+  asn: integer('asn'),
+  asOrganization: text('as_organization'),
+  colo: text('colo'),
+  continent: text('continent'),
+  timezone: text('timezone'),
+  
+  // Enhanced Geolocation
+  latitude: text('latitude'),
+  longitude: text('longitude'),
+  postalCode: text('postal_code'),
+  region: text('region'),
+  regionCode: text('region_code'),
+  
+  // Connection Details
+  httpProtocol: text('http_protocol'),
+  tlsVersion: text('tls_version'),
+  tlsCipher: text('tls_cipher'),
+  clientTcpRtt: integer('client_tcp_rtt'),
+  
+  // Security & Trust
+  clientTrustScore: integer('client_trust_score'),
+  isEUCountry: integer('is_eu_country'),
 });
 
 export type User = typeof users.$inferSelect;
