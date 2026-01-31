@@ -606,243 +606,264 @@ const usersList = await safeFetch(
       </div>
     </div>
   </div>
-  <!-- Data Inspector Modal (Unified) -->
+  <!-- Active Network Sessions Modal -->
   <div
-    id="data-inspector-modal"
-    class="fixed inset-0 z-50 items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300"
-    onclick="if(event.target === this) closeInspector()"
+    id="active-sessions-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden opacity-0 transition-all duration-300 pointer-events-none"
   >
     <div
-      class="glass-panel w-full max-w-6xl max-h-[85vh] flex flex-col rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative"
+      class="glass-panel w-full max-w-6xl max-h-[85vh] flex flex-col rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative transform scale-95 transition-all duration-300"
     >
       <!-- Close Button -->
       <button
-        onclick="closeInspector()"
-        class="absolute top-6 right-6 p-2 rounded-lg bg-black/20 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors border border-white/5 hover:border-red-500/30 z-20"
+        class="close-inspect-btn absolute top-6 right-6 p-2 rounded-lg bg-black/20 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors border border-white/5 hover:border-red-500/30 z-20"
       >
         <span class="i-heroicons-x-mark w-6 h-6"></span>
       </button>
 
-      <!-- Modal Header & Tabs -->
-      <div class="p-0 border-b border-white/10 bg-black/40">
-        <div class="flex items-center px-8 pt-6 gap-8">
-          <button
-            class="tab-btn pb-4 border-b-2 font-bold transition-colors flex items-center gap-2 text-gray-400 border-transparent hover:text-white"
-            data-tab="sessions"
-            onclick="switchTab('sessions')"
-          >
-            <span class="i-heroicons-globe-alt w-5 h-5"></span>
+      <!-- Header -->
+      <div
+        class="p-6 border-b border-white/10 bg-black/40 flex justify-between items-center"
+      >
+        <div class="flex items-center gap-3">
+          <span class="i-heroicons-globe-alt w-6 h-6 text-green-400"></span>
+          <h2 class="text-xl font-bold font-display">
             Active Network Sessions
-          </button>
-          <button
-            class="tab-btn pb-4 border-b-2 font-bold transition-colors flex items-center gap-2 text-gray-400 border-transparent hover:text-white"
-            data-tab="users"
-            onclick="switchTab('users')"
-          >
-            <span class="i-heroicons-users w-5 h-5"></span>
-            User Database
-          </button>
+          </h2>
         </div>
+
+        <!-- Logout All Button -->
+        <button
+          id="logout-all-btn"
+          class="mr-12 px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-sm font-bold flex items-center gap-2 transition-all"
+        >
+          <span class="i-heroicons-power w-4 h-4"></span>
+          Logout All Users
+        </button>
       </div>
 
-      <!-- Tab Content Area -->
+      <!-- Content -->
       <div
         class="overflow-y-auto p-0 scrollbar-hide flex-1 bg-black/20 relative"
       >
-        <!-- Sessions Tab -->
-        <div id="tab-sessions" class="tab-content hidden">
-          <div
-            class="p-6 bg-brand-primary/5 border-b border-white/5 text-sm text-gray-400 font-mono"
-          >
-            Monitoring <span class="text-white font-bold"
-              >{(activeSessionsList.results || []).length}</span
-            > active connections
-          </div>
-          <table class="w-full text-left border-collapse">
-            <thead class="sticky top-0 bg-black/95 backdrop-blur-xl z-10">
-              <tr
-                class="text-gray-400 text-xs uppercase tracking-wider font-mono border-b border-white/10"
-              >
-                <th class="p-6 font-normal">User Identity</th>
-                <th class="p-6 font-normal">Network (IP/Loc)</th>
-                <th class="p-6 font-normal">Device Fingerprint</th>
-                <th class="p-6 font-normal text-right">Last Echo</th>
-              </tr>
-            </thead>
-            <tbody class="text-sm divide-y divide-white/5">
-              {
-                (activeSessionsList.results || []).map((s: any) => (
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="p-6">
-                      <div class="flex items-center gap-3">
-                        <img
-                          src={
-                            s.avatar ||
-                            `https://ui-avatars.com/api/?name=${s.username || "?"}&background=random`
-                          }
-                          class="w-8 h-8 rounded-full border border-white/10"
-                        />
-                        <div>
-                          <div class="font-bold text-white">
-                            {s.username || "Unknown"}
-                          </div>
-                          <div class="text-xs text-gray-500 font-mono">
-                            SID: {s.session_id.substring(0, 8)}
-                          </div>
+        <div
+          class="p-6 bg-brand-primary/5 border-b border-white/5 text-sm text-gray-400 font-mono"
+        >
+          Monitoring <span class="text-white font-bold"
+            >{(activeSessionsList.results || []).length}</span
+          > active connections
+        </div>
+        <table class="w-full text-left border-collapse">
+          <thead class="sticky top-0 bg-black/95 backdrop-blur-xl z-10">
+            <tr
+              class="text-gray-400 text-xs uppercase tracking-wider font-mono border-b border-white/10"
+            >
+              <th class="p-6 font-normal">User Identity</th>
+              <th class="p-6 font-normal">Network (IP/Loc)</th>
+              <th class="p-6 font-normal">Device Fingerprint</th>
+              <th class="p-6 font-normal text-right">Last Echo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm divide-y divide-white/5">
+            {
+              (activeSessionsList.results || []).map((s: any) => (
+                <tr class="hover:bg-white/5 transition-colors">
+                  <td class="p-6">
+                    <div class="flex items-center gap-3">
+                      <img
+                        src={
+                          s.avatar ||
+                          `https://ui-avatars.com/api/?name=${s.username || "?"}&background=random`
+                        }
+                        class="w-8 h-8 rounded-full border border-white/10"
+                      />
+                      <div>
+                        <div class="font-bold text-white">
+                          {s.username || "Unknown"}
+                        </div>
+                        <div class="text-xs text-gray-500 font-mono">
+                          SID: {s.session_id.substring(0, 8)}
                         </div>
                       </div>
-                    </td>
-                    <td class="p-6">
-                      <div class="flex flex-col gap-1">
-                        <div class="font-mono text-xs text-brand-accent bg-brand-accent/10 px-2 py-1 rounded inline-block border border-brand-accent/20 w-fit">
-                          {s.ip_address || "Hidden"}
-                        </div>
-                        {s.city || s.country ? (
-                          <div class="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                            <span class="text-white font-medium">
-                              {s.country || "??"}
-                            </span>
-                            <span>{s.city}</span>
-                          </div>
-                        ) : (
-                          <div class="text-xs text-gray-500 mt-1">
-                            Localhost / Unknown
-                          </div>
-                        )}
+                    </div>
+                  </td>
+                  <td class="p-6">
+                    <div class="flex flex-col gap-1">
+                      <div class="font-mono text-xs text-brand-accent bg-brand-accent/10 px-2 py-1 rounded inline-block border border-brand-accent/20 w-fit">
+                        {s.ip_address || "Hidden"}
                       </div>
-                    </td>
-                    <td class="p-6">
-                      <div
-                        class="ua-parser-container text-xs text-gray-300 space-y-1"
-                        data-ua={s.user_agent}
-                      >
-                        <div class="opacity-50">
-                          Raw:{" "}
-                          {s.user_agent
-                            ? s.user_agent.substring(0, 30) + "..."
-                            : "N/A"}
+                      {s.city || s.country ? (
+                        <div class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                          <span class="text-white font-medium">
+                            {s.country || "??"}
+                          </span>
+                          <span>{s.city}</span>
                         </div>
-                      </div>
-                    </td>
-                    <td class="p-6 text-right">
-                      <div class="text-white font-mono">
-                        {s.last_active
-                          ? new Date(s.last_active).toLocaleTimeString()
+                      ) : (
+                        <div class="text-xs text-gray-500 mt-1">
+                          Localhost / Unknown
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td class="p-6">
+                    <div
+                      class="ua-parser-container text-xs text-gray-300 space-y-1"
+                      data-ua={s.user_agent}
+                    >
+                      <div class="opacity-50">
+                        Raw:{" "}
+                        {s.user_agent
+                          ? s.user_agent.substring(0, 30) + "..."
                           : "N/A"}
                       </div>
-                      <div class="text-xs text-gray-500">
-                        First:{" "}
-                        {s.session_created
-                          ? new Date(s.session_created).toLocaleDateString()
-                          : "?"}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Users Tab -->
-        <div id="tab-users" class="tab-content hidden">
-          <div
-            class="p-6 bg-brand-accent/5 border-b border-white/5 text-sm text-gray-400 font-mono"
-          >
-            Found <span class="text-white font-bold"
-              >{(usersList.results || []).length}</span
-            > records (showing latest 100)
-          </div>
-          <table class="w-full text-left border-collapse">
-            <thead
-              class="sticky top-0 bg-black/95 backdrop-blur-xl z-10 box-decoration-clone"
-            >
-              <tr
-                class="text-gray-400 text-xs uppercase tracking-wider font-mono border-b border-white/10"
-              >
-                <th class="p-6 font-normal">User</th>
-                <th class="p-6 font-normal">Identity Provider</th>
-                <th class="p-6 font-normal">IDs</th>
-                <th class="p-6 font-normal text-right">Joined</th>
-              </tr>
-            </thead>
-            <tbody class="text-sm divide-y divide-white/5">
-              {
-                (usersList.results || []).map((u: any) => (
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="p-6">
-                      <div class="flex items-center gap-3">
-                        <img
-                          src={
-                            u.avatar ||
-                            `https://ui-avatars.com/api/?name=${u.username}&background=random`
-                          }
-                          class="w-10 h-10 rounded-full object-cover border border-white/10"
-                        />
-                        <div>
-                          <div class="font-bold text-white mb-0.5">
-                            {u.username}
-                          </div>
-                          <div class="text-xs text-brand-accent/80 font-mono">
-                            {u.id.substring(0, 8)}...
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="p-6">
-                      <div class="flex gap-2">
-                        {u.github_id && (
-                          <span class="px-2 py-1 rounded bg-[#24292e]/50 border border-[#24292e]/50 text-xs text-gray-300 flex items-center gap-1">
-                            <span class="i-simple-icons-github" /> GitHub
-                          </span>
-                        )}
-                        {u.google_id && (
-                          <span class="px-2 py-1 rounded bg-[#DB4437]/20 border border-[#DB4437]/30 text-xs text-red-200 flex items-center gap-1">
-                            <span class="i-simple-icons-google" /> Google
-                          </span>
-                        )}
-                        {u.discord_id && (
-                          <span class="px-2 py-1 rounded bg-[#5865F2]/20 border border-[#5865F2]/30 text-xs text-indigo-200 flex items-center gap-1">
-                            <span class="i-simple-icons-discord" /> Discord
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td class="p-6 font-mono text-xs text-gray-500 space-y-1">
-                      {u.github_username && (
-                        <div class="flex items-center gap-2">
-                          <span class="i-simple-icons-github w-4 h-4" />
-                          <span>{u.github_username}</span>
-                        </div>
-                      )}
-                      {u.google_username && (
-                        <div class="flex items-center gap-2">
-                          <span class="i-simple-icons-google w-4 h-4" />
-                          <span>{u.google_username}</span>
-                        </div>
-                      )}
-                      {u.discord_username && (
-                        <div class="flex items-center gap-2">
-                          <span class="i-simple-icons-discord w-4 h-4" />
-                          <span>{u.discord_username}</span>
-                        </div>
-                      )}
-                    </td>
-                    <td class="p-6 text-right text-gray-400 font-mono text-xs">
-                      {u.created_at
-                        ? new Date(
-                            typeof u.created_at === "number"
-                              ? u.created_at
-                              : parseInt(u.created_at) || 0,
-                          ).toLocaleDateString()
+                    </div>
+                  </td>
+                  <td class="p-6 text-right">
+                    <div class="text-white font-mono">
+                      {s.last_active
+                        ? new Date(s.last_active).toLocaleTimeString()
                         : "N/A"}
-                    </td>
-                  </tr>
-                ))
-              }
-            </tbody>
-          </table>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                      First:{" "}
+                      {s.session_created
+                        ? new Date(s.session_created).toLocaleDateString()
+                        : "?"}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Database Modal -->
+  <div
+    id="user-database-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden opacity-0 transition-all duration-300 pointer-events-none"
+  >
+    <div
+      class="glass-panel w-full max-w-6xl max-h-[85vh] flex flex-col rounded-3xl overflow-hidden border border-white/10 shadow-2xl relative transform scale-95 transition-all duration-300"
+    >
+      <!-- Close Button -->
+      <button
+        class="close-inspect-btn absolute top-6 right-6 p-2 rounded-lg bg-black/20 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors border border-white/5 hover:border-red-500/30 z-20"
+      >
+        <span class="i-heroicons-x-mark w-6 h-6"></span>
+      </button>
+
+      <!-- Header -->
+      <div
+        class="p-6 border-b border-white/10 bg-black/40 flex items-center gap-3"
+      >
+        <span class="i-heroicons-users w-6 h-6 text-brand-accent"></span>
+        <h2 class="text-xl font-bold font-display">User Database</h2>
+      </div>
+
+      <!-- Content -->
+      <div
+        class="overflow-y-auto p-0 scrollbar-hide flex-1 bg-black/20 relative"
+      >
+        <div
+          class="p-6 bg-brand-accent/5 border-b border-white/5 text-sm text-gray-400 font-mono"
+        >
+          Found <span class="text-white font-bold"
+            >{(usersList.results || []).length}</span
+          > records (showing latest 100)
         </div>
+        <table class="w-full text-left border-collapse">
+          <thead
+            class="sticky top-0 bg-black/95 backdrop-blur-xl z-10 box-decoration-clone"
+          >
+            <tr
+              class="text-gray-400 text-xs uppercase tracking-wider font-mono border-b border-white/10"
+            >
+              <th class="p-6 font-normal">User</th>
+              <th class="p-6 font-normal">Identity Provider</th>
+              <th class="p-6 font-normal">IDs</th>
+              <th class="p-6 font-normal text-right">Joined</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm divide-y divide-white/5">
+            {
+              (usersList.results || []).map((u: any) => (
+                <tr class="hover:bg-white/5 transition-colors">
+                  <td class="p-6">
+                    <div class="flex items-center gap-3">
+                      <img
+                        src={
+                          u.avatar ||
+                          `https://ui-avatars.com/api/?name=${u.username}&background=random`
+                        }
+                        class="w-10 h-10 rounded-full object-cover border border-white/10"
+                      />
+                      <div>
+                        <div class="font-bold text-white mb-0.5">
+                          {u.username}
+                        </div>
+                        <div class="text-xs text-brand-accent/80 font-mono">
+                          {u.id.substring(0, 8)}...
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="p-6">
+                    <div class="flex gap-2">
+                      {u.github_id && (
+                        <span class="px-2 py-1 rounded bg-[#24292e]/50 border border-[#24292e]/50 text-xs text-gray-300 flex items-center gap-1">
+                          <span class="i-simple-icons-github" /> GitHub
+                        </span>
+                      )}
+                      {u.google_id && (
+                        <span class="px-2 py-1 rounded bg-[#DB4437]/20 border border-[#DB4437]/30 text-xs text-red-200 flex items-center gap-1">
+                          <span class="i-simple-icons-google" /> Google
+                        </span>
+                      )}
+                      {u.discord_id && (
+                        <span class="px-2 py-1 rounded bg-[#5865F2]/20 border border-[#5865F2]/30 text-xs text-indigo-200 flex items-center gap-1">
+                          <span class="i-simple-icons-discord" /> Discord
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td class="p-6 font-mono text-xs text-gray-500 space-y-1">
+                    {u.github_username && (
+                      <div class="flex items-center gap-2">
+                        <span class="i-simple-icons-github w-4 h-4" />
+                        <span>{u.github_username}</span>
+                      </div>
+                    )}
+                    {u.google_username && (
+                      <div class="flex items-center gap-2">
+                        <span class="i-simple-icons-google w-4 h-4" />
+                        <span>{u.google_username}</span>
+                      </div>
+                    )}
+                    {u.discord_username && (
+                      <div class="flex items-center gap-2">
+                        <span class="i-simple-icons-discord w-4 h-4" />
+                        <span>{u.discord_username}</span>
+                      </div>
+                    )}
+                  </td>
+                  <td class="p-6 text-right text-gray-400 font-mono text-xs">
+                    {u.created_at
+                      ? new Date(
+                          typeof u.created_at === "number"
+                            ? u.created_at
+                            : parseInt(u.created_at) || 0,
+                        ).toLocaleDateString()
+                      : "N/A"}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -886,69 +907,103 @@ const usersList = await safeFetch(
 
   // Tab Switcher Logic
   // @ts-ignore
-  window.openInspector = (tab) => {
-    const modal = document.getElementById("data-inspector-modal");
-    if (modal) {
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
-      // @ts-ignore
-      window.switchTab(tab);
-    }
+  // --- Modals Logic ---
+  const activeSessionsModal = document.getElementById("active-sessions-modal");
+  const userDatabaseModal = document.getElementById("user-database-modal");
+
+  const closeModals = () => {
+    activeSessionsModal?.classList.add(
+      "hidden",
+      "opacity-0",
+      "pointer-events-none",
+    );
+    userDatabaseModal?.classList.add(
+      "hidden",
+      "opacity-0",
+      "pointer-events-none",
+    );
+    // Reset scales
+    activeSessionsModal
+      ?.querySelector(".glass-panel")
+      ?.classList.remove("scale-100");
+    activeSessionsModal
+      ?.querySelector(".glass-panel")
+      ?.classList.add("scale-95");
+    userDatabaseModal
+      ?.querySelector(".glass-panel")
+      ?.classList.remove("scale-100");
+    userDatabaseModal?.querySelector(".glass-panel")?.classList.add("scale-95");
   };
 
-  // @ts-ignore
-  window.closeInspector = () => {
-    const modal = document.getElementById("data-inspector-modal");
-    if (modal) {
-      modal.classList.add("hidden");
-      modal.classList.remove("flex");
-    }
-  };
-
-  // @ts-ignore
-  window.switchTab = (tabName) => {
-    // Update Tabs
-    document.querySelectorAll(".tab-btn").forEach((btn) => {
-      // @ts-ignore
-      if (btn.dataset.tab === tabName) {
-        btn.classList.add("text-white", "border-brand-primary");
-        btn.classList.remove("text-gray-400", "border-transparent");
-        // Specific header colors per tab
-        // btn.classList.add(tabName === 'sessions' ? 'border-green-400' : 'border-brand-accent');
-      } else {
-        btn.classList.remove("text-white", "border-brand-primary");
-        btn.classList.add("text-gray-400", "border-transparent");
-      }
-    });
-
-    // Update Content
-    document.querySelectorAll(".tab-content").forEach((content) => {
-      content.classList.add("hidden");
-    });
-    document.getElementById(`tab-${tabName}`)?.classList.remove("hidden");
-
-    // Trigger Geo Fetch if sessions - Removed
-    // if (tabName === "sessions") {
-    //   fetchGeoData();
-    // }
-  };
-
-  // Trigger geo fetch when modal opens
-  const sessionsModal = document.getElementById("data-inspector-modal");
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (
-        mutation.type === "attributes" &&
-        mutation.attributeName === "class"
-      ) {
-        if (!sessionsModal?.classList.contains("hidden")) {
-          // Modal opened, check active tab?
-          // Handled by switchTab
-        }
-      }
-    });
+  document.querySelectorAll(".close-inspect-btn").forEach((btn) => {
+    btn.addEventListener("click", closeModals);
   });
-  if (sessionsModal) observer.observe(sessionsModal, { attributes: true });
+
+  // Close on click outside
+  activeSessionsModal?.addEventListener("click", (e) => {
+    if (e.target === activeSessionsModal) closeModals();
+  });
+  userDatabaseModal?.addEventListener("click", (e) => {
+    if (e.target === userDatabaseModal) closeModals();
+  });
+
+  // Open Handlers
+  // @ts-ignore
+  window.openInspector = (type) => {
+    if (type === "sessions") {
+      activeSessionsModal?.classList.remove("hidden", "pointer-events-none");
+      // Trigger reflow for transition
+      void activeSessionsModal?.offsetWidth;
+      activeSessionsModal?.classList.remove("opacity-0");
+      activeSessionsModal
+        ?.querySelector(".glass-panel")
+        ?.classList.remove("scale-95");
+      activeSessionsModal
+        ?.querySelector(".glass-panel")
+        ?.classList.add("scale-100");
+    } else {
+      userDatabaseModal?.classList.remove("hidden", "pointer-events-none");
+      void userDatabaseModal?.offsetWidth;
+      userDatabaseModal?.classList.remove("opacity-0");
+      userDatabaseModal
+        ?.querySelector(".glass-panel")
+        ?.classList.remove("scale-95");
+      userDatabaseModal
+        ?.querySelector(".glass-panel")
+        ?.classList.add("scale-100");
+    }
+  };
+
+  // Logout All Users Logic
+  const logoutAllBtn = document.getElementById("logout-all-btn");
+  logoutAllBtn?.addEventListener("click", async () => {
+    const confirmed = confirm(
+      "CRITICAL: This will log out every active user (including you if you are using a session). Are you sure?",
+    );
+    if (!confirmed) return;
+
+    logoutAllBtn.innerText = "Terminating...";
+    (logoutAllBtn as HTMLButtonElement).disabled = true;
+
+    try {
+      const res = await fetch("/api/admin/sessions", { method: "DELETE" });
+      if (res.ok) {
+        alert("All sessions terminated. The grid will now reboot.");
+        window.location.reload();
+      } else {
+        alert("Failed to terminate sessions.");
+        logoutAllBtn.innerHTML =
+          '<span class="i-heroicons-power w-4 h-4"></span> Logout All Users';
+        (logoutAllBtn as HTMLButtonElement).disabled = false;
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Network Error");
+      logoutAllBtn.innerHTML =
+        '<span class="i-heroicons-power w-4 h-4"></span> Logout All Users';
+      (logoutAllBtn as HTMLButtonElement).disabled = false;
+    }
+  });
 
   const client = hc<AppType>(window.location.origin) as any;
   const form = document.getElementById("create-post-form") as HTMLFormElement;
