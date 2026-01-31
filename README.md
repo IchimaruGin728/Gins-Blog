@@ -71,6 +71,11 @@
 - **Multi-Language Support** - Search across both English and Chinese content
 - **Instant Results** - Fast, edge-based vector search
 
+### 📊 **Analytics & Insights**
+- **Real-time View Counts** - Hybrid D1+KV architecture using `UPDATE ... RETURNING` for zero-latency, fresh view stats.
+- **Geolocation Tracking** - Automatic city/country detection via Cloudflare Headers (`request.cf`) stored in session data.
+- **Unified Data Inspector** - Consolidated admin view for active sessions and user data with visual identity icons.
+
 ---
 
 ## 🎨 Gallery
