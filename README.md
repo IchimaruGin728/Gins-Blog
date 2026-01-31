@@ -79,7 +79,7 @@
     - **Europe**: 35+ nodes (LHR, FRA, CDG, AMS...)
     - **Asia-Pacific**: 20+ nodes (NRT, SIN, HKG, SYD...)
   - ⚡ **Performance Monitoring** - Automatic routing anomaly detection (e.g., Singapore users routed to US West).
-  - 🗺️ **Visual Distribution** - Interactive node map with session counts, avg RTT, and performance ratings.
+  - 📋 **Visual Data Grid** - Interactive tables with location flags, session counts, avg RTT, and performance ratings.
   - 🟢 **Real-time Metrics** - Live connection quality indicators:
     - **Excellent**: < 50ms
     - **Good**: < 150ms
@@ -89,15 +89,15 @@
   - **Network**: ISP name, ASN, HTTP Protocol (h2/h3), TCP RTT
   - **Security**: TLS Version (1.2/1.3), Client Trust Score
   - **Location**: City, Country, Coordinates
-- **Device Intelligence** - Ready-to-use schema for client-side collection:
+- **Device Intelligence** - Backend infrastructure ready for:
   - **Hardware**: Screen resolution, Device Memory (GB), CPU Cores
   - **Connection**: Network type (4g/5g/wifi) via `navigator` APIs
 - **Unified Modal UX** - Backdrop click-to-close, 300ms fade+scale animations, consistent red-hover close buttons.
 
 ### 🎨 **Icon System Optimization**
-- ✨ **Maximum Quality** - `shape-rendering: geometricPrecision` + GPU acceleration for crisp edges.
+- ✨ **Sharp Rendering** - `shape-rendering: geometricPrecision` for crisp SVG edges.
 - 🚀 **Zero Latency** - Local inline SVGs with **Safelist Preloading** (No FOUC).
-- 💨 **Performance** - `translateZ(0)` hardware acceleration + `will-change: transform` to prevent layout thrashing.
+- 💨 **Optimized Loading** - Pre-compiled icons for instant display without external network requests.
 
 ---
 
