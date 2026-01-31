@@ -16,7 +16,13 @@ export async function createSession(
 	userId: string,
 	db: ReturnType<typeof getDb>,
 	env: Env,
-	request: Request
+	request: Request,
+	deviceInfo?: {
+		screenResolution?: string;
+		deviceMemory?: number;
+		cpuCores?: number;
+		connectionType?: string;
+	}
 ): Promise<Session> {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 	const now = Date.now();
@@ -82,6 +88,12 @@ export async function createSession(
 		// Security & Trust
 		clientTrustScore: cf?.clientTrustScore || null,
 		isEUCountry: cf?.isEUCountry ? 1 : 0,
+		
+		// Device Information (client-collected)
+		screenResolution: deviceInfo?.screenResolution || null,
+		deviceMemory: deviceInfo?.deviceMemory || null,
+		cpuCores: deviceInfo?.cpuCores || null,
+		connectionType: deviceInfo?.connectionType || null,
 		
 		createdAt: now,
 		lastActive: now,

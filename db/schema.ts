@@ -55,6 +55,12 @@ export const sessions = sqliteTable('sessions', {
   // Security & Trust
   clientTrustScore: integer('client_trust_score'),
   isEUCountry: integer('is_eu_country'),
+  
+  // Device Information (client-collected)
+  screenResolution: text('screen_resolution'), // e.g., "1920x1080"
+  deviceMemory: integer('device_memory'), // GB
+  cpuCores: integer('cpu_cores'), // logical cores
+  connectionType: text('connection_type'), // e.g., "4g", "wifi", "slow-2g"
 });
 
 export type User = typeof users.$inferSelect;
