@@ -59,10 +59,17 @@ try {
           <div class="absolute inset-0 bg-gradient-to-r from-brand-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
           <div class="relative z-10">
-            <div class="text-xs font-mono text-brand-accent mb-3">
-              {new Date(
-                post.publishedAt || post.createdAt,
-              ).toLocaleDateString()}
+            <div class="flex items-center gap-3 text-xs font-mono text-brand-accent mb-3">
+              <span>
+                {new Date(
+                  post.publishedAt || post.createdAt,
+                ).toLocaleDateString()}
+              </span>
+              <span class="w-1 h-1 rounded-full bg-brand-accent/50" />
+              <span class="flex items-center gap-1">
+                <span class="i-heroicons-eye w-3 h-3" />
+                {post.views}
+              </span>
             </div>
             <h2 class="text-2xl font-bold mb-3 group-hover:text-brand-accent transition-colors">
               {post.title}

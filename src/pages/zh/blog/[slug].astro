@@ -2,7 +2,7 @@
 import Layout from "../../../layouts/Layout.astro";
 import { getDb } from "../../../lib/db";
 import { posts } from "../../../../db/schema";
-import { eq, and, lte, gt, lt, desc } from "drizzle-orm";
+import { eq, and, lte, gt, lt, desc, sql } from "drizzle-orm";
 import Comments from "../../../components/Comments";
 import { Markdown } from "astro-remote";
 import MarkdownImage from "../../../components/MarkdownImage.astro";
@@ -57,9 +57,24 @@ if (!result) {
   return Astro.redirect("/404");
 }
 
-// Fetch Next & Previous Posts
-
+// Increment View Count (Fire and forget to not block rendering too much, but for consistent read we might want to await)
+// For simple blog, we can await it.
 const db = getDb(env);
+try {
+  const updated = await db
+    .update(posts)
+    .set({ views: sql`views + 1` })
+    .where(eq(posts.slug, slug))
+    .returning({ views: posts.views })
+    .get();
+
+  // OVERRIDE CACHE: Ensure we show the fresh DB view count, not the stale KV cached one
+  if (updated && result) {
+    result.views = updated.views;
+  }
+} catch (e) {
+  console.error("Failed to increment view count", e);
+}
 const currentPublishedAt = result.publishedAt || 0;
 
 const prevPost = await db
@@ -147,6 +162,12 @@ Astro.response.headers.set(
         class="inline-block px-4 py-1 rounded-full bg-brand-primary/10 text-brand-accent font-mono text-sm mb-6 border border-brand-primary/20"
       >
         {new Date(result.publishedAt || result.createdAt).toLocaleDateString()}
+      </div>
+      <div
+        class="flex items-center justify-center gap-2 text-gray-500 text-sm font-mono mb-4"
+      >
+        <span class="i-heroicons-eye w-4 h-4"></span>
+        <span>{result.views} views</span>
       </div>
       <h1
         class="text-5xl font-display font-bold mb-6 leading-tight"

@@ -235,6 +235,7 @@ const usersList = await safeFetch(
             <th class="py-4 font-normal">Status</th>
             <th class="py-4 font-normal">Title</th>
             <th class="py-4 font-normal">Published</th>
+            <th class="py-4 font-normal text-right">Views</th>
             <th class="py-4 font-normal text-right">Action</th>
           </tr>
         </thead>
@@ -254,6 +255,12 @@ const usersList = await safeFetch(
                     {new Date(
                       post.published_at || post.created_at,
                     ).toLocaleDateString()}
+                  </td>
+                  <td class="py-4 text-right">
+                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-mono">
+                      <span class="i-heroicons-eye w-3 h-3 text-gray-500" />
+                      {post.views || 0}
+                    </span>
                   </td>
                   <td class="py-4 text-right flex items-center justify-end gap-2">
                     <button
@@ -1393,6 +1400,11 @@ const usersList = await safeFetch(
                       </td>
                       <td class="py-4 font-medium text-white">${post.title}</td>
                       <td class="py-4 text-gray-400 font-mono text-xs">${dateStr}</td>
+                      <td class="py-4 text-gray-400 font-mono text-xs text-right">
+                          <span class="inline-flex items-center gap-1 bg-white/5 px-2 py-1 rounded">
+                             <span class="i-heroicons-eye w-3 h-3"></span> ${post.views || 0}
+                          </span>
+                      </td>
                       <td class="py-4 text-right flex items-center justify-end gap-2">
                         <button class="edit-post-btn px-3 py-1 rounded-lg bg-white/5 hover:bg-brand-primary/20 text-gray-300 hover:text-brand-accent border border-white/10 hover:border-brand-primary/50 transition-all text-xs" data-slug="${post.slug}" title="Edit Post">
                           <span class="i-heroicons-pencil-square w-4 h-4"></span>

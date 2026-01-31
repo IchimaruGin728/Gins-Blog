@@ -44,6 +44,7 @@ export const posts = sqliteTable('posts', {
   publishedAt: integer('published_at'),
   createdAt: integer('created_at').notNull(),
   updatedAt: integer('updated_at').notNull(),
+  views: integer('views').notNull().default(0),
 });
 
 export const comments = sqliteTable('comments', {
