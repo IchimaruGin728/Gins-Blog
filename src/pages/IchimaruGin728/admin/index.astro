@@ -59,6 +59,31 @@ const activeSessionsList = await safeFetch(
       sessions.created_at as session_created,
       sessions.city,
       sessions.country,
+      
+      -- Network & ISP
+      sessions.asn,
+      sessions.as_organization,
+      sessions.colo,
+      sessions.continent,
+      sessions.timezone,
+      
+      -- Enhanced Geolocation
+      sessions.latitude,
+      sessions.longitude,
+      sessions.postal_code,
+      sessions.region,
+      sessions.region_code,
+      
+      -- Connection Details
+      sessions.http_protocol,
+      sessions.tls_version,
+      sessions.tls_cipher,
+      sessions.client_tcp_rtt,
+      
+      -- Security & Trust
+      sessions.client_trust_score,
+      sessions.is_eu_country,
+      
       users.username, 
       users.avatar,
       users.id as user_id,
