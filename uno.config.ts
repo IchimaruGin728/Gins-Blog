@@ -56,7 +56,8 @@ export default defineConfig({
     presetIcons({
       // No scale - use original size for consistency
       warn: true, // Warn about missing icons in dev
-      // Use local inline icons for instant loading (no network requests)
+      // Local inline SVG (no CDN = zero network requests)
+      // Safelist ensures all icons preloaded for instant rendering
       extraProperties: {
         // SVG optimization for maximum quality
         'display': 'inline-block',
@@ -66,12 +67,6 @@ export default defineConfig({
         // Subpixel antialiasing for clarity
         '-webkit-font-smoothing': 'antialiased',
         '-moz-osx-font-smoothing': 'grayscale',
-      },
-      // Optimize collection loading
-      collections: {
-        // Only load collections we actually use
-        heroicons: () => import('@iconify-json/heroicons/icons.json').then(i => i.default),
-        'simple-icons': () => import('@iconify-json/simple-icons/icons.json').then(i => i.default),
       },
     }),
     presetTypography(),
