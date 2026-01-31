@@ -239,7 +239,7 @@ const usersList = await safeFetch(
         <tbody class="text-sm" id="signal-log-body">
           {
             (recentPosts.results || []).map((post: any) => {
-              const isPublished = Date.now() >= (post.publishedAt || 0);
+              const isPublished = Date.now() >= (post.published_at || 0);
               return (
                 <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
                   <td class="py-4">
@@ -250,7 +250,7 @@ const usersList = await safeFetch(
                   <td class="py-4 font-medium text-white">{post.title}</td>
                   <td class="py-4 text-gray-400 font-mono text-xs">
                     {new Date(
-                      post.publishedAt || post.createdAt,
+                      post.published_at || post.created_at,
                     ).toLocaleDateString()}
                   </td>
                   <td class="py-4 text-right flex items-center justify-end gap-2">
