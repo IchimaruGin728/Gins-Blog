@@ -17,7 +17,8 @@ export async function createSession(
 	db: ReturnType<typeof getDb>,
 	env: Env,
 	userAgent?: string,
-	ipAddress?: string
+	ipAddress?: string,
+    location?: { city?: string, country?: string }
 ): Promise<Session> {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 	const now = Date.now();
@@ -50,6 +51,8 @@ export async function createSession(
 		expiresAt: now + 1000 * 60 * 60 * 24 * 30,
 		userAgent: userAgent || null,
 		ipAddress: ipAddress || null,
+        country: location?.country || null,
+        city: location?.city || null,
 		createdAt: now,
 		lastActive: now,
 	};

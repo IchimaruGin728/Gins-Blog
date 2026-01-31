@@ -57,6 +57,8 @@ const activeSessionsList = await safeFetch(
       sessions.user_agent, 
       sessions.last_active, 
       sessions.created_at as session_created,
+      sessions.city,
+      sessions.country,
       users.username, 
       users.avatar,
       users.id as user_id,
@@ -685,17 +687,21 @@ const usersList = await safeFetch(
                     </td>
                     <td class="p-6">
                       <div class="flex flex-col gap-1">
-                        <div class="flex items-center gap-2">
-                          <span class="text-green-300 font-mono bg-green-500/10 px-1.5 py-0.5 rounded border border-green-500/20">
-                            {s.ip_address || "Hidden"}
-                          </span>
-                          <span
-                            class="ip-geo-badge text-[10px] uppercase font-bold text-gray-500 border border-white/10 px-1.5 py-0.5 rounded cursor-help"
-                            data-ip={s.ip_address}
-                          >
-                            Locating...
-                          </span>
+                        <div class="font-mono text-xs text-brand-accent bg-brand-accent/10 px-2 py-1 rounded inline-block border border-brand-accent/20 w-fit">
+                          {s.ip_address || "Hidden"}
                         </div>
+                        {s.city || s.country ? (
+                          <div class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                            <span class="text-white font-medium">
+                              {s.country || "??"}
+                            </span>
+                            <span>{s.city}</span>
+                          </div>
+                        ) : (
+                          <div class="text-xs text-gray-500 mt-1">
+                            Localhost / Unknown
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td class="p-6">
@@ -796,9 +802,23 @@ const usersList = await safeFetch(
                       </div>
                     </td>
                     <td class="p-6 font-mono text-xs text-gray-500 space-y-1">
-                      {u.github_username && <div>GH: {u.github_username}</div>}
+                      {u.github_username && (
+                        <div class="flex items-center gap-2">
+                          <span class="i-simple-icons-github w-4 h-4" />
+                          <span>{u.github_username}</span>
+                        </div>
+                      )}
+                      {u.google_username && (
+                        <div class="flex items-center gap-2">
+                          <span class="i-simple-icons-google w-4 h-4" />
+                          <span>{u.google_username}</span>
+                        </div>
+                      )}
                       {u.discord_username && (
-                        <div>DS: {u.discord_username}</div>
+                        <div class="flex items-center gap-2">
+                          <span class="i-simple-icons-discord w-4 h-4" />
+                          <span>{u.discord_username}</span>
+                        </div>
                       )}
                     </td>
                     <td class="p-6 text-right text-gray-400 font-mono text-xs">
@@ -854,69 +874,8 @@ const usersList = await safeFetch(
     }
   });
 
-  // Lazy load IP Geo Data (Batching could be better but this is simple for admin)
-  const fetchGeoData = async () => {
-    const badges = document.querySelectorAll(".ip-geo-badge");
-    const seenIPs = new Set();
-
-    // Create a simple local cache
-    const cache = new Map();
-
-    for (const badge of badges) {
-      const ip = (badge as HTMLElement).dataset.ip;
-      if (!ip || ip === "null") {
-        badge.innerHTML = "Localhost";
-        continue;
-      }
-
-      // If we already have data for this IP in this valid session
-      if (cache.has(ip)) {
-        populateBadge(badge as HTMLElement, cache.get(ip));
-        continue;
-      }
-
-      if (seenIPs.has(ip)) {
-        // Should technically wait for the first promise but simple poll is fine for now
-        continue;
-      }
-      seenIPs.add(ip);
-
-      try {
-        // Use ipapi.co for detailed info
-        const res = await fetch(`https://ipapi.co/${ip}/json/`);
-        if (res.ok) {
-          const data = await res.json();
-          cache.set(ip, data);
-          // Find all badges with this IP and update
-          document
-            .querySelectorAll(`.ip-geo-badge[data-ip="${ip}"]`)
-            .forEach((b) => populateBadge(b as HTMLElement, data));
-        } else {
-          badge.innerHTML = "Unk";
-        }
-      } catch (e) {
-        console.error("Geo fetch failed", e);
-        badge.innerHTML = "Err";
-      }
-
-      // Rate limit protection (1 rps)
-      await new Promise((r) => setTimeout(r, 1000));
-    }
-  };
-
-  function populateBadge(el: HTMLElement, data: any) {
-    if (data.error) {
-      el.innerHTML = "Private/Reserved";
-      return;
-    }
-    el.innerHTML = `
-       <span class="mr-1">${data.country_code || "??"}</span>
-       <span class="text-gray-400 font-normal">${data.city || data.region || "Unknown"}</span>
-    `;
-    el.title = `${data.city}, ${data.region}, ${data.country_name} (${data.org})`;
-    el.classList.remove("text-gray-500");
-    el.classList.add("text-brand-accent");
-  }
+  // No-op for compatibility if referenced elsewhere, or remove entirely if safe.
+  // Legacy fetchGeoData removed as per user request to rely on DB data.
 
   // Tab Switcher Logic
   // @ts-ignore
@@ -961,10 +920,10 @@ const usersList = await safeFetch(
     });
     document.getElementById(`tab-${tabName}`)?.classList.remove("hidden");
 
-    // Trigger Geo Fetch if sessions
-    if (tabName === "sessions") {
-      fetchGeoData();
-    }
+    // Trigger Geo Fetch if sessions - Removed
+    // if (tabName === "sessions") {
+    //   fetchGeoData();
+    // }
   };
 
   // Trigger geo fetch when modal opens
