@@ -82,6 +82,12 @@ const activeSessionsList = await safeFetch(
       -- Security & Trust
       sessions.client_trust_score,
       sessions.is_eu_country,
+
+      -- Device Information
+      sessions.screen_resolution,
+      sessions.device_memory,
+      sessions.cpu_cores,
+      sessions.connection_type,
       
       users.username, 
       users.avatar,
@@ -947,6 +953,8 @@ const COLO_LOCATIONS: Record<
                           <div class="text-xs text-gray-500 font-mono">
                             SID: {s.session_id.substring(0, 8)}
                           </div>
+                          <!-- Client-side UA Parsed Info -->
+                          <div class="ua-parser-container mt-1 text-xs" data-ua={s.user_agent}></div>
                         </div>
                       </div>
                     </td>
