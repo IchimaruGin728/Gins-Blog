@@ -14,6 +14,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	// Safety check for dev mode without wrangler or weird states
 	const runtime = context.locals.runtime;
 	const env = runtime?.env || ({} as any);
+
+    // NUCLEAR BYPASS: Privacy pages (static) should strictly skip all middleware logic to prevent 500s
+    if (context.url.pathname.includes("/privacy")) {
+        return next();
+    }
 	
     // If no DB binding, we can't do much session work, but we should try to survive public routes
 	const db = env.DB ? getDb(env) : null;
