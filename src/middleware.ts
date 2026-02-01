@@ -11,8 +11,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	context.locals.session = null;
 
 	// Access env from locals.runtime (populated by Adapter)
-	const env = context.locals.runtime.env;
-	const db = getDb(env);
+	// Safety check for dev mode without wrangler or weird states
+	const runtime = context.locals.runtime;
+	const env = runtime?.env || ({} as any);
+	
+    // If no DB binding, we can't do much session work, but we should try to survive public routes
+	const db = env.DB ? getDb(env) : null;
 
 	// HTML Caching for Public GET Routes
 	// Skip if logged in (token present), or if admin/api/login
@@ -76,6 +80,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	// But restrict Admin to ZT.
 
 	if (token === null) {
+		return next();
+	}
+
+	// Check for DB availability before validating session
+	if (!db) {
+		console.warn("Middleware: DB not available, skipping session validation");
 		return next();
 	}
 
