@@ -20,7 +20,7 @@ try {
   console.error("Cache initialization failed:", e);
 }
 
-let _recentPosts: (typeof posts.$inferSelect)[] = [];
+let recentPosts: (typeof posts.$inferSelect)[] = [];
 const CACHE_KEY = "home_recent_posts_zh";
 const CACHE_TTL = 300;
 
@@ -36,9 +36,9 @@ try {
   };
 
   if (cache) {
-    _recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
+    recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
   } else {
-    _recentPosts = await fetchPosts();
+    recentPosts = await fetchPosts();
   }
 } catch (e: any) {
   console.error("Failed to fetch posts:", e);
@@ -105,8 +105,8 @@ try {
 
       <div class="flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
         {
-          _recentPosts.length > 0 ? (
-            _recentPosts.map((post) => (
+          recentPosts.length > 0 ? (
+            recentPosts.map((post) => (
               <a
                 href={`/zh/blog/${post.slug}`}
                 data-astro-prefetch
