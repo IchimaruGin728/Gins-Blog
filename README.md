@@ -40,6 +40,7 @@
 ### 🌐 **Internationalization (i18n)**
 - **Multi-Language Support** - Seamless English and Chinese (Simplified) experience
 - **Dynamic Routing** - Smart routing for smooth language switching
+- **Localized 404** - Client-side detected 404 pages that adapt to the user's language path (e.g. `/zh/*`)
 - **Localized RSS** - Dedicated feeds for each language
 
 ### 🔍 **Advanced SEO**
@@ -49,6 +50,7 @@
 
 ### 🔐 **Authentication & Security**
 - **OAuth Integration** - GitHub, Google, Discord via Arctic + Oslo
+- **Active Session Management** - View and revoke active sessions across devices
 - **Smart Sessions** - Device-aware tracking with automatic deduplication
 - **Zero Trust Admin** - Protected admin routes with Cloudflare Access integration
 
@@ -173,6 +175,7 @@
 | [Marked](https://marked.js.org) | Markdown parser for content | ^17.0.1 |
 | [Zod](https://zod.dev) | TypeScript-first schema validation | ^3.25.76 |
 | [TypeScript](https://www.typescriptlang.org) | Type-safe JavaScript | ^5.9.3 |
+| [Biome](https://biomejs.dev) | Fast formatter & linter (replaces Prettier/ESLint) | Latest |
 
 ---
 
