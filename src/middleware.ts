@@ -26,15 +26,23 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	if (isPublicGet) {
 		// Cache Key: Full URL
 		const cacheKey = context.url.href;
-		const cachedHtml = await env.GIN_KV.get(cacheKey);
+		// Safely check if KV is available (might be missing in some dev environments)
+		if (env.GIN_KV) {
+			try {
+				const cachedHtml = await env.GIN_KV.get(cacheKey);
 
-		if (cachedHtml) {
-			return new Response(cachedHtml, {
-				headers: {
-					"Content-Type": "text/html;charset=UTF-8",
-					"X-Cache": "HIT",
-				},
-			});
+				if (cachedHtml) {
+					return new Response(cachedHtml, {
+						headers: {
+							"Content-Type": "text/html;charset=UTF-8",
+							"X-Cache": "HIT",
+						},
+					});
+				}
+			} catch (e) {
+				console.error("KV Cache Error:", e);
+				// Fail silently and render fresh
+			}
 		}
 	}
 
