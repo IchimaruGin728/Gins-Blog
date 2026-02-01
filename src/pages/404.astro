@@ -20,9 +20,10 @@ const t = useTranslations(lang);
       </h1>
       <div class="absolute inset-0 flex items-center justify-center">
         <h2
+          id="not-found-title"
           class="text-4xl md:text-6xl font-bold font-display text-brand-accent drop-shadow-[0_0_15px_rgba(244,114,182,0.5)] animate-pulse"
         >
-          Aiyo!
+          {t("404.title")}
         </h2>
       </div>
     </div>
@@ -30,14 +31,21 @@ const t = useTranslations(lang);
     <div
       class="glass-panel p-8 rounded-3xl max-w-lg w-full border border-white/10 backdrop-blur-xl"
     >
-      <p class="text-xl md:text-2xl font-medium text-white mb-4">
+      <p
+        id="not-found-text"
+        class="text-xl md:text-2xl font-medium text-white mb-4"
+      >
         {t("404.text")}
       </p>
-      <p class="text-gray-400 mb-8 font-mono text-sm leading-relaxed">
+      <p
+        id="not-found-subtitle"
+        class="text-gray-400 mb-8 font-mono text-sm leading-relaxed"
+      >
         {t("404.subtitle")}
       </p>
 
       <a
+        id="back-home-btn"
         href={lang === "en-SG" ? "/" : `/${lang}/`}
         class="group relative inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-accent/50 transition-all duration-300"
       >
@@ -49,6 +57,7 @@ const t = useTranslations(lang);
           class="i-heroicons-home text-brand-accent group-hover:scale-110 transition-transform"
         ></span>
         <span
+          id="back-home-text"
           class="font-bold text-white group-hover:text-brand-accent transition-colors"
           >{t("404.home")}</span
         >
@@ -56,3 +65,34 @@ const t = useTranslations(lang);
     </div>
   </div>
 </Layout>
+
+<script>
+  // Client-side 404 localization
+  // Since 404 is statically generated as English, we detect /zh/ path and switch strings
+  if (
+    window.location.pathname.startsWith("/zh") ||
+    window.location.pathname.startsWith("/zh/")
+  ) {
+    // Chinese Strings
+    const zhStrings = {
+      title: "404 - 哎哟!",
+      text: "找不到页面！",
+      subtitle: "你在此迷失了吗？信号中断。传送需要有效的坐标。",
+      home: "返回首页",
+      docTitle: "404 - 哎哟!",
+    };
+
+    const titleEl = document.getElementById("not-found-title");
+    const textEl = document.getElementById("not-found-text");
+    const subtitleEl = document.getElementById("not-found-subtitle");
+    const btnTextEl = document.getElementById("back-home-text");
+    const btnEl = document.getElementById("back-home-btn") as HTMLAnchorElement;
+
+    if (titleEl) titleEl.textContent = zhStrings.title;
+    if (textEl) textEl.textContent = zhStrings.text;
+    if (subtitleEl) subtitleEl.textContent = zhStrings.subtitle;
+    if (btnTextEl) btnTextEl.textContent = zhStrings.home;
+    if (btnEl) btnEl.href = "/zh/";
+    document.title = zhStrings.docTitle;
+  }
+</script>
