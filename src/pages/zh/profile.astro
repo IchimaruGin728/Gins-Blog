@@ -15,16 +15,25 @@ import { eq } from "drizzle-orm";
 import { users } from "../../../db/schema";
 import { getDb } from "../../lib/db";
 
-const db = getDb(env);
-const userProfile = await db
-  .select()
-  .from(users)
-  .where(eq(users.id, user.id))
-  .get();
+let userProfile;
+let socialLinks: any = {};
+let errorMsg = null;
 
-const socialLinks = userProfile?.socialLinks
-  ? JSON.parse(userProfile.socialLinks as string)
-  : {};
+try {
+  const db = getDb(env);
+  userProfile = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, user.id))
+    .get();
+
+  socialLinks = userProfile?.socialLinks
+    ? JSON.parse(userProfile.socialLinks as string)
+    : {};
+} catch (e: any) {
+  console.error("Profile Error:", e);
+  errorMsg = e.message;
+}
 ---
 
 <Layout title={t("profile.title")}>
@@ -34,6 +43,14 @@ const socialLinks = userProfile?.socialLinks
     >
       {t("profile.title")}
     </h1>
+
+    {
+      errorMsg && (
+        <div class="p-4 mb-6 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-center">
+          Error loading profile: {errorMsg}
+        </div>
+      )
+    }
 
     <div class="glass-panel p-8 rounded-3xl">
       <form id="profile-form" class="space-y-6">
