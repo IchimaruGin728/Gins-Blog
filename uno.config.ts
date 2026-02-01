@@ -51,6 +51,14 @@ export default defineConfig({
 		"i-simple-icons-github",
 		"i-simple-icons-google",
 		"i-simple-icons-discord",
+		// Browser & OS Icons (Dynamic)
+		"i-simple-icons-googlechrome",
+		"i-simple-icons-safari",
+		"i-simple-icons-firefox",
+		"i-simple-icons-microsoftedge",
+		"i-simple-icons-opera",
+		"i-simple-icons-linux",
+		"i-simple-icons-ubuntu",
 	],
 	presets: [
 		presetUno(),
