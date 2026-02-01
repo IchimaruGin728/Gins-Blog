@@ -108,7 +108,31 @@ const activeSessionsList = await safeFetch(
 );
 
 const usersList = await safeFetch(
-  env.DB.prepare("SELECT * FROM users ORDER BY rowid DESC LIMIT 100").all(), // valid sqlite
+  env.DB.prepare(`
+    SELECT 
+      users.*,
+      latest_session.last_active,
+      latest_session.ip_address,
+      latest_session.city,
+      latest_session.country,
+      latest_session.device_memory,
+      latest_session.connection_type
+    FROM users
+    LEFT JOIN (
+      SELECT 
+        user_id, 
+        MAX(last_active) as last_active,
+        ip_address,
+        city,
+        country,
+        device_memory,
+        connection_type
+      FROM sessions
+      GROUP BY user_id
+    ) as latest_session ON users.id = latest_session.user_id
+    ORDER BY users.rowid DESC 
+    LIMIT 100
+  `).all(),
   // @ts-expect-error
   { results: [] },
 );
@@ -1150,6 +1174,7 @@ const COLO_LOCATIONS: Record<
               <th class="p-6 font-normal">User</th>
               <th class="p-6 font-normal">Identity Provider</th>
               <th class="p-6 font-normal">IDs</th>
+              <th class="p-6 font-normal">Last Seen</th>
               <th class="p-6 font-normal text-right">Joined</th>
             </tr>
           </thead>
@@ -1214,6 +1239,26 @@ const COLO_LOCATIONS: Record<
                         <span>{u.discord_username}</span>
                       </div>
                     )}
+                  </td>
+                  <td class="p-6">
+                    <div class="space-y-1">
+                      {u.last_active ? (
+                        <>
+                          <div class="text-white font-medium text-xs">
+                            {new Date(u.last_active).toLocaleString()}
+                          </div>
+                          <div class="text-xs text-gray-400 flex items-center gap-1.5">
+                             <span class="i-heroicons-map-pin w-3 h-3 text-brand-accent"></span>
+                             <span>{u.city || "?"}, {u.country || "?"}</span>
+                          </div>
+                          <div class="text-[10px] font-mono text-gray-500 bg-white/5 px-1.5 py-0.5 rounded inline-block">
+                            {u.ip_address || "Hidden IP"}
+                          </div>
+                        </>
+                      ) : (
+                        <span class="text-xs text-gray-600 italic">Never</span>
+                      )}
+                    </div>
                   </td>
                   <td class="p-6 text-right text-gray-400 font-mono text-xs">
                     {u.created_at
