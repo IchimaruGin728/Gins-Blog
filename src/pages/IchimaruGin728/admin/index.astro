@@ -1285,10 +1285,11 @@ const COLO_LOCATIONS: Record<
                   </td>
                   <td class="p-6 text-right text-gray-400 font-mono text-xs">
                     {(() => {
+                      const allowedOwners = ["ichimarugin", "ichimarugin728", "gin ichimaru"];
                       const isOwner = 
-                        u.github_username?.toLowerCase() === "ichimarugin" || u.github_username?.toLowerCase() === "ichimarugin728" ||
-                        u.google_username?.toLowerCase() === "ichimarugin" || u.google_username?.toLowerCase() === "ichimarugin728" ||
-                        u.discord_username?.toLowerCase() === "ichimarugin" || u.discord_username?.toLowerCase() === "ichimarugin728";
+                        (u.github_username && allowedOwners.includes(u.github_username.toLowerCase())) ||
+                        (u.google_username && allowedOwners.includes(u.google_username.toLowerCase())) ||
+                        (u.discord_username && allowedOwners.includes(u.discord_username.toLowerCase()));
                       
                       if (isOwner) {
                         return <span class="text-brand-accent font-bold px-2 py-0.5 rounded bg-brand-accent/10 border border-brand-accent/20">👑 Creator</span>;
