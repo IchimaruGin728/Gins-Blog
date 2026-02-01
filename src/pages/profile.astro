@@ -323,10 +323,10 @@ const socialLinks = userProfile?.socialLinks
       <div class="mt-8">
         <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
           <span class="i-heroicons-device-phone-mobile w-5 h-5"></span>
-          Active Sessions
+          {t("profile.sessions")}
         </h3>
         <p class="text-sm text-gray-400 mb-4">
-          Manage devices where you're currently logged in
+          {t("profile.sessions_desc")}
         </p>
 
         <div id="sessions-list" class="space-y-3">
@@ -336,7 +336,7 @@ const socialLinks = userProfile?.socialLinks
               class="inline-block animate-spin i-heroicons-arrow-path w-6 h-6"
             >
             </div>
-            <p class="mt-2 text-sm">Loading sessions...</p>
+            <p class="mt-2 text-sm">{t("profile.sessions_loading")}</p>
           </div>
         </div>
       </div>
@@ -528,7 +528,16 @@ const socialLinks = userProfile?.socialLinks
 </script>
 
 <!-- Session Management Script -->
-<script>
+<script
+  define:vars={{
+    tSessionsNone: t("profile.sessions_none"),
+    tSessionsCurrent: t("profile.sessions_current"),
+    tSessionsRevoke: t("profile.sessions_revoke"),
+    tSessionsConfirmRevoke: t("profile.sessions_confirm_revoke"),
+    tSessionsErrorLoad: t("profile.sessions_error_load"),
+    tSessionsErrorRevoke: t("profile.sessions_error_revoke"),
+  }}
+>
   const sessionsList = document.getElementById("sessions-list");
 
   // Load sessions on page load
@@ -538,19 +547,19 @@ const socialLinks = userProfile?.socialLinks
       if (!res.ok) throw new Error("Failed to load sessions");
 
       const sessionsData = await res.json();
-      const sessions: any[] = Array.isArray(sessionsData) ? sessionsData : [];
+      const sessions = Array.isArray(sessionsData) ? sessionsData : [];
 
       if (sessions.length === 0) {
-        sessionsList!.innerHTML = `
+        sessionsList.innerHTML = `
           <div class="text-center text-gray-500 py-4">
-            <p class="text-sm">No active sessions found</p>
+            <p class="text-sm">${tSessionsNone}</p>
           </div>
         `;
         return;
       }
 
-      sessionsList!.innerHTML = sessions
-        .map((session: any) => {
+      sessionsList.innerHTML = sessions
+        .map((session) => {
           const createdDate = session.createdAt
             ? new Date(session.createdAt).toLocaleDateString()
             : "Unknown";
@@ -567,7 +576,7 @@ const socialLinks = userProfile?.socialLinks
               <div>
                 <div class="font-medium text-white">
                   ${session.browser} on ${session.os}
-                  ${session.isCurrent ? '<span class="ml-2 text-xs px-2 py-0.5 bg-brand-accent/20 text-brand-accent rounded-full">Current</span>' : ""}
+                  ${session.isCurrent ? `<span class="ml-2 text-xs px-2 py-0.5 bg-brand-accent/20 text-brand-accent rounded-full">${tSessionsCurrent}</span>` : ""}
                 </div>
                 <div class="text-xs text-gray-400">
                   First login: ${createdDate} • Last active: ${lastActive}
@@ -581,7 +590,7 @@ const socialLinks = userProfile?.socialLinks
                 onclick="revokeSession('${session.id}')"
                 class="px-3 py-1.5 text-xs font-medium text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors"
               >
-                Revoke
+                ${tSessionsRevoke}
               </button>
             `
                 : ""
@@ -592,21 +601,17 @@ const socialLinks = userProfile?.socialLinks
         .join("");
     } catch (error) {
       console.error("Error loading sessions:", error);
-      sessionsList!.innerHTML = `
+      sessionsList.innerHTML = `
         <div class="text-center text-red-400 py-4">
-          <p class="text-sm">Failed to load sessions</p>
+          <p class="text-sm">${tSessionsErrorLoad}</p>
         </div>
       `;
     }
   }
 
   // Revoke a session
-  (window as any).revokeSession = async (sessionId: string) => {
-    if (
-      !confirm(
-        "Are you sure you want to revoke this session? You will be logged out on that device.",
-      )
-    ) {
+  window.revokeSession = async (sessionId) => {
+    if (!confirm(tSessionsConfirmRevoke)) {
       return;
     }
 
@@ -616,17 +621,15 @@ const socialLinks = userProfile?.socialLinks
       });
 
       if (!res.ok) {
-        const errorData = (await res.json()) as { error?: string };
-        throw new Error(errorData.error || "Failed to revoke session");
+        const errorData = await res.json();
+        throw new Error(errorData.error || tSessionsErrorRevoke);
       }
 
       // Reload sessions list
       await loadSessions();
     } catch (error) {
       console.error("Error revoking session:", error);
-      alert(
-        error instanceof Error ? error.message : "Failed to revoke session",
-      );
+      alert(error instanceof Error ? error.message : tSessionsErrorRevoke);
     }
   };
 
