@@ -115,7 +115,9 @@ const usersList = await safeFetch(
       latest_session.ip_address,
       latest_session.city,
       latest_session.country,
+      latest_session.screen_resolution,
       latest_session.device_memory,
+      latest_session.cpu_cores,
       latest_session.connection_type
     FROM users
     LEFT JOIN (
@@ -125,7 +127,9 @@ const usersList = await safeFetch(
         ip_address,
         city,
         country,
+        screen_resolution,
         device_memory,
+        cpu_cores,
         connection_type
       FROM sessions
       GROUP BY user_id
@@ -1292,7 +1296,8 @@ const COLO_LOCATIONS: Record<
                              {(u.screen_resolution || u.device_memory || u.connection_type) && (
                               <div class="flex flex-wrap gap-1 mt-1 text-[10px] text-gray-500 font-mono">
                                 {u.screen_resolution && <span>{u.screen_resolution}</span>}
-                                {u.device_memory && <span>{u.device_memory}GB</span>}
+                                {u.cpu_cores && <span>{u.cpu_cores} Cores</span>}
+                                {u.device_memory && <span>{u.device_memory}GB RAM</span>}
                                 {u.connection_type && <span class="uppercase border border-white/10 px-1 rounded">{u.connection_type}</span>}
                               </div>
                              )}
