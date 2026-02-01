@@ -109,31 +109,24 @@ const activeSessionsList = await safeFetch(
 
 const usersList = await safeFetch(
   env.DB.prepare(`
+    WITH RankedSessions AS (
+      SELECT 
+        *,
+        ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY last_active DESC) as rn
+      FROM sessions
+    )
     SELECT 
       users.*,
-      latest_session.last_active,
-      latest_session.ip_address,
-      latest_session.city,
-      latest_session.country,
-      latest_session.screen_resolution,
-      latest_session.device_memory,
-      latest_session.cpu_cores,
-      latest_session.connection_type
+      rs.last_active,
+      rs.ip_address,
+      rs.city,
+      rs.country,
+      rs.screen_resolution,
+      rs.device_memory,
+      rs.cpu_cores,
+      rs.connection_type
     FROM users
-    LEFT JOIN (
-      SELECT 
-        user_id, 
-        MAX(last_active) as last_active,
-        ip_address,
-        city,
-        country,
-        screen_resolution,
-        device_memory,
-        cpu_cores,
-        connection_type
-      FROM sessions
-      GROUP BY user_id
-    ) as latest_session ON users.id = latest_session.user_id
+    LEFT JOIN RankedSessions rs ON users.id = rs.user_id AND rs.rn = 1
     ORDER BY users.rowid DESC 
     LIMIT 100
   `).all(),
