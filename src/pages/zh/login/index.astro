@@ -76,24 +76,29 @@ const t = useTranslations(lang);
       </div>
 
       <script>
-        const checkbox = document.getElementById(
-          "privacy-agree",
-        ) as HTMLInputElement;
-        const buttons = document.getElementById("login-buttons");
+        document.addEventListener("astro:page-load", () => {
+          const checkbox = document.getElementById(
+            "privacy-agree",
+          ) as HTMLInputElement;
+          const buttons = document.getElementById("login-buttons");
 
-        if (checkbox && buttons) {
-          if (checkbox.checked) {
-            buttons.classList.remove("opacity-50", "pointer-events-none");
-          }
-
-          checkbox.addEventListener("change", () => {
+          if (checkbox && buttons) {
+            // Reset state on load (browser might keep checkbox checked on soft reload)
             if (checkbox.checked) {
               buttons.classList.remove("opacity-50", "pointer-events-none");
             } else {
               buttons.classList.add("opacity-50", "pointer-events-none");
             }
-          });
-        }
+
+            checkbox.addEventListener("change", () => {
+              if (checkbox.checked) {
+                buttons.classList.remove("opacity-50", "pointer-events-none");
+              } else {
+                buttons.classList.add("opacity-50", "pointer-events-none");
+              }
+            });
+          }
+        });
       </script>
     </div>
   </div>
