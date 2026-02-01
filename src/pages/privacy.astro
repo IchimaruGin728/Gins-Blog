@@ -1,16 +1,20 @@
-import Layout from "../layouts/Layout.astro"; export const prerender = true;
+---
+import Layout from "../layouts/Layout.astro";
+
+export const prerender = true;
+---
 
 <Layout title="Privacy Policy">
-  <div class="max-w-3xl mx-auto py-12">
-    <div class="glass-panel p-8 md:p-12 rounded-3xl">
+  <div class="max-w-3xl mx-auto py-12 px-6">
+    <div class="glass-panel p-8 md:p-12 rounded-3xl animate-fade-in-up">
       <h1
-        class="text-4xl font-display font-bold mb-8 bg-gradient-to-r from-brand-accent to-brand-primary bg-clip-text text-transparent"
+        class="text-3xl md:text-4xl font-display font-bold mb-6 bg-gradient-to-r from-brand-accent to-brand-primary bg-clip-text text-transparent"
       >
         Privacy Policy
       </h1>
 
       <div
-        class="prose prose-invert prose-lg max-w-none prose-headings:font-display prose-a:text-brand-accent hover:prose-a:text-brand-primary"
+        class="prose prose-invert prose-lg max-w-none prose-headings:font-display prose-headings:text-gray-100 prose-p:text-gray-300 prose-strong:text-brand-accent prose-a:text-brand-accent hover:prose-a:text-brand-primary transition-colors"
       >
         <p class="text-sm text-gray-400 mb-8 border-b border-white/10 pb-4">
           Last Updated: 2026-01-31
@@ -29,15 +33,14 @@ import Layout from "../layouts/Layout.astro"; export const prerender = true;
           When you visit our site, we may collect minimal technical data to
           optimize your experience and ensure security:
         </p>
-        <ul class="list-disc pl-5 space-y-2">
+        <ul>
           <li>
             <strong>Network Info</strong>: IP address, ISP, connection type
             (e.g., WiFi/4G) for routing optimization.
           </li>
           <li>
-            <strong>Adaptive UX Metrics</strong>: Screen resolution, device
-            memory, and connection quality to determine optimal content
-            rendering.
+            <strong>Device Metrics</strong>: Screen resolution, device memory,
+            and CPU concurrency to determine optimal content rendering quality.
           </li>
           <li>
             <strong>Location Data</strong>: Approximate location (City/Country)
@@ -51,7 +54,7 @@ import Layout from "../layouts/Layout.astro"; export const prerender = true;
           Google, Discord), we store only the public information provided by
           them:
         </p>
-        <ul class="list-disc pl-5 space-y-2">
+        <ul>
           <li>Username</li>
           <li>Public Email Address</li>
           <li>Avatar URL</li>
@@ -59,10 +62,10 @@ import Layout from "../layouts/Layout.astro"; export const prerender = true;
         </ul>
 
         <h3>2. How We Use Your Data</h3>
-        <ul class="list-disc pl-5 space-y-2">
+        <ul>
           <li>
-            <strong>Performance Optimization</strong>: Metrics help us serve
-            lighter content to slower connections.
+            <strong>Performance Optimization</strong>: Device metrics help us
+            serve lighter content to slower connections or lower-end devices.
           </li>
           <li>
             <strong>Security</strong>: IP addresses are used to detect routing
@@ -73,10 +76,11 @@ import Layout from "../layouts/Layout.astro"; export const prerender = true;
             post comments and interact with content.
           </li>
         </ul>
+
         <div
-          class="bg-brand-primary/10 border-l-4 border-brand-primary p-4 my-4"
+          class="bg-brand-primary/10 border-l-4 border-brand-primary p-4 my-6 rounded-r-lg"
         >
-          <p class="font-bold m-0 p-0 text-white">
+          <p class="m-0 text-white font-medium">
             We do NOT share your personal data with advertisers or third
             parties.
           </p>
@@ -96,12 +100,25 @@ import Layout from "../layouts/Layout.astro"; export const prerender = true;
           manage your session data.
         </p>
 
+        <h3>5. Third-Party Services</h3>
+        <p>We use the following services which may process data:</p>
+        <ul>
+          <li>
+            <strong>Cloudflare</strong>: Hosting, Security, and Edge Computing.
+          </li>
+          <li>
+            <strong>OAuth Providers</strong>: GitHub, Google, Discord (for
+            authentication only).
+          </li>
+        </ul>
+
         <hr class="border-white/10 my-8" />
 
-        <p class="text-sm text-gray-500">
-          This project is open source. You can audit the code at <a
+        <p class="text-sm text-gray-500 italic">
+          This project is open source. You can audit the code at the <a
             href="https://github.com/IchimaruGin728/Gins-Blog"
-            target="_blank">GitHub Repository</a
+            target="_blank"
+            rel="noreferrer">GitHub Repository</a
           >.
         </p>
       </div>

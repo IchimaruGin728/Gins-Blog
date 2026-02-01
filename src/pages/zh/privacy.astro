@@ -1,16 +1,20 @@
-import Layout from "../../layouts/Layout.astro"; export const prerender = true;
+---
+import Layout from "../../layouts/Layout.astro";
+
+export const prerender = true;
+---
 
 <Layout title="隐私政策">
-  <div class="max-w-3xl mx-auto py-12">
-    <div class="glass-panel p-8 md:p-12 rounded-3xl">
+  <div class="max-w-3xl mx-auto py-12 px-6">
+    <div class="glass-panel p-8 md:p-12 rounded-3xl animate-fade-in-up">
       <h1
-        class="text-4xl font-display font-bold mb-8 bg-gradient-to-r from-brand-accent to-brand-primary bg-clip-text text-transparent"
+        class="text-3xl md:text-4xl font-display font-bold mb-6 bg-gradient-to-r from-brand-accent to-brand-primary bg-clip-text text-transparent"
       >
         隐私政策
       </h1>
 
       <div
-        class="prose prose-invert prose-lg max-w-none prose-headings:font-display prose-a:text-brand-accent hover:prose-a:text-brand-primary"
+        class="prose prose-invert prose-lg max-w-none prose-headings:font-display prose-headings:text-gray-100 prose-p:text-gray-300 prose-strong:text-brand-accent prose-a:text-brand-accent hover:prose-a:text-brand-primary transition-colors"
       >
         <p class="text-sm text-gray-400 mb-8 border-b border-white/10 pb-4">
           最后更新: 2026-01-31
@@ -27,14 +31,14 @@ import Layout from "../../layouts/Layout.astro"; export const prerender = true;
         <p>
           当您访问我们的网站时，我们可能会收集最少量的技术数据以优化您的体验并确保安全：
         </p>
-        <ul class="list-disc pl-5 space-y-2">
+        <ul>
           <li>
             <strong>网络信息</strong>: IP 地址、ISP、连接类型（如
             WiFi/4G），用于路由优化。
           </li>
           <li>
-            <strong>体验优化指标</strong>:
-            屏幕分辨率、设备内存和连接质量，用于决定最佳的内容渲染质量。
+            <strong>设备指标</strong>: 屏幕分辨率、设备内存和 CPU
+            并发数，用于决定最佳的内容渲染质量。
           </li>
           <li>
             <strong>位置数据</strong>: 基于 IP
@@ -47,7 +51,7 @@ import Layout from "../../layouts/Layout.astro"; export const prerender = true;
           如果您选择通过第三方 OAuth
           提供商（GitHub、Google、Discord）登录，我们仅存储其提供的公开信息：
         </p>
-        <ul class="list-disc pl-5 space-y-2">
+        <ul>
           <li>用户名</li>
           <li>公开电子邮件地址</li>
           <li>头像链接</li>
@@ -55,7 +59,7 @@ import Layout from "../../layouts/Layout.astro"; export const prerender = true;
         </ul>
 
         <h3>2. 我们如何使用您的数据</h3>
-        <ul class="list-disc pl-5 space-y-2">
+        <ul>
           <li>
             <strong>性能优化</strong>:
             设备指标帮助我们为慢速连接或低端设备提供更轻量的内容。
@@ -68,10 +72,11 @@ import Layout from "../../layouts/Layout.astro"; export const prerender = true;
             您的账户数据使您能够发表评论并与内容互动。
           </li>
         </ul>
+
         <div
-          class="bg-brand-primary/10 border-l-4 border-brand-primary p-4 my-4"
+          class="bg-brand-primary/10 border-l-4 border-brand-primary p-4 my-6 rounded-r-lg"
         >
-          <p class="font-bold m-0 p-0 text-white">
+          <p class="m-0 text-white font-medium">
             我们不会与广告商或第三方共享您的个人数据。
           </p>
         </div>
@@ -86,12 +91,23 @@ import Layout from "../../layouts/Layout.astro"; export const prerender = true;
           您拥有对自己数据的完全控制权。通过请求或使用用户界面中的“注销并清除会话”功能，您可以管理您的会话数据。
         </p>
 
+        <h3>5. 第三方服务</h3>
+        <p>我们使用以下可能处理数据的服务：</p>
+        <ul>
+          <li><strong>Cloudflare</strong>: 托管、安全和边缘计算。</li>
+          <li>
+            <strong>OAuth 提供商</strong>: GitHub、Google、Discord
+            (仅用于身份验证)。
+          </li>
+        </ul>
+
         <hr class="border-white/10 my-8" />
 
-        <p class="text-sm text-gray-500">
+        <p class="text-sm text-gray-500 italic">
           本项目是开源的。您可以在 <a
             href="https://github.com/IchimaruGin728/Gins-Blog"
-            target="_blank">GitHub 仓库</a
+            target="_blank"
+            rel="noreferrer">GitHub 仓库</a
           > 审计代码。
         </p>
       </div>
