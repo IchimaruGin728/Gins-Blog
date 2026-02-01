@@ -1,25 +1,26 @@
 ---
 import { desc, lte } from "drizzle-orm";
 import { posts } from "../../../db/schema";
+import Layout from "../../layouts/Layout.astro";
 import { getDb } from "../../lib/db";
 
 // Access Cloudflare bindings from locals
 const { env } = Astro.locals.runtime;
 
-let _allPosts: (typeof posts.$inferSelect)[] = [];
-let _error = null;
+let allPosts: (typeof posts.$inferSelect)[] = [];
+let error = null;
 
 try {
-	const db = getDb(env);
-	_allPosts = await db
-		.select()
-		.from(posts)
-		.where(lte(posts.publishedAt, Date.now()))
-		.orderBy(desc(posts.publishedAt))
-		.all();
+  const db = getDb(env);
+  allPosts = await db
+    .select()
+    .from(posts)
+    .where(lte(posts.publishedAt, Date.now()))
+    .orderBy(desc(posts.publishedAt))
+    .all();
 } catch (e: any) {
-	console.error("Failed to fetch posts:", e);
-	_error = e.message;
+  console.error("Failed to fetch posts:", e);
+  error = e.message;
 }
 ---
 
