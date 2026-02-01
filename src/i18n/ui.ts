@@ -27,6 +27,8 @@ export const ui = {
 		"blog.back": "Back to Overview",
 		"blog.prev": "Previous Post",
 		"blog.next": "Next Post",
+		"chronicle.biome_fmt": "Standardized with Biome",
+		"chronicle.biome_fmt_desc": "Migrated the entire codebase to Biome for unified formatting and linting, replacing Prettier and ESLint.",
 		"chronicle.ai_search": "AI Search Redesign",
 		"chronicle.ai_search_desc":
 			"Implemented RAG-based intelligent Q&A system integrated with Vectorize vector database.",
@@ -107,6 +109,8 @@ export const ui = {
 		"blog.back": "返回列表",
 		"blog.prev": "上一篇",
 		"blog.next": "下一篇",
+		"chronicle.biome_fmt": "Biome 格式化标准化",
+		"chronicle.biome_fmt_desc": "全站代码库迁移至 Biome，统一了格式化和 Lint 规则，替代了 Prettier 和 ESLint。",
 		"chronicle.ai_search": "AI 搜索重构",
 		"chronicle.ai_search_desc":
 			"实现了基于 RAG 的智能问答系统，集成了 Vectorize 向量数据库。",

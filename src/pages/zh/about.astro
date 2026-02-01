@@ -94,6 +94,28 @@ const t = useTranslations(lang);
       </h2>
 
       <div class="relative border-l border-white/10 ml-6 md:ml-12 space-y-12">
+        <!-- Item 0 (Biome) -->
+        <div class="relative pl-8 md:pl-12">
+          <span
+            class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-orange-400 shadow-[0_0_10px_rgba(251,146,60,0.5)]"
+          ></span>
+          <div
+            class="glass-panel p-6 rounded-2xl hover:bg-white/5 transition-colors group"
+          >
+            <span class="text-sm font-mono text-orange-400/70 mb-2 block"
+              >2026.02.01</span
+            >
+            <h3
+              class="text-lg font-bold text-white mb-2 group-hover:text-orange-400 transition-colors"
+            >
+              {t("chronicle.biome_fmt")}
+            </h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              {t("chronicle.biome_fmt_desc")}
+            </p>
+          </div>
+        </div>
+
         <!-- Item 1 -->
         <div class="relative pl-8 md:pl-12">
           <span
