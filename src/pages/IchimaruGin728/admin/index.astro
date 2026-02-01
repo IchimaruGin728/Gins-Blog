@@ -1262,6 +1262,26 @@ const COLO_LOCATIONS: Record<
                                 {u.as_organization}
                               </div>
                             )}
+
+                             {/* Zero Trust Badges (New!) */}
+                             <div class="flex items-center gap-2 mt-1">
+                               {u.client_trust_score && u.client_trust_score < 30 && (
+                                 <span class="px-1.5 py-0.5 rounded text-[9px] bg-red-500/20 border border-red-500/30 text-red-300 font-bold uppercase tracking-wider">
+                                   VPN/Risk
+                                 </span>
+                               )}
+                               {u.client_tcp_rtt !== null && (
+                                 <span class={`text-[10px] font-mono flex items-center gap-0.5 ${u.client_tcp_rtt < 50 ? "text-green-400" : "text-yellow-400"}`}>
+                                   <span class="i-heroicons-bolt w-3 h-3"></span>
+                                   {u.client_tcp_rtt}ms
+                                 </span>
+                               )}
+                               {u.tls_version && (
+                                 <span class="text-[10px] text-gray-500 border border-white/10 px-1 rounded">
+                                   {u.tls_version}
+                                 </span>
+                               )}
+                             </div>
                           </div>
                           
                           {/* Rich Device Info */}
