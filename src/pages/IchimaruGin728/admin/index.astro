@@ -1246,7 +1246,9 @@ const COLO_LOCATIONS: Record<
                         <>
                           <div class="space-y-1 border-b border-white/5 pb-2 mb-2">
                             <div class="text-white font-medium text-xs">
-                              {new Date(u.last_active).toLocaleString()}
+                              {new Date(u.last_active).toLocaleString("en-SG", {
+                                timeZone: "Asia/Singapore",
+                              })}
                             </div>
                             <div class="text-xs text-gray-400 flex items-center gap-1.5">
                                <span class="i-heroicons-map-pin w-3 h-3 text-brand-accent"></span>
@@ -1287,7 +1289,11 @@ const COLO_LOCATIONS: Record<
                           typeof u.created_at === "number"
                             ? u.created_at
                             : parseInt(u.created_at) || 0,
-                        ).toLocaleDateString()
+                        ).toLocaleString("en-SG", {
+                          timeZone: "Asia/Singapore",
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })
                       : "N/A"}
                   </td>
                 </tr>
