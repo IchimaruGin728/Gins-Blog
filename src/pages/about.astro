@@ -1,6 +1,8 @@
 ---
 const gravatarHash = "60eb98ab51a815a519feeca028e08573"; // IchimaruGin728
 
+import Layout from "../layouts/Layout.astro";
+import SocialLinks from "../components/SocialLinks.tsx";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
