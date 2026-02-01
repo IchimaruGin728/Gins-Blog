@@ -1,11 +1,12 @@
 ---
 import { desc, lte } from "drizzle-orm";
 import { posts } from "../../db/schema";
+import Layout from "../layouts/Layout.astro";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 import { getDb } from "../lib/db";
 
 const lang = getLangFromUrl(Astro.url);
-const _t = useTranslations(lang);
+const t = useTranslations(lang);
 
 // Access Cloudflare bindings from locals
 const { env } = Astro.locals.runtime;
@@ -106,8 +107,8 @@ try {
 
 			<div class="flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
 				{
-					recentPosts.length > 0 ? (
-						recentPosts.map((post) => (
+					_recentPosts.length > 0 ? (
+						_recentPosts.map((post) => (
 							<a
 								href={`/blog/${post.slug}`}
 								data-astro-prefetch
