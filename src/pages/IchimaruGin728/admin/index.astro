@@ -1107,7 +1107,9 @@ const COLO_LOCATIONS: Record<
                     <td class="p-6 text-right">
                       <div class="text-white font-mono text-sm">
                         {s.last_active
-                          ? new Date(s.last_active).toLocaleTimeString()
+                          ? new Date(s.last_active).toLocaleTimeString("en-SG", {
+                              hour12: false,
+                            })
                           : "N/A"}
                       </div>
                       <div class="text-xs text-gray-500 mt-1">
@@ -1245,6 +1247,7 @@ const COLO_LOCATIONS: Record<
                             <div class="text-white font-medium text-xs">
                               {new Date(u.last_active).toLocaleString("en-SG", {
                                 timeZone: "Asia/Singapore",
+                                hour12: false,
                               })}
                             </div>
                             <div class="text-xs text-gray-400 flex items-center gap-1.5">
