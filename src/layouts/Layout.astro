@@ -195,8 +195,11 @@ const fullTitle =
             ? navigator.hardwareConcurrency.toString()
             : undefined;
           // @ts-ignore
-          const connectionType = navigator.connection
-            ? navigator.connection.effectiveType
+          const connection = navigator.connection;
+          const connectionType = connection
+            ? connection.type === "cellular"
+              ? connection.effectiveType
+              : connection.type || connection.effectiveType
             : undefined;
 
           const data = {

@@ -1260,41 +1260,48 @@ const COLO_LOCATIONS: Record<
                               </div>
                             )}
 
-                             {/* Zero Trust Badges (New!) */}
-                             <div class="flex items-center gap-2 mt-1">
-                               {u.client_trust_score && u.client_trust_score < 30 && (
-                                 <span class="px-1.5 py-0.5 rounded text-[9px] bg-red-500/20 border border-red-500/30 text-red-300 font-bold uppercase tracking-wider">
-                                   VPN/Risk
+                             {/* Network & Security Badges */}
+                             <div class="flex flex-wrap items-center gap-2 mt-1.5">
+                               {/* Network Type (4G/5G/WiFi) */}
+                               {u.connection_type && (
+                                 <span class="flex items-center gap-1 text-[10px] text-blue-300 bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 rounded font-mono uppercase tracking-wider">
+                                   <span class="i-heroicons-signal w-3 h-3"></span>
+                                   {u.connection_type}
                                  </span>
                                )}
-                               {u.client_tcp_rtt !== null && (
-                                 <span class={`text-[10px] font-mono flex items-center gap-0.5 ${u.client_tcp_rtt < 50 ? "text-green-400" : "text-yellow-400"}`}>
+
+                               {/* Risk Score / VPN */}
+                               {u.client_trust_score && u.client_trust_score < 30 ? (
+                                 <span class="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-red-500/20 border border-red-500/30 text-red-300 font-bold uppercase tracking-wider">
+                                   <span class="i-heroicons-shield-exclamation w-3 h-3"></span>
+                                   VPN
+                                 </span>
+                               ) : u.client_trust_score ? (
+                                  <span class="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-green-500/10 border border-green-500/20 text-green-400 font-mono">
+                                   <span class="i-heroicons-shield-check w-3 h-3"></span>
+                                   Clean
+                                 </span>
+                               ) : null}
+
+                               {/* RTT Latency */}
+                               {u.client_tcp_rtt != null && (
+                                 <span class={`flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded border ${u.client_tcp_rtt < 50 ? "border-green-500/20 text-green-400 bg-green-500/5" : "border-yellow-500/20 text-yellow-400 bg-yellow-500/5"}`}>
                                    <span class="i-heroicons-bolt w-3 h-3"></span>
                                    {u.client_tcp_rtt}ms
                                  </span>
                                )}
+                               
+                               {/* TLS */}
                                {u.tls_version && (
-                                 <span class="text-[10px] text-gray-500 border border-white/10 px-1 rounded">
+                                 <span class="text-[10px] text-gray-500 border border-white/10 px-1.5 py-0.5 rounded bg-white/5">
                                    {u.tls_version}
                                  </span>
                                )}
                              </div>
                           </div>
                           
-                          {/* Rich Device Info */}
-                          <div>
-                             {/* Client-side UA Parsed Info */}
-                             <div class="ua-parser-container text-[10px]" data-ua={u.user_agent}></div>
-                             
-                             {(u.screen_resolution || u.device_memory || u.connection_type) && (
-                              <div class="flex flex-wrap gap-1 mt-1 text-[10px] text-gray-500 font-mono">
-                                {u.screen_resolution && <span>{u.screen_resolution}</span>}
-                                {u.cpu_cores && <span>{u.cpu_cores} Cores</span>}
-                                {u.device_memory && <span>{u.device_memory}GB RAM</span>}
-                                {u.connection_type && <span class="uppercase border border-white/10 px-1 rounded">{u.connection_type}</span>}
-                              </div>
-                             )}
-                          </div>
+                          {/* Client-side UA Parsed Info (Hidden but functional for tooltip if needed) */}
+                          <div class="ua-parser-container hidden" data-ua={u.user_agent}></div>
                         </>
                       ) : (
                         <span class="text-xs text-gray-600 italic">Never</span>
