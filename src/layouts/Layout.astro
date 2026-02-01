@@ -175,5 +175,64 @@ const fullTitle =
     <Footer />
 
     <SearchModal client:load />
+
+    <!-- Device Info Collector (Runs once per session) -->
+    <script>
+      // Only run if user is logged in (we check for a session indicator or just try the API)
+      // To save requests, we check sessionStorage first
+      const collectDeviceInfo = async () => {
+        if (sessionStorage.getItem("gins_device_info_sent")) return;
+
+        try {
+          // Collect Data
+          const screenResolution = `${window.screen.width}x${window.screen.height}`;
+          // @ts-ignore
+          const deviceMemory = navigator.deviceMemory
+            ? navigator.deviceMemory.toString()
+            : undefined;
+          // @ts-ignore
+          const cpuCores = navigator.hardwareConcurrency
+            ? navigator.hardwareConcurrency.toString()
+            : undefined;
+          // @ts-ignore
+          const connectionType = navigator.connection
+            ? navigator.connection.effectiveType
+            : undefined;
+
+          const data = {
+            screenResolution,
+            deviceMemory,
+            cpuCores,
+            connectionType,
+          };
+
+          // Send to API
+          const res = await fetch("/api/session/device-info", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          if (res.ok) {
+            sessionStorage.setItem("gins_device_info_sent", "true");
+            console.log("Device info synced");
+          }
+        } catch (e) {
+          // Silent fail
+        }
+      };
+
+      // Delay slightly to not block hydration
+      setTimeout(() => {
+        // Run on page load if we suspect user might be logged in.
+        // Best effort: we just fire it. The API checks auth and returns 401 if not logged in.
+        collectDeviceInfo();
+      }, 2000);
+
+      // Re-run on view transitions (sessionStorage check prevents dupes)
+      document.addEventListener("astro:page-load", () =>
+        setTimeout(collectDeviceInfo, 2000),
+      );
+    </script>
   </body>
 </html>
