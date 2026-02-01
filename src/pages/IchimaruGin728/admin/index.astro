@@ -1473,24 +1473,44 @@ const COLO_LOCATIONS: Record<
       if (ua) {
         const parser = new UAParser(ua);
         const result = parser.getResult();
-        const osIcon = result.os.name?.toLowerCase().includes("mac")
-          ? "i-simple-icons-apple"
-          : result.os.name?.toLowerCase().includes("win")
-            ? "i-simple-icons-windows"
-            : result.os.name?.toLowerCase().includes("android")
-              ? "i-simple-icons-android"
-              : "i-heroicons-cpu-chip";
+        
+        // Helper for OS Icons
+        let osIcon = "i-heroicons-cpu-chip";
+        const osName = result.os.name?.toLowerCase() || "";
+        if (osName.includes("mac") || osName.includes("ios")) osIcon = "i-simple-icons-apple";
+        else if (osName.includes("win")) osIcon = "i-simple-icons-windows";
+        else if (osName.includes("android")) osIcon = "i-simple-icons-android";
+        else if (osName.includes("linux")) osIcon = "i-simple-icons-linux";
+        else if (osName.includes("ubuntu")) osIcon = "i-simple-icons-ubuntu";
+        
+        // Helper for Browser Icons
+        let browserIcon = "i-heroicons-globe-alt";
+        const browserName = result.browser.name?.toLowerCase() || "";
+        if (browserName.includes("chrome")) browserIcon = "i-simple-icons-googlechrome";
+        else if (browserName.includes("safari")) browserIcon = "i-simple-icons-safari";
+        else if (browserName.includes("firefox")) browserIcon = "i-simple-icons-firefox";
+        else if (browserName.includes("edge")) browserIcon = "i-simple-icons-microsoftedge";
+        else if (browserName.includes("opera")) browserIcon = "i-simple-icons-opera";
 
         el.innerHTML = `
-        <div class="flex items-center gap-2">
-          <span class="${osIcon} w-4 h-4"></span>
-          <span class="font-bold">${result.os.name || "Unknown OS"} ${result.os.version || ""}</span>
+        <div class="flex flex-col gap-1 select-none">
+          <div class="flex items-center gap-1.5 text-gray-200">
+            <span class="${osIcon} w-3 h-3 text-gray-400"></span>
+            <span class="font-bold text-[10px]">${result.os.name || "Unknown OS"} ${result.os.version || ""}</span>
+          </div>
+          <div class="flex items-center gap-1.5 text-gray-400">
+             <span class="${browserIcon} w-3 h-3"></span>
+             <span class="text-[10px]">${result.browser.name || "Unknown Browser"} ${result.browser.version || ""}</span>
+          </div>
+          ${result.device.type || result.device.model ? 
+            `<div class="flex items-center gap-1 mt-0.5">
+               <span class="i-heroicons-device-phone-mobile w-3 h-3 text-gray-500"></span>
+               <div class="text-[10px] text-gray-500 font-mono border border-white/10 px-1 rounded bg-white/5">
+                 ${result.device.vendor || ""} ${result.device.model || "Generic Device"}
+               </div>
+             </div>` 
+            : ""}
         </div>
-        <div class="flex items-center gap-2 text-gray-400">
-           <span class="i-heroicons-computer-desktop w-4 h-4"></span>
-           <span>${result.browser.name || "Unknown Browser"} ${result.browser.version || ""}</span>
-        </div>
-        ${result.device.type ? `<div class="text-xs text-gray-500 uppercase tracking-wide border border-white/10 inline-block px-1 rounded">${result.device.vendor || ""} ${result.device.model || ""}</div>` : ""}
       `;
       }
     });
