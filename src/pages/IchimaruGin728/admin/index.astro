@@ -1284,8 +1284,18 @@ const COLO_LOCATIONS: Record<
                     </div>
                   </td>
                   <td class="p-6 text-right text-gray-400 font-mono text-xs">
-                    {u.created_at
-                      ? new Date(
+                    {(() => {
+                      const isOwner = 
+                        u.github_username === "IchimaruGin" || 
+                        u.google_username === "IchimaruGin" || 
+                        u.discord_username === "IchimaruGin";
+                      
+                      if (isOwner) {
+                        return <span class="text-brand-accent font-bold px-2 py-0.5 rounded bg-brand-accent/10 border border-brand-accent/20">👑 Creator</span>;
+                      }
+                      
+                      if (u.created_at) {
+                        return new Date(
                           typeof u.created_at === "number"
                             ? u.created_at
                             : parseInt(u.created_at) || 0,
@@ -1293,8 +1303,11 @@ const COLO_LOCATIONS: Record<
                           timeZone: "Asia/Singapore",
                           dateStyle: "medium",
                           timeStyle: "short",
-                        })
-                      : "N/A"}
+                        });
+                      }
+                      
+                      return <span class="opacity-50">Jan 31, 2026</span>;
+                    })()}
                   </td>
                 </tr>
               ))
