@@ -1,8 +1,9 @@
 ---
 import { useTranslations } from "../../i18n/utils";
 
-const lang = "en-SG";
-const _t = useTranslations(lang);
+const lang = getLangFromUrl(Astro.url);
+// biome-ignore lint/correctness/noUnusedVariables: Used in template
+const t = useTranslations(lang);
 ---
 
 <Layout title={`${t("nav.login")} - ${t("hero.title")}`}>

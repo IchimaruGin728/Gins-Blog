@@ -1,29 +1,32 @@
 ---
 import { desc, lte } from "drizzle-orm";
 import { posts } from "../../../../db/schema";
+import Layout from "../../../layouts/Layout.astro";
 import { getLangFromUrl, useTranslations } from "../../../i18n/utils";
 import { getDb } from "../../../lib/db";
 
 const lang = getLangFromUrl(Astro.url);
-const _t = useTranslations(lang);
+// biome-ignore lint/correctness/noUnusedVariables: Used in template
+const t = useTranslations(lang);
 
 // Access Cloudflare bindings from locals
 const { env } = Astro.locals.runtime;
 
-let _allPosts: (typeof posts.$inferSelect)[] = [];
-let _error = null;
+let allPosts: (typeof posts.$inferSelect)[] = [];
+let error = null;
 
 try {
-	const db = getDb(env);
-	_allPosts = await db
-		.select()
-		.from(posts)
-		.where(lte(posts.publishedAt, Date.now()))
-		.orderBy(desc(posts.publishedAt))
-		.all();
-} catch (e: any) {
-	console.error("Failed to fetch posts:", e);
-	_error = e.message;
+  const db = getDb(env);
+  allPosts = await db
+    .select()
+    .from(posts)
+    .where(lte(posts.publishedAt, Date.now()))
+    .orderBy(desc(posts.publishedAt))
+    .all();
+} catch (error) {
+  console.error("Failed to fetch posts:", error);
+  // Fallback empty
+  allPosts = [];
 }
 ---
 

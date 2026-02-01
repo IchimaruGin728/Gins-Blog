@@ -1,8 +1,10 @@
 ---
+import Layout from "../layouts/Layout.astro";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
-const _t = useTranslations(lang);
+// biome-ignore lint/correctness/noUnusedVariables: Used in template
+const t = useTranslations(lang);
 ---
 
 <Layout title={t("404.title")} description={t("404.description")}>

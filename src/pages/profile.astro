@@ -1,8 +1,9 @@
 ---
-import { useTranslations } from "../i18n/utils";
+import { useTranslations, getLangFromUrl } from "../i18n/utils";
 
-const lang = "en-SG";
-const _t = useTranslations(lang);
+const lang = getLangFromUrl(Astro.url);
+// biome-ignore lint/correctness/noUnusedVariables: Used in template
+const t = useTranslations(lang);
 
 const user = Astro.locals.user;
 if (!user) return Astro.redirect("/login");
@@ -19,14 +20,14 @@ import { getDb } from "../lib/db";
 
 const db = getDb(env);
 const userProfile = await db
-	.select()
-	.from(users)
-	.where(eq(users.id, user.id))
-	.get();
+  .select()
+  .from(users)
+  .where(eq(users.id, user.id))
+  .get();
 
-const _socialLinks = userProfile?.socialLinks
-	? JSON.parse(userProfile.socialLinks as string)
-	: {};
+const socialLinks = userProfile?.socialLinks
+  ? JSON.parse(userProfile.socialLinks as string)
+  : {};
 ---
 
 <Layout title={t("profile.title")}>
