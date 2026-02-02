@@ -1,10 +1,10 @@
 ---
 interface Props {
-	src: string;
-	alt: string;
-	title?: string;
-	width?: string;
-	height?: string;
+  src: string;
+  alt: string;
+  title?: string;
+  width?: string;
+  height?: string;
 }
 
 const { src, alt, title } = Astro.props;
@@ -23,7 +23,6 @@ const isRemote = src.startsWith("http");
         height={450}
         format="webp"
         class="rounded-xl w-full h-auto object-cover border border-white/10 shadow-lg"
-        inferSize={true}
       />
     ) : (
       <img
