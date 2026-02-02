@@ -1,4 +1,4 @@
-# Gin's Blog 💎
+# Gin's Blog
 
 <div align="center">
 
@@ -461,7 +461,7 @@ Built with ❤️ using modern web technologies. Special thanks to:
 
 <div align="center">
 
-**[⬆ Back to Top](#gins-blog---neo-aesthetics-edition-)**
+**[⬆ Back to Top](#gins-blog)**
 
 Made with 💜 by [Ichimaru Gin](https://github.com/IchimaruGin728)
 
