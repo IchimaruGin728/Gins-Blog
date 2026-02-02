@@ -9,22 +9,22 @@ const currentPath = Astro.url.pathname;
 
 // Helper to strip locale from path for comparison
 const getPathWithoutLocale = (path: string) => {
-	if (path.startsWith("/zh/")) {
-		return path.replace("/zh", "") || "/";
-	}
-	if (path === "/zh") {
-		return "/";
-	}
-	return path;
+  if (path.startsWith("/zh/")) {
+    return path.replace("/zh", "") || "/";
+  }
+  if (path === "/zh") {
+    return "/";
+  }
+  return path;
 };
 
 const normalizedPath = getPathWithoutLocale(currentPath);
 
 const isActive = (path: string) => {
-	if (path === "/") {
-		return normalizedPath === "/";
-	}
-	return normalizedPath.startsWith(path);
+  if (path === "/") {
+    return normalizedPath === "/";
+  }
+  return normalizedPath.startsWith(path);
 };
 ---
 
@@ -235,24 +235,22 @@ const isActive = (path: string) => {
             currentScrollY > lastScrollY && currentScrollY > 50;
 
           if (isScrollingDown) {
-            // Shrink: Simple vertical collapse animation (no blur for performance)
+            // Shrink: Use transform and opacity only (no reflow)
             navLabels.forEach((el) => {
-              (el as HTMLElement).style.transform = "scaleY(0)";
-              (el as HTMLElement).style.height = "0";
-              (el as HTMLElement).style.marginTop = "0";
+              (el as HTMLElement).style.transform = "scale(0)";
               (el as HTMLElement).style.opacity = "0";
+              (el as HTMLElement).style.position = "absolute";
             });
             navPanel.classList.remove("py-3");
-            navPanel.classList.add("py-2.5");
+            navPanel.classList.add("py-2");
           } else {
-            // Expand: Restore labels
+            // Expand: Restore
             navLabels.forEach((el) => {
-              (el as HTMLElement).style.transform = "scaleY(1)";
-              (el as HTMLElement).style.height = "auto";
-              (el as HTMLElement).style.marginTop = "";
+              (el as HTMLElement).style.transform = "scale(1)";
               (el as HTMLElement).style.opacity = "1";
+              (el as HTMLElement).style.position = "";
             });
-            navPanel.classList.remove("py-2.5");
+            navPanel.classList.remove("py-2");
             navPanel.classList.add("py-3");
           }
 

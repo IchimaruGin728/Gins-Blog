@@ -938,6 +938,7 @@ const COLO_LOCATIONS: Record<
       <!-- Content -->
       <div
         class="overflow-y-auto p-0 scrollbar-hide flex-1 bg-black/20 relative"
+        style="overscroll-behavior: contain;"
       >
         <div
           class="p-6 bg-brand-primary/5 border-b border-white/5 text-sm text-gray-400 font-mono"
@@ -1182,6 +1183,7 @@ const COLO_LOCATIONS: Record<
       <!-- Content -->
       <div
         class="overflow-y-auto p-0 scrollbar-hide flex-1 bg-black/20 relative"
+        style="overscroll-behavior: contain;"
       >
         <div
           class="p-6 bg-brand-accent/5 border-b border-white/5 text-sm text-gray-400 font-mono"
@@ -1426,7 +1428,10 @@ const COLO_LOCATIONS: Record<
       </div>
 
       <!-- Content -->
-      <div class="overflow-y-auto p-6 scrollbar-hide flex-1 bg-black/20">
+      <div
+        class="overflow-y-auto p-6 scrollbar-hide flex-1 bg-black/20"
+        style="overscroll-behavior: contain;"
+      >
         <div class="grid grid-cols-4 gap-4 mb-8">
           <div class="glass-panel p-4 rounded-xl">
             <div class="text-xs text-gray-400 mb-1">Active Nodes</div>
@@ -1661,6 +1666,7 @@ const COLO_LOCATIONS: Record<
     const edgeAnalyticsModal = document.getElementById("edge-analytics-modal");
 
     const closeModals = () => {
+      document.body.style.overflow = ""; // Restore scroll
       activeSessionsModal?.classList.add("opacity-0");
       userDatabaseModal?.classList.add("opacity-0");
       edgeAnalyticsModal?.classList.add("opacity-0");
@@ -1707,6 +1713,7 @@ const COLO_LOCATIONS: Record<
     // Open Handlers
     // @ts-ignore
     window.openInspector = (type) => {
+      document.body.style.overflow = "hidden"; // Lock scroll
       if (type === "sessions") {
         activeSessionsModal?.classList.remove("hidden", "pointer-events-none");
         void activeSessionsModal?.offsetWidth;

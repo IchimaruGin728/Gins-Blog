@@ -16,44 +16,44 @@ import SearchModal from "../components/SearchModal.tsx";
 const lang = getLangFromUrl(Astro.url);
 
 interface Props {
-	title: string;
-	description?: string;
-	image?: string;
-	type?: "website" | "article";
-	publishedTime?: string;
-	author?: string;
-	keywords?: string;
+  title: string;
+  description?: string;
+  image?: string;
+  type?: "website" | "article";
+  publishedTime?: string;
+  author?: string;
+  keywords?: string;
 }
 
 const {
-	title,
-	description = "Gin's bleeding edge blog exploring AI, software engineering, and technology.",
-	image,
-	type = "website",
-	publishedTime,
-	author = "IchimaruGin728",
-	keywords = "blog, tech, ai, software engineering, ichimarugin728",
+  title,
+  description = "Gin's bleeding edge blog exploring AI, software engineering, and technology.",
+  image,
+  type = "website",
+  publishedTime,
+  author = "IchimaruGin728",
+  keywords = "blog, tech, ai, software engineering, ichimarugin728",
 } = Astro.props;
 
 // Construct full URL for canonical and social media
 const canonicalURL = new URL(
-	Astro.url.pathname,
-	Astro.site || Astro.url.origin,
+  Astro.url.pathname,
+  Astro.site || Astro.url.origin,
 );
 
 // Determine OG image
 const ogImage =
-	image ||
-	(Astro.url.pathname.startsWith("/blog/")
-		? `/og${Astro.url.pathname.replace("/blog", "")}.png`
-		: "/og-default.png");
+  image ||
+  (Astro.url.pathname.startsWith("/blog/")
+    ? `/og${Astro.url.pathname.replace("/blog", "")}.png`
+    : "/og-default.png");
 const fullOgImage = new URL(ogImage, Astro.site || Astro.url.origin).href;
 
 // Format title with site name
 const fullTitle =
-	title === "Home"
-		? "Gin's Blog - AI, Tech & Engineering"
-		: `${title} | Gin's Blog`;
+  title === "Home"
+    ? "Gin's Blog - AI, Tech & Engineering"
+    : `${title} | Gin's Blog`;
 ---
 
 <!doctype html>
@@ -145,14 +145,15 @@ const fullTitle =
     <!-- Background Elements -->
     <div
       class="fixed inset-0 z-0 pointer-events-none overflow-hidden"
+      style="transform: translateZ(0); backface-visibility: hidden; will-change: transform;"
       transition:persist
     >
       <div
-        class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-brand-primary/10 rounded-full blur-[120px]"
+        class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-brand-primary/10 rounded-full blur-[80px]"
       >
       </div>
       <div
-        class="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-brand-accent/5 rounded-full blur-[120px]"
+        class="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-brand-accent/5 rounded-full blur-[80px]"
       >
       </div>
     </div>
