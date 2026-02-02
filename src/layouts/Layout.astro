@@ -144,26 +144,18 @@ const fullTitle =
   </head>
   <body class="bg-[#050505] text-white min-h-screen font-sans flex flex-col">
     <!-- Background Elements -->
-    {
-      import.meta.env.DEV && (
-        <div style="position:fixed; top:0; left:0; z-index:9999; background:red; color:white; padding:10px; font-size:12px; max-width: 100%; overflow:auto;">
-          <>
-            <strong>DEBUG INFO:</strong>
-            <br />
-          </>
-          Runtime: {!!Astro.locals.runtime}
-          <br />
-          Env: {!!Astro.locals.runtime?.env}
-          <br />
-          DB Binding: {!!Astro.locals.runtime?.env?.DB}
-          <br />
-          KV Binding: {!!Astro.locals.runtime?.env?.GIN_KV}
-          <br />
-          Platform:{" "}
-          {JSON.stringify(Astro.locals.runtime?.ctx ? "Found CTX" : "No CTX")}
-        </div>
-      )
-    }
+    <div
+      style="position:fixed; top:0; left:0; z-index:99999; background:red; color:white; padding:10px; font-size:12px; max-width: 100%; overflow:auto; border: 2px solid white;"
+    >
+      <strong>⚠️ SYSTEM DIAGNOSTIC:</strong><br />
+      Runtime: {!!Astro.locals.runtime}<br />
+      Env: {!!Astro.locals.runtime?.env}<br />
+      DB Binding: {!!Astro.locals.runtime?.env?.DB}<br />
+      KV Binding: {!!Astro.locals.runtime?.env?.GIN_KV}<br />
+      Platform: {
+        JSON.stringify(Astro.locals.runtime?.ctx ? "Found CTX" : "No CTX")
+      }
+    </div>
     <div
       class="fixed inset-0 z-0 pointer-events-none overflow-hidden"
       transition:persist
@@ -193,7 +185,7 @@ const fullTitle =
     <MobileNav />
     <Footer />
 
-    <SearchModal client:only="preact" />
+    <!-- <SearchModal client:only="preact" /> -->
 
     <!-- Device Info Collector (Runs once per session) -->
     <script>
