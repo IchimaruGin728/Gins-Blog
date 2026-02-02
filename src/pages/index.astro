@@ -29,24 +29,29 @@ const CACHE_KEY = "home_recent_posts_en";
 const CACHE_TTL = 300; // 5 minutes
 
 try {
-	const fetchPosts = async () => {
-		const db = getDb(env);
-		return await db
-			.select()
-			.from(posts)
-			.where(lte(posts.publishedAt, Date.now()))
-			.orderBy(desc(posts.publishedAt))
-			.limit(3);
-	};
+	// Initialize defaults
+	recentPosts = [];
 
-	if (cache) {
-		recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
-	} else {
-		recentPosts = await fetchPosts();
+	if (env.DB) {
+		const fetchPosts = async () => {
+			const db = getDb(env);
+			return await db
+				.select()
+				.from(posts)
+				.where(lte(posts.publishedAt, Date.now()))
+				.orderBy(desc(posts.publishedAt))
+				.limit(3);
+		};
+
+		if (cache) {
+			recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
+		} else {
+			recentPosts = await fetchPosts();
+		}
 	}
 } catch (e) {
 	console.error("Failed to fetch posts:", e);
-	// Fallback to empty array or handle error gracefully
+	// Fallback to empty array is already set
 }
 ---
 

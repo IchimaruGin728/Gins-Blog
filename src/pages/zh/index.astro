@@ -28,24 +28,26 @@ const CACHE_KEY = "home_recent_posts_zh";
 const CACHE_TTL = 300;
 
 try {
-  const fetchPosts = async () => {
-    const db = getDb(env);
-    return await db
-      .select()
-      .from(posts)
-      .where(lte(posts.publishedAt, Date.now()))
-      .orderBy(desc(posts.publishedAt))
-      .limit(3);
-  };
+  recentPosts = [];
+  if (env.DB) {
+    const fetchPosts = async () => {
+      const db = getDb(env);
+      return await db
+        .select()
+        .from(posts)
+        .where(lte(posts.publishedAt, Date.now()))
+        .orderBy(desc(posts.publishedAt))
+        .limit(3);
+    };
 
-  if (cache) {
-    recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
-  } else {
-    recentPosts = await fetchPosts();
+    if (cache) {
+      recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
+    } else {
+      recentPosts = await fetchPosts();
+    }
   }
 } catch (e) {
   console.error("Failed to fetch posts:", e);
-  // Fallback if needed
 }
 ---
 
