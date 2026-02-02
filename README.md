@@ -151,7 +151,7 @@
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | [Cloudflare Workers](https://workers.cloudflare.com) | - | Serverless edge compute platform |
-| [Cloudflare Pages](https://pages.cloudflare.com) | - | Static site hosting with edge functions |
+| [GitHub Actions](https://github.com/features/actions) | - | Automated CI/CD deployment pipeline |
 | [Hono](https://hono.dev) | Latest | Ultrafast web framework for robust API Routes (`/api/*`) |
 | [Drizzle ORM](https://orm.drizzle.team) | Latest | Type-safe SQL ORM for Cloudflare D1 |
 
@@ -381,21 +381,25 @@ Visit `http://localhost:4321` 🎉
 
 ## 📦 Deployment
 
-### **Deploy to Cloudflare Pages**
+### **Deploy to Cloudflare Workers via GitHub Actions**
 
-1. **Set up production environment variables:**
+1. **Set up GitHub Secrets:**
 
-Go to your [Cloudflare Pages Dashboard](https://dash.cloudflare.com) → Select your project → Settings → Environment Variables
+Go to your GitHub Repository → Settings → Secrets and variables → Actions. Add the following secrets:
+- `CLOUDFLARE_API_TOKEN`: Your Cloudflare API Token (with Workers deployment permissions)
+- `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare Account ID
 
-Add all variables from `.dev.vars` (with production values for redirect URIs).
+2. **Configure Environment Variables:**
 
-2. **Deploy:**
+Environment variables should be configured via `wrangler.jsonc` for production or set in the Cloudflare Dashboard for the Worker.
+
+3. **Automatic Deployment:**
+
+Pushing to the `main` branch will automatically trigger the GitHub Action defined in `.github/workflows/deploy.yml` to build and deploy your blog.
 
 ```bash
-npm run deploy
+git push origin main
 ```
-
-Or connect your GitHub repository to Cloudflare Pages for automatic deployments on push.
 
 ---
 
