@@ -4,7 +4,6 @@ import { and, desc, eq, gt, lt, lte, sql } from "drizzle-orm";
 import { posts } from "../../../../db/schema";
 import { getLangFromUrl, useTranslations } from "../../../i18n/utils";
 import { getDb } from "../../../lib/db";
-import Markdown from "../../../components/Markdown.astro";
 import MarkdownImage from "../../../components/MarkdownImage.astro";
 import ShareButtons from "../../../components/ShareButtons.astro";
 import Comments from "../../../components/Comments.tsx";
@@ -180,12 +179,7 @@ Astro.response.headers.set(
     <div
       class="glass-panel rounded-3xl p-8 md:p-12 prose prose-invert prose-lg max-w-none text-gray-300"
     >
-      <Markdown
-        content={result.content}
-        components={{
-          img: MarkdownImage,
-        }}
-      />
+      <div set:html={result.content} />
     </div>
 
     <!-- Share Buttons -->
