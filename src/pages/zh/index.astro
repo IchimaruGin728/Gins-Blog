@@ -4,44 +4,48 @@ import { posts } from "../../../db/schema";
 import { getLangFromUrl, useTranslations } from "../../i18n/utils";
 import { getDb } from "../../lib/db";
 
-const lang = getLangFromUrl(Astro.url);
-const _t = useTranslations(lang);
+import Layout from "../../layouts/Layout.astro";
 
-const { env } = Astro.locals.runtime;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Access Cloudflare bindings from locals
+const runtime = Astro.locals.runtime;
+const env = runtime?.env || ({} as any);
 
 // Initialize Cache
 import { getCache } from "../../lib/cache";
 
 let cache;
 try {
-	cache = getCache(env);
+  cache = getCache(env);
 } catch (e) {
-	console.error("Cache initialization failed:", e);
+  console.error("Cache initialization failed:", e);
 }
 
-let _recentPosts: (typeof posts.$inferSelect)[] = [];
+let recentPosts: (typeof posts.$inferSelect)[] = [];
 const CACHE_KEY = "home_recent_posts_zh";
 const CACHE_TTL = 300;
 
 try {
-	const fetchPosts = async () => {
-		const db = getDb(env);
-		return await db
-			.select()
-			.from(posts)
-			.where(lte(posts.publishedAt, Date.now()))
-			.orderBy(desc(posts.publishedAt))
-			.limit(3);
-	};
+  const fetchPosts = async () => {
+    const db = getDb(env);
+    return await db
+      .select()
+      .from(posts)
+      .where(lte(posts.publishedAt, Date.now()))
+      .orderBy(desc(posts.publishedAt))
+      .limit(3);
+  };
 
-	if (cache) {
-		_recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
-	} else {
-		_recentPosts = await fetchPosts();
-	}
-} catch (e: any) {
-	console.error("Failed to fetch posts:", e);
-	// Fallback if needed
+  if (cache) {
+    recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
+  } else {
+    recentPosts = await fetchPosts();
+  }
+} catch (e) {
+  console.error("Failed to fetch posts:", e);
+  // Fallback if needed
 }
 ---
 

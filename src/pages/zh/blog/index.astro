@@ -4,28 +4,32 @@ import { posts } from "../../../../db/schema";
 import { getLangFromUrl, useTranslations } from "../../../i18n/utils";
 import { getDb } from "../../../lib/db";
 
+import Layout from "../../../layouts/Layout.astro";
+
 const lang = getLangFromUrl(Astro.url);
 // biome-ignore lint/correctness/noUnusedVariables: Used in template
 const t = useTranslations(lang);
 
 // Access Cloudflare bindings from locals
-const { env } = Astro.locals.runtime;
+const runtime = Astro.locals.runtime;
+const env = runtime?.env || ({} as any);
 
-let _allPosts: (typeof posts.$inferSelect)[] = [];
-const _error = null;
+let allPosts: (typeof posts.$inferSelect)[] = [];
+let error = null;
 
 try {
-	const db = getDb(env);
-	_allPosts = await db
-		.select()
-		.from(posts)
-		.where(lte(posts.publishedAt, Date.now()))
-		.orderBy(desc(posts.publishedAt))
-		.all();
-} catch (error) {
-	console.error("Failed to fetch posts:", error);
-	// Fallback empty
-	_allPosts = [];
+  const db = getDb(env);
+  allPosts = await db
+    .select()
+    .from(posts)
+    .where(lte(posts.publishedAt, Date.now()))
+    .orderBy(desc(posts.publishedAt))
+    .all();
+} catch (e: any) {
+  console.error("Failed to fetch posts:", e);
+  // Fallback empty
+  allPosts = [];
+  error = e.message;
 }
 ---
 
