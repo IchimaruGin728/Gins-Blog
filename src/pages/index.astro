@@ -4,11 +4,14 @@ import { posts } from "../../db/schema";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 import { getDb } from "../lib/db";
 
+import Layout from "../layouts/Layout.astro";
+
 const lang = getLangFromUrl(Astro.url);
-const _t = useTranslations(lang);
+const t = useTranslations(lang);
 
 // Access Cloudflare bindings from locals
-const { env } = Astro.locals.runtime;
+const runtime = Astro.locals.runtime;
+const env = runtime?.env || ({} as any);
 
 // Initialize Cache
 import { getCache } from "../lib/cache";
@@ -21,7 +24,7 @@ try {
 }
 
 // Fetch recent posts with caching
-let _recentPosts: (typeof posts.$inferSelect)[] = [];
+let recentPosts: (typeof posts.$inferSelect)[] = [];
 const CACHE_KEY = "home_recent_posts_en";
 const CACHE_TTL = 300; // 5 minutes
 
@@ -37,9 +40,9 @@ try {
 	};
 
 	if (cache) {
-		_recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
+		recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
 	} else {
-		_recentPosts = await fetchPosts();
+		recentPosts = await fetchPosts();
 	}
 } catch (e) {
 	console.error("Failed to fetch posts:", e);
@@ -106,8 +109,8 @@ try {
 
 			<div class="flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
 				{
-					_recentPosts.length > 0 ? (
-						_recentPosts.map((post) => (
+					recentPosts.length > 0 ? (
+						recentPosts.map((post) => (
 							<a
 								href={`/blog/${post.slug}`}
 								data-astro-prefetch
