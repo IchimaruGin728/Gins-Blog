@@ -10,7 +10,7 @@ import "@fontsource-variable/outfit";
 import Header from "../components/Header.astro";
 import MobileNav from "../components/MobileNav.astro";
 import Footer from "../components/Footer.astro";
-import SearchModal from "../components/SearchModal";
+import SearchModal from "../components/SearchModal.tsx";
 
 // biome-ignore lint/correctness/noUnusedVariables: Used in template
 const lang = getLangFromUrl(Astro.url);
@@ -36,7 +36,7 @@ const {
 } = Astro.props;
 
 // Construct full URL for canonical and social media
-const _canonicalURL = new URL(
+const canonicalURL = new URL(
   Astro.url.pathname,
   Astro.site || Astro.url.origin,
 );
@@ -47,10 +47,10 @@ const ogImage =
   (Astro.url.pathname.startsWith("/blog/")
     ? `/og${Astro.url.pathname.replace("/blog", "")}.png`
     : "/og-default.png");
-const _fullOgImage = new URL(ogImage, Astro.site || Astro.url.origin).href;
+const fullOgImage = new URL(ogImage, Astro.site || Astro.url.origin).href;
 
 // Format title with site name
-const _fullTitle =
+const fullTitle =
   title === "Home"
     ? "Gin's Blog - AI, Tech & Engineering"
     : `${title} | Gin's Blog`;
@@ -173,7 +173,7 @@ const _fullTitle =
     <MobileNav />
     <Footer />
 
-    <SearchModal client:load />
+    <SearchModal client:only="preact" />
 
     <!-- Device Info Collector (Runs once per session) -->
     <script>
