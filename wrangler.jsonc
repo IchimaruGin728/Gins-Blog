@@ -71,7 +71,7 @@
 				"queue": "gins-queue"
 			}
 		]
-	},
+	}
 	// "vectorize": [
 	// 	{
 	// 		"binding": "VECTOR_INDEX",
