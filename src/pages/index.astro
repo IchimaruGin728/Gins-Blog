@@ -1,11 +1,12 @@
 ---
+import Layout from "../layouts/Layout.astro";
 import { desc, lte } from "drizzle-orm";
 import { posts } from "../../db/schema";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 import { getDb } from "../lib/db";
 
 const lang = getLangFromUrl(Astro.url);
-const _t = useTranslations(lang);
+const t = useTranslations(lang);
 
 // Access Cloudflare bindings from locals
 const runtime = Astro.locals.runtime;
