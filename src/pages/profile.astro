@@ -1,4 +1,5 @@
 ---
+import Layout from "../layouts/Layout.astro";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
@@ -20,14 +21,14 @@ import { getDb } from "../lib/db";
 
 const db = getDb(env);
 const userProfile = await db
-	.select()
-	.from(users)
-	.where(eq(users.id, user.id))
-	.get();
+  .select()
+  .from(users)
+  .where(eq(users.id, user.id))
+  .get();
 
-const _socialLinks = userProfile?.socialLinks
-	? JSON.parse(userProfile.socialLinks as string)
-	: {};
+const socialLinks = userProfile?.socialLinks
+  ? JSON.parse(userProfile.socialLinks as string)
+  : {};
 ---
 
 <Layout title={t("profile.title")}>
