@@ -20,14 +20,14 @@ import { getDb } from "../lib/db";
 
 const db = getDb(env);
 const userProfile = await db
-  .select()
-  .from(users)
-  .where(eq(users.id, user.id))
-  .get();
+	.select()
+	.from(users)
+	.where(eq(users.id, user.id))
+	.get();
 
 const _socialLinks = userProfile?.socialLinks
-  ? JSON.parse(userProfile.socialLinks as string)
-  : {};
+	? JSON.parse(userProfile.socialLinks as string)
+	: {};
 ---
 
 <Layout title={t("profile.title")}>

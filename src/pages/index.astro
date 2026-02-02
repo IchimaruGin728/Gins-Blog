@@ -2,9 +2,8 @@
 import { desc, lte } from "drizzle-orm";
 import { posts } from "../../db/schema";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
-import { getDb } from "../lib/db";
-
 import Layout from "../layouts/Layout.astro";
+import { getDb } from "../lib/db";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);

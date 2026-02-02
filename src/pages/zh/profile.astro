@@ -19,19 +19,19 @@ let _socialLinks: any = {};
 let _errorMsg = null;
 
 try {
-  const db = getDb(env);
-  userProfile = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, user.id))
-    .get();
+	const db = getDb(env);
+	userProfile = await db
+		.select()
+		.from(users)
+		.where(eq(users.id, user.id))
+		.get();
 
-  _socialLinks = userProfile?.socialLinks
-    ? JSON.parse(userProfile.socialLinks as string)
-    : {};
+	_socialLinks = userProfile?.socialLinks
+		? JSON.parse(userProfile.socialLinks as string)
+		: {};
 } catch (e: any) {
-  console.error("Profile Error:", e);
-  _errorMsg = e.message;
+	console.error("Profile Error:", e);
+	_errorMsg = e.message;
 }
 ---
 

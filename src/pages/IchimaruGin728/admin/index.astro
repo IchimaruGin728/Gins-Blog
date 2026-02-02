@@ -28,39 +28,40 @@ let performanceSummary: any = null;
 
 // Unified Data Loading
 try {
-  const db = env.DB;
-  if (db) {
-    // Analytics Data
-    postCount = await safeFetch(
-      db.prepare("SELECT count(*) as count FROM posts").first<number>("count"),
-      0
-    );
-    
-    userCount = await safeFetch(
-      db.prepare("SELECT count(*) as count FROM users").first<number>("count"),
-      0
-    );
+	const db = env.DB;
+	if (db) {
+		// Analytics Data
+		postCount = await safeFetch(
+			db.prepare("SELECT count(*) as count FROM posts").first<number>("count"),
+			0,
+		);
 
-    activeSessionCount = await safeFetch(
-      db
-        .prepare("SELECT count(*) as count FROM sessions WHERE expires_at > ?")
-        .bind(Date.now())
-        .first<number>("count"),
-      0
-    );
+		userCount = await safeFetch(
+			db.prepare("SELECT count(*) as count FROM users").first<number>("count"),
+			0,
+		);
 
-    // Recent Posts
-    recentPosts = await safeFetch(
-      db
-        .prepare("SELECT * FROM posts ORDER BY published_at DESC LIMIT 10")
-        .all(),
-      // @ts-expect-error
-      { results: [], success: false, meta: {} }
-    );
+		activeSessionCount = await safeFetch(
+			db
+				.prepare("SELECT count(*) as count FROM sessions WHERE expires_at > ?")
+				.bind(Date.now())
+				.first<number>("count"),
+			0,
+		);
 
-    // Detailed Lists
-    activeSessionsList = await safeFetch(
-      db.prepare(`
+		// Recent Posts
+		recentPosts = await safeFetch(
+			db
+				.prepare("SELECT * FROM posts ORDER BY published_at DESC LIMIT 10")
+				.all(),
+			// @ts-expect-error
+			{ results: [], success: false, meta: {} },
+		);
+
+		// Detailed Lists
+		activeSessionsList = await safeFetch(
+			db
+				.prepare(`
         SELECT 
           sessions.id as session_id,
           sessions.ip_address, 
@@ -99,13 +100,16 @@ try {
         LEFT JOIN users ON sessions.user_id = users.id 
         WHERE sessions.expires_at > ? 
         ORDER BY sessions.last_active DESC
-      `).bind(Date.now()).all(),
-      // @ts-expect-error
-      { results: [] }
-    );
+      `)
+				.bind(Date.now())
+				.all(),
+			// @ts-expect-error
+			{ results: [] },
+		);
 
-    usersList = await safeFetch(
-      db.prepare(`
+		usersList = await safeFetch(
+			db
+				.prepare(`
         WITH RankedSessions AS (
           SELECT 
             *,
@@ -126,14 +130,16 @@ try {
         LEFT JOIN RankedSessions rs ON users.id = rs.user_id AND rs.rn = 1
         ORDER BY users.rowid DESC 
         LIMIT 100
-      `).all(),
-      // @ts-expect-error
-      { results: [] }
-    );
+      `)
+				.all(),
+			// @ts-expect-error
+			{ results: [] },
+		);
 
-    // Edge Analytics
-    edgeNodeStats = await safeFetch(
-      db.prepare(`
+		// Edge Analytics
+		edgeNodeStats = await safeFetch(
+			db
+				.prepare(`
         SELECT 
           colo,
           COUNT(*) as session_count,
@@ -144,13 +150,16 @@ try {
         WHERE expires_at > ? AND colo IS NOT NULL
         GROUP BY colo
         ORDER BY session_count DESC
-      `).bind(Date.now()).all(),
-      // @ts-expect-error
-      { results: [] }
-    );
+      `)
+				.bind(Date.now())
+				.all(),
+			// @ts-expect-error
+			{ results: [] },
+		);
 
-    performanceSummary = await safeFetch(
-      db.prepare(`
+		performanceSummary = await safeFetch(
+			db
+				.prepare(`
         SELECT 
           AVG(client_tcp_rtt) as global_avg_rtt,
           MIN(client_tcp_rtt) as min_rtt,
@@ -158,13 +167,15 @@ try {
           COUNT(DISTINCT colo) as active_nodes
         FROM sessions
         WHERE expires_at > ? AND client_tcp_rtt IS NOT NULL
-      `).bind(Date.now()).first(),
-      null
-    );
-  }
+      `)
+				.bind(Date.now())
+				.first(),
+			null,
+		);
+	}
 } catch (e) {
-  console.error("CRITICAL: Admin Dashboard Data Load Failed", e);
-  // Defaults are already set
+	console.error("CRITICAL: Admin Dashboard Data Load Failed", e);
+	// Defaults are already set
 }
 
 // Prevent Caching

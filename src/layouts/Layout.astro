@@ -1,5 +1,4 @@
 ---
-// STAGE 3 DEBUG: Footer/MobileNav Restored, Header commented
 import { ClientRouter } from "astro:transitions";
 import { getLangFromUrl, getRouteFromUrl } from "../i18n/utils";
 import "../styles/global.css";
@@ -9,44 +8,55 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/jetbrains-mono";
 import "@fontsource-variable/outfit";
 
+import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import MobileNav from "../components/MobileNav.astro";
-import Footer from "../components/Footer.astro";
 import SearchModal from "../components/SearchModal.tsx";
 
-// Logic Check
+// biome-ignore lint/correctness/noUnusedVariables: Used in template
 const lang = getLangFromUrl(Astro.url);
 
+// biome-ignore lint/correctness/noUnusedVariables: Used in props definition
 interface Props {
-  title: string;
-  description?: string;
-  image?: string;
-  type?: "website" | "article";
-  publishedTime?: string;
-  author?: string;
-  keywords?: string;
+	title: string;
+	description?: string;
+	image?: string;
+	type?: "website" | "article";
+	publishedTime?: string;
+	author?: string;
+	keywords?: string;
 }
 
+// biome-ignore lint/correctness/noUnusedVariables: All props used in template
 const {
-  title,
-  description = "Gin's bleeding edge blog exploring AI, software engineering, and technology.",
-  image,
-  type = "website",
-  publishedTime,
-  author = "IchimaruGin728",
-  keywords = "blog, tech, ai, software engineering, ichimarugin728",
+	title,
+	description = "Gin's bleeding edge blog exploring AI, software engineering, and technology.",
+	image,
+	type = "website",
+	publishedTime,
+	author = "IchimaruGin728",
+	keywords = "blog, tech, ai, software engineering, ichimarugin728",
 } = Astro.props;
 
-// Construct full URL
+// Construct full URL for canonical and social media
 const canonicalURL = new URL(
-  Astro.url.pathname,
-  Astro.site || Astro.url.origin,
+	Astro.url.pathname,
+	Astro.site || Astro.url.origin,
 );
 
-const ogImage = image || "/og-default.png";
+// Determine OG image
+const ogImage =
+	image ||
+	(Astro.url.pathname.startsWith("/blog/")
+		? `/og${Astro.url.pathname.replace("/blog", "")}.png`
+		: "/og-default.png");
 const fullOgImage = new URL(ogImage, Astro.site || Astro.url.origin).href;
 
-const fullTitle = title === "Home" ? "Gin's Blog" : `${title} | Gin's Blog`;
+// Format title with site name
+const fullTitle =
+	title === "Home"
+		? "Gin's Blog - AI, Tech & Engineering"
+		: `${title} | Gin's Blog`;
 ---
 
 <!doctype html>
@@ -54,17 +64,178 @@ const fullTitle = title === "Home" ? "Gin's Blog" : `${title} | Gin's Blog`;
   <head>
     <ClientRouter />
     <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <!-- Favicons & PWA -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#8b5cf6" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="GinBlog" />
+    <link rel="apple-touch-icon" href="/pwa-192x192.png" />
+
+    <!-- SEO Meta Tags -->
+    <link rel="canonical" href={canonicalURL} />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="author" content={author} />
+    <meta name="keywords" content={keywords} />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={fullOgImage} />
+    <meta property="og:site_name" content="Gin's Blog" />
+    <meta property="og:locale" content={lang.replace("-", "_")} />
+    {
+      publishedTime && (
+        <meta property="article:published_time" content={publishedTime} />
+      )
+    }
+    {author && <meta property="article:author" content={author} />}
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={fullOgImage} />
+    <meta name="twitter:creator" content="@IchimaruGin728" />
+
+    <!-- Hreflang Tags for SEO -->
+    <link
+      rel="alternate"
+      hreflang="en-SG"
+      href={new URL(
+        getRouteFromUrl(Astro.url, "en-SG"),
+        Astro.site || Astro.url.origin,
+      ).href}
+    />
+    <link
+      rel="alternate"
+      hreflang="zh"
+      href={new URL(
+        getRouteFromUrl(Astro.url, "zh-SG"),
+        Astro.site || Astro.url.origin,
+      ).href}
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={new URL(
+        getRouteFromUrl(Astro.url, "en-SG"),
+        Astro.site || Astro.url.origin,
+      ).href}
+    />
+
     <title>{fullTitle}</title>
   </head>
-  <body>
+  <body class="bg-[#050505] text-white min-h-screen font-sans flex flex-col">
+    <!-- Background Elements -->
+    <div
+      class="fixed inset-0 z-0 pointer-events-none overflow-hidden"
+      transition:persist
+    >
+      <div
+        class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-brand-primary/10 rounded-full blur-[120px]"
+      >
+      </div>
+      <div
+        class="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-brand-accent/5 rounded-full blur-[120px]"
+      >
+      </div>
+    </div>
+
     <Header />
-    <slot />
-    <Footer />
-    <MobileNav />
-    <SearchModal client:only="preact" />
+
+    <main
+      class="relative z-10 pt-32 px-6 max-w-7xl mx-auto w-full flex-grow pb-24 md:pb-0 main-content"
+    >
+      <slot />
+    </main>
+
     <div class="hidden">
       <!-- Hidden hydration trigger for Islands if needed -->
     </div>
+
+    <MobileNav />
+    <Footer />
+
+    <SearchModal client:only="preact" />
+
     <!-- Device Info Collector (Runs once per session) -->
+    <script>
+      // Only run if user is logged in (we check for a session indicator or just try the API)
+      // To save requests, we check sessionStorage first
+      const collectDeviceInfo = async () => {
+        if (sessionStorage.getItem("gins_device_info_sent")) return;
+
+        try {
+          // Collect Data
+          const screenResolution = `${window.screen.width}x${window.screen.height}`;
+          const deviceMemory = (navigator as any).deviceMemory
+            ? (navigator as any).deviceMemory.toString()
+            : undefined;
+          // @ts-ignore
+          const cpuCores = navigator.hardwareConcurrency
+            ? navigator.hardwareConcurrency.toString()
+            : undefined;
+          // @ts-ignore
+          const connection = navigator.connection;
+          const connectionType = connection
+            ? connection.type === "cellular"
+              ? connection.effectiveType
+              : connection.type || connection.effectiveType
+            : undefined;
+
+          const data = {
+            screenResolution,
+            deviceMemory,
+            cpuCores,
+            connectionType,
+          };
+
+          // Send to API
+          const res = await fetch("/api/session/device-info", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          if (res.ok) {
+            sessionStorage.setItem("gins_device_info_sent", "true");
+            console.log("Device info synced");
+          }
+        } catch (e) {
+          // Silent fail
+        }
+      };
+
+      // Delay slightly to not block hydration
+      setTimeout(() => {
+        // Run on page load if we suspect user might be logged in.
+        // Best effort: we just fire it. The API checks auth and returns 401 if not logged in.
+        collectDeviceInfo();
+      }, 2000);
+
+      // Re-run on view transitions (sessionStorage check prevents dupes)
+      document.addEventListener("astro:page-load", () =>
+        setTimeout(collectDeviceInfo, 2000),
+      );
+    </script>
   </body>
 </html>
