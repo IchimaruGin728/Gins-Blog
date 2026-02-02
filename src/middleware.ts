@@ -4,6 +4,7 @@ import { validateSessionToken } from "./lib/session";
 import { getZeroTrustUser } from "./lib/zerotrust";
 
 export const onRequest = defineMiddleware(async (context, next) => {
+	console.log("[Middleware] Request:", context.url.pathname);
 	const token = context.cookies.get("session")?.value ?? null;
 
 	// Initialize locals
@@ -38,7 +39,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		// Safely check if KV is available (might be missing in some dev environments)
 		if (env.GIN_KV) {
 			try {
+				console.log("[Middleware] Checking KV cache...");
 				const cachedHtml = await env.GIN_KV.get(cacheKey);
+				console.log("[Middleware] KV Result:", !!cachedHtml);
 
 				if (cachedHtml) {
 					return new Response(cachedHtml, {
