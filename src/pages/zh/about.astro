@@ -1,7 +1,10 @@
 ---
+import Layout from "../../layouts/Layout.astro";
+import SocialLinks from "../../components/SocialLinks.tsx";
 import { getLangFromUrl, useTranslations } from "../../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
+// biome-ignore lint/correctness/noUnusedVariables: Used in template
 const t = useTranslations(lang);
 ---
 
