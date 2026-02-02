@@ -13,7 +13,7 @@ const encodedTitle = encodeURIComponent(title);
 const encodedText = encodeURIComponent(`${title} - ${description}`.trim());
 
 // Share URLs
-const shareUrls = {
+const _shareUrls = {
 	x: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
 	facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
 	telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`,

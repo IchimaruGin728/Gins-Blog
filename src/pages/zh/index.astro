@@ -2,11 +2,10 @@
 import { desc, lte } from "drizzle-orm";
 import { posts } from "../../../db/schema";
 import { getLangFromUrl, useTranslations } from "../../i18n/utils";
-import Layout from "../../layouts/Layout.astro";
 import { getDb } from "../../lib/db";
 
 const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
+const _t = useTranslations(lang);
 
 // Access Cloudflare bindings from locals
 const runtime = Astro.locals.runtime;
@@ -22,12 +21,12 @@ try {
 	console.error("Cache initialization failed:", e);
 }
 
-let recentPosts: (typeof posts.$inferSelect)[] = [];
+let _recentPosts: (typeof posts.$inferSelect)[] = [];
 const CACHE_KEY = "home_recent_posts_zh";
 const CACHE_TTL = 300;
 
 try {
-	recentPosts = [];
+	_recentPosts = [];
 	if (env.DB) {
 		const fetchPosts = async () => {
 			const db = getDb(env);
@@ -40,9 +39,9 @@ try {
 		};
 
 		if (cache) {
-			recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
+			_recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
 		} else {
-			recentPosts = await fetchPosts();
+			_recentPosts = await fetchPosts();
 		}
 	}
 } catch (e) {

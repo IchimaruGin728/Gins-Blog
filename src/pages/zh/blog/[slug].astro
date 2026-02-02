@@ -1,11 +1,7 @@
 ---
 import { and, desc, eq, gt, lt, lte, sql } from "drizzle-orm";
 import { posts } from "../../../../db/schema";
-import Comments from "../../../components/Comments.tsx";
-import MarkdownImage from "../../../components/MarkdownImage.astro";
-import ShareButtons from "../../../components/ShareButtons.astro";
 import { getLangFromUrl, useTranslations } from "../../../i18n/utils";
-import Layout from "../../../layouts/Layout.astro";
 import { getDb } from "../../../lib/db";
 
 const lang = getLangFromUrl(Astro.url);
@@ -77,7 +73,7 @@ try {
 }
 const currentPublishedAt = result.publishedAt || 0;
 
-const prevPost = await db
+const _prevPost = await db
 	.select({ title: posts.title, slug: posts.slug })
 	.from(posts)
 	.where(
@@ -90,7 +86,7 @@ const prevPost = await db
 	.limit(1)
 	.get();
 
-const nextPost = await db
+const _nextPost = await db
 	.select({ title: posts.title, slug: posts.slug })
 	.from(posts)
 	.where(
@@ -113,7 +109,7 @@ const publishedTime = new Date(
 ).toISOString();
 
 // JSON-LD Structured Data
-const structuredData = {
+const _structuredData = {
 	"@context": "https://schema.org",
 	"@type": "BlogPosting",
 	headline: result.title,

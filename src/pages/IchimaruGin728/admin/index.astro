@@ -3,8 +3,6 @@
 const runtime = Astro.locals.runtime;
 const env = runtime?.env || ({} as any);
 
-import Layout from "../../../layouts/Layout.astro";
-
 // Helper for safe DB queries
 async function safeFetch<T>(promise: Promise<T>, fallback: T): Promise<T> {
 	try {
@@ -17,31 +15,31 @@ async function safeFetch<T>(promise: Promise<T>, fallback: T): Promise<T> {
 
 // Analytics Data
 // Initialize defaults
-let postCount = 0;
-let userCount = 0;
-let activeSessionCount = 0;
-let recentPosts = { results: [], success: false, meta: {} };
-let activeSessionsList = { results: [] };
-let usersList = { results: [] };
-let edgeNodeStats = { results: [] };
-let performanceSummary: any = null;
+let _postCount = 0;
+let _userCount = 0;
+let _activeSessionCount = 0;
+let _recentPosts = { results: [], success: false, meta: {} };
+let _activeSessionsList = { results: [] };
+let _usersList = { results: [] };
+let _edgeNodeStats = { results: [] };
+let _performanceSummary: any = null;
 
 // Unified Data Loading
 try {
 	const db = env.DB;
 	if (db) {
 		// Analytics Data
-		postCount = await safeFetch(
+		_postCount = await safeFetch(
 			db.prepare("SELECT count(*) as count FROM posts").first<number>("count"),
 			0,
 		);
 
-		userCount = await safeFetch(
+		_userCount = await safeFetch(
 			db.prepare("SELECT count(*) as count FROM users").first<number>("count"),
 			0,
 		);
 
-		activeSessionCount = await safeFetch(
+		_activeSessionCount = await safeFetch(
 			db
 				.prepare("SELECT count(*) as count FROM sessions WHERE expires_at > ?")
 				.bind(Date.now())
@@ -50,7 +48,7 @@ try {
 		);
 
 		// Recent Posts
-		recentPosts = await safeFetch(
+		_recentPosts = await safeFetch(
 			db
 				.prepare("SELECT * FROM posts ORDER BY published_at DESC LIMIT 10")
 				.all(),
@@ -59,7 +57,7 @@ try {
 		);
 
 		// Detailed Lists
-		activeSessionsList = await safeFetch(
+		_activeSessionsList = await safeFetch(
 			db
 				.prepare(`
         SELECT 
@@ -107,7 +105,7 @@ try {
 			{ results: [] },
 		);
 
-		usersList = await safeFetch(
+		_usersList = await safeFetch(
 			db
 				.prepare(`
         WITH RankedSessions AS (
@@ -137,7 +135,7 @@ try {
 		);
 
 		// Edge Analytics
-		edgeNodeStats = await safeFetch(
+		_edgeNodeStats = await safeFetch(
 			db
 				.prepare(`
         SELECT 
@@ -157,7 +155,7 @@ try {
 			{ results: [] },
 		);
 
-		performanceSummary = await safeFetch(
+		_performanceSummary = await safeFetch(
 			db
 				.prepare(`
         SELECT 
@@ -187,7 +185,7 @@ Astro.response.headers.set("Pragma", "no-cache");
 Astro.response.headers.set("Expires", "0");
 
 // Edge Node Location Mapping (100+ Major Cloudflare Nodes)
-const COLO_LOCATIONS: Record<
+const _COLO_LOCATIONS: Record<
 	string,
 	{ city: string; country: string; region: string; flag: string }
 > = {

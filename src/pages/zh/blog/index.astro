@@ -2,7 +2,6 @@
 import { desc, lte } from "drizzle-orm";
 import { posts } from "../../../../db/schema";
 import { getLangFromUrl, useTranslations } from "../../../i18n/utils";
-import Layout from "../../../layouts/Layout.astro";
 import { getDb } from "../../../lib/db";
 
 const lang = getLangFromUrl(Astro.url);
@@ -13,13 +12,13 @@ const t = useTranslations(lang);
 const runtime = Astro.locals.runtime;
 const env = runtime?.env || ({} as any);
 
-let allPosts: (typeof posts.$inferSelect)[] = [];
-let error = null;
+let _allPosts: (typeof posts.$inferSelect)[] = [];
+let _error = null;
 
 try {
 	if (env.DB) {
 		const db = getDb(env);
-		allPosts = await db
+		_allPosts = await db
 			.select()
 			.from(posts)
 			.where(lte(posts.publishedAt, Date.now()))
@@ -31,8 +30,8 @@ try {
 } catch (e: any) {
 	console.error("Failed to fetch posts:", e);
 	// Fallback empty
-	allPosts = [];
-	error = e.message;
+	_allPosts = [];
+	_error = e.message;
 }
 ---
 

@@ -1,6 +1,4 @@
 ---
-import { Image } from "astro:assets";
-
 interface Props {
 	src: string;
 	alt: string;
@@ -12,7 +10,7 @@ interface Props {
 const { src, alt, title } = Astro.props;
 
 // Helper to determine if remote
-const isRemote = src.startsWith("http");
+const _isRemote = src.startsWith("http");
 ---
 
 <figure class="my-8">

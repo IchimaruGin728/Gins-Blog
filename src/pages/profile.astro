@@ -1,6 +1,5 @@
 ---
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
-import Layout from "../layouts/Layout.astro";
 
 const lang = getLangFromUrl(Astro.url);
 // biome-ignore lint/correctness/noUnusedVariables: Used in template
@@ -26,7 +25,7 @@ const userProfile = await db
 	.where(eq(users.id, user.id))
 	.get();
 
-const socialLinks = userProfile?.socialLinks
+const _socialLinks = userProfile?.socialLinks
 	? JSON.parse(userProfile.socialLinks as string)
 	: {};
 ---
