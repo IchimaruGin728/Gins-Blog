@@ -1,4 +1,4 @@
-import { defaultLang, ui, languages } from "./ui";
+import { defaultLang, languages, ui } from "./ui";
 
 export { languages };
 

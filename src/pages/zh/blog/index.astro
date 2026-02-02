@@ -15,22 +15,22 @@ let _allPosts: (typeof posts.$inferSelect)[] = [];
 let _error = null;
 
 try {
-	if (env.DB) {
-		const db = getDb(env);
-		_allPosts = await db
-			.select()
-			.from(posts)
-			.where(lte(posts.publishedAt, Date.now()))
-			.orderBy(desc(posts.publishedAt))
-			.all();
-	} else {
-		console.warn("No DB binding found, serving empty blog list (ZH)");
-	}
+  if (env.DB) {
+    const db = getDb(env);
+    _allPosts = await db
+      .select()
+      .from(posts)
+      .where(lte(posts.publishedAt, Date.now()))
+      .orderBy(desc(posts.publishedAt))
+      .all();
+  } else {
+    console.warn("No DB binding found, serving empty blog list (ZH)");
+  }
 } catch (e: any) {
-	console.error("Failed to fetch posts:", e);
-	// Fallback empty
-	_allPosts = [];
-	_error = e.message;
+  console.error("Failed to fetch posts:", e);
+  // Fallback empty
+  _allPosts = [];
+  _error = e.message;
 }
 ---
 

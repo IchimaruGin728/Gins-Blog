@@ -5,12 +5,12 @@ const env = runtime?.env || ({} as any);
 
 // Helper for safe DB queries
 async function safeFetch<T>(promise: Promise<T>, fallback: T): Promise<T> {
-	try {
-		return await promise;
-	} catch (e) {
-		console.error("DB Error:", e);
-		return fallback;
-	}
+  try {
+    return await promise;
+  } catch (e) {
+    console.error("DB Error:", e);
+    return fallback;
+  }
 }
 
 // Analytics Data
@@ -26,40 +26,41 @@ let _performanceSummary: any = null;
 
 // Unified Data Loading
 try {
-	const db = env.DB;
-	if (db) {
-		// Analytics Data
-		_postCount = await safeFetch(
-			db.prepare("SELECT count(*) as count FROM posts").first<number>("count"),
-			0,
-		);
+  const db = env.DB;
+  if (db) {
+    // Analytics Data
+    _postCount = await safeFetch(
+      db.prepare("SELECT count(*) as count FROM posts").first<number>("count"),
+      0,
+    );
 
-		_userCount = await safeFetch(
-			db.prepare("SELECT count(*) as count FROM users").first<number>("count"),
-			0,
-		);
+    _userCount = await safeFetch(
+      db.prepare("SELECT count(*) as count FROM users").first<number>("count"),
+      0,
+    );
 
-		_activeSessionCount = await safeFetch(
-			db
-				.prepare("SELECT count(*) as count FROM sessions WHERE expires_at > ?")
-				.bind(Date.now())
-				.first<number>("count"),
-			0,
-		);
+    _activeSessionCount = await safeFetch(
+      db
+        .prepare("SELECT count(*) as count FROM sessions WHERE expires_at > ?")
+        .bind(Date.now())
+        .first<number>("count"),
+      0,
+    );
 
-		// Recent Posts
-		_recentPosts = await safeFetch(
-			db
-				.prepare("SELECT * FROM posts ORDER BY published_at DESC LIMIT 10")
-				.all(),
-			// @ts-expect-error
-			{ results: [], success: false, meta: {} },
-		);
+    // Recent Posts
+    _recentPosts = await safeFetch(
+      db
+        .prepare("SELECT * FROM posts ORDER BY published_at DESC LIMIT 10")
+        .all(),
+      // @ts-expect-error
+      { results: [], success: false, meta: {} },
+    );
 
-		// Detailed Lists
-		_activeSessionsList = await safeFetch(
-			db
-				.prepare(`
+    // Detailed Lists
+    _activeSessionsList = await safeFetch(
+      db
+        .prepare(
+          `
         SELECT 
           sessions.id as session_id,
           sessions.ip_address, 
@@ -98,16 +99,18 @@ try {
         LEFT JOIN users ON sessions.user_id = users.id 
         WHERE sessions.expires_at > ? 
         ORDER BY sessions.last_active DESC
-      `)
-				.bind(Date.now())
-				.all(),
-			// @ts-expect-error
-			{ results: [] },
-		);
+      `,
+        )
+        .bind(Date.now())
+        .all(),
+      // @ts-expect-error
+      { results: [] },
+    );
 
-		_usersList = await safeFetch(
-			db
-				.prepare(`
+    _usersList = await safeFetch(
+      db
+        .prepare(
+          `
         WITH RankedSessions AS (
           SELECT 
             *,
@@ -128,16 +131,18 @@ try {
         LEFT JOIN RankedSessions rs ON users.id = rs.user_id AND rs.rn = 1
         ORDER BY users.rowid DESC 
         LIMIT 100
-      `)
-				.all(),
-			// @ts-expect-error
-			{ results: [] },
-		);
+      `,
+        )
+        .all(),
+      // @ts-expect-error
+      { results: [] },
+    );
 
-		// Edge Analytics
-		_edgeNodeStats = await safeFetch(
-			db
-				.prepare(`
+    // Edge Analytics
+    _edgeNodeStats = await safeFetch(
+      db
+        .prepare(
+          `
         SELECT 
           colo,
           COUNT(*) as session_count,
@@ -148,16 +153,18 @@ try {
         WHERE expires_at > ? AND colo IS NOT NULL
         GROUP BY colo
         ORDER BY session_count DESC
-      `)
-				.bind(Date.now())
-				.all(),
-			// @ts-expect-error
-			{ results: [] },
-		);
+      `,
+        )
+        .bind(Date.now())
+        .all(),
+      // @ts-expect-error
+      { results: [] },
+    );
 
-		_performanceSummary = await safeFetch(
-			db
-				.prepare(`
+    _performanceSummary = await safeFetch(
+      db
+        .prepare(
+          `
         SELECT 
           AVG(client_tcp_rtt) as global_avg_rtt,
           MIN(client_tcp_rtt) as min_rtt,
@@ -165,174 +172,175 @@ try {
           COUNT(DISTINCT colo) as active_nodes
         FROM sessions
         WHERE expires_at > ? AND client_tcp_rtt IS NOT NULL
-      `)
-				.bind(Date.now())
-				.first(),
-			null,
-		);
-	}
+      `,
+        )
+        .bind(Date.now())
+        .first(),
+      null,
+    );
+  }
 } catch (e) {
-	console.error("CRITICAL: Admin Dashboard Data Load Failed", e);
-	// Defaults are already set
+  console.error("CRITICAL: Admin Dashboard Data Load Failed", e);
+  // Defaults are already set
 }
 
 // Prevent Caching
 Astro.response.headers.set(
-	"Cache-Control",
-	"no-cache, no-store, must-revalidate",
+  "Cache-Control",
+  "no-cache, no-store, must-revalidate",
 );
 Astro.response.headers.set("Pragma", "no-cache");
 Astro.response.headers.set("Expires", "0");
 
 // Edge Node Location Mapping (100+ Major Cloudflare Nodes)
 const _COLO_LOCATIONS: Record<
-	string,
-	{ city: string; country: string; region: string; flag: string }
+  string,
+  { city: string; country: string; region: string; flag: string }
 > = {
-	// North America - US West
-	SJC: { city: "San Jose", country: "US", region: "California", flag: "🇺🇸" },
-	LAX: { city: "Los Angeles", country: "US", region: "California", flag: "🇺🇸" },
-	SFO: {
-		city: "San Francisco",
-		country: "US",
-		region: "California",
-		flag: "🇺🇸",
-	},
-	SEA: { city: "Seattle", country: "US", region: "Washington", flag: "🇺🇸" },
-	PDX: { city: "Portland", country: "US", region: "Oregon", flag: "🇺🇸" },
-	SAN: { city: "San Diego", country: "US", region: "California", flag: "🇺🇸" },
-	PHX: { city: "Phoenix", country: "US", region: "Arizona", flag: "🇺🇸" },
-	LAS: { city: "Las Vegas", country: "US", region: "Nevada", flag: "🇺🇸" },
-	DEN: { city: "Denver", country: "US", region: "Colorado", flag: "🇺🇸" },
-	SLC: { city: "Salt Lake City", country: "US", region: "Utah", flag: "🇺🇸" },
-	// US Central
-	ORD: { city: "Chicago", country: "US", region: "Illinois", flag: "🇺🇸" },
-	DFW: { city: "Dallas", country: "US", region: "Texas", flag: "🇺🇸" },
-	IAH: { city: "Houston", country: "US", region: "Texas", flag: "🇺🇸" },
-	AUS: { city: "Austin", country: "US", region: "Texas", flag: "🇺🇸" },
-	MSP: { city: "Minneapolis", country: "US", region: "Minnesota", flag: "🇺🇸" },
-	MCI: { city: "Kansas City", country: "US", region: "Missouri", flag: "🇺🇸" },
-	DTW: { city: "Detroit", country: "US", region: "Michigan", flag: "🇺🇸" },
-	CMH: { city: "Columbus", country: "US", region: "Ohio", flag: "🇺🇸" },
-	BNA: { city: "Nashville", country: "US", region: "Tennessee", flag: "🇺🇸" },
-	// US East
-	IAD: { city: "Ashburn", country: "US", region: "Virginia", flag: "🇺🇸" },
-	EWR: { city: "Newark", country: "US", region: "New Jersey", flag: "🇺🇸" },
-	BOS: { city: "Boston", country: "US", region: "Massachusetts", flag: "🇺🇸" },
-	PHL: {
-		city: "Philadelphia",
-		country: "US",
-		region: "Pennsylvania",
-		flag: "🇺🇸",
-	},
-	ATL: { city: "Atlanta", country: "US", region: "Georgia", flag: "🇺🇸" },
-	MIA: { city: "Miami", country: "US", region: "Florida", flag: "🇺🇸" },
-	MCO: { city: "Orlando", country: "US", region: "Florida", flag: "🇺🇸" },
-	CLT: { city: "Charlotte", country: "US", region: "N. Carolina", flag: "🇺🇸" },
-	// Canada
-	YYZ: { city: "Toronto", country: "CA", region: "Ontario", flag: "🇨🇦" },
-	YVR: { city: "Vancouver", country: "CA", region: "BC", flag: "🇨🇦" },
-	YUL: { city: "Montreal", country: "CA", region: "Quebec", flag: "🇨🇦" },
-	// Mexico
-	MEX: { city: "Mexico City", country: "MX", region: "CDMX", flag: "🇲🇽" },
-	GDL: { city: "Guadalajara", country: "MX", region: "Jalisco", flag: "🇲🇽" },
-	MTY: { city: "Monterrey", country: "MX", region: "Nuevo León", flag: "🇲🇽" },
+  // North America - US West
+  SJC: { city: "San Jose", country: "US", region: "California", flag: "🇺🇸" },
+  LAX: { city: "Los Angeles", country: "US", region: "California", flag: "🇺🇸" },
+  SFO: {
+    city: "San Francisco",
+    country: "US",
+    region: "California",
+    flag: "🇺🇸",
+  },
+  SEA: { city: "Seattle", country: "US", region: "Washington", flag: "🇺🇸" },
+  PDX: { city: "Portland", country: "US", region: "Oregon", flag: "🇺🇸" },
+  SAN: { city: "San Diego", country: "US", region: "California", flag: "🇺🇸" },
+  PHX: { city: "Phoenix", country: "US", region: "Arizona", flag: "🇺🇸" },
+  LAS: { city: "Las Vegas", country: "US", region: "Nevada", flag: "🇺🇸" },
+  DEN: { city: "Denver", country: "US", region: "Colorado", flag: "🇺🇸" },
+  SLC: { city: "Salt Lake City", country: "US", region: "Utah", flag: "🇺🇸" },
+  // US Central
+  ORD: { city: "Chicago", country: "US", region: "Illinois", flag: "🇺🇸" },
+  DFW: { city: "Dallas", country: "US", region: "Texas", flag: "🇺🇸" },
+  IAH: { city: "Houston", country: "US", region: "Texas", flag: "🇺🇸" },
+  AUS: { city: "Austin", country: "US", region: "Texas", flag: "🇺🇸" },
+  MSP: { city: "Minneapolis", country: "US", region: "Minnesota", flag: "🇺🇸" },
+  MCI: { city: "Kansas City", country: "US", region: "Missouri", flag: "🇺🇸" },
+  DTW: { city: "Detroit", country: "US", region: "Michigan", flag: "🇺🇸" },
+  CMH: { city: "Columbus", country: "US", region: "Ohio", flag: "🇺🇸" },
+  BNA: { city: "Nashville", country: "US", region: "Tennessee", flag: "🇺🇸" },
+  // US East
+  IAD: { city: "Ashburn", country: "US", region: "Virginia", flag: "🇺🇸" },
+  EWR: { city: "Newark", country: "US", region: "New Jersey", flag: "🇺🇸" },
+  BOS: { city: "Boston", country: "US", region: "Massachusetts", flag: "🇺🇸" },
+  PHL: {
+    city: "Philadelphia",
+    country: "US",
+    region: "Pennsylvania",
+    flag: "🇺🇸",
+  },
+  ATL: { city: "Atlanta", country: "US", region: "Georgia", flag: "🇺🇸" },
+  MIA: { city: "Miami", country: "US", region: "Florida", flag: "🇺🇸" },
+  MCO: { city: "Orlando", country: "US", region: "Florida", flag: "🇺🇸" },
+  CLT: { city: "Charlotte", country: "US", region: "N. Carolina", flag: "🇺🇸" },
+  // Canada
+  YYZ: { city: "Toronto", country: "CA", region: "Ontario", flag: "🇨🇦" },
+  YVR: { city: "Vancouver", country: "CA", region: "BC", flag: "🇨🇦" },
+  YUL: { city: "Montreal", country: "CA", region: "Quebec", flag: "🇨🇦" },
+  // Mexico
+  MEX: { city: "Mexico City", country: "MX", region: "CDMX", flag: "🇲🇽" },
+  GDL: { city: "Guadalajara", country: "MX", region: "Jalisco", flag: "🇲🇽" },
+  MTY: { city: "Monterrey", country: "MX", region: "Nuevo León", flag: "🇲🇽" },
 
-	// Europe - West
-	LHR: { city: "London", country: "GB", region: "England", flag: "🇬🇧" },
-	MAN: { city: "Manchester", country: "GB", region: "England", flag: "🇬🇧" },
-	DUB: { city: "Dublin", country: "IE", region: "Leinster", flag: "🇮🇪" },
-	AMS: {
-		city: "Amsterdam",
-		country: "NL",
-		region: "North Holland",
-		flag: "🇳🇱",
-	},
-	BRU: { city: "Brussels", country: "BE", region: "Brussels", flag: "🇧🇪" },
-	CDG: { city: "Paris", country: "FR", region: "Île-de-France", flag: "🇫🇷" },
-	MRS: { city: "Marseille", country: "FR", region: "PACA", flag: "🇫🇷" },
-	LYS: { city: "Lyon", country: "FR", region: "Auvergne", flag: "🇫🇷" },
-	FRA: { city: "Frankfurt", country: "DE", region: "Hesse", flag: "🇩🇪" },
-	MUC: { city: "Munich", country: "DE", region: "Bavaria", flag: "🇩🇪" },
-	HAM: { city: "Hamburg", country: "DE", region: "Hamburg", flag: "🇩🇪" },
-	ZRH: { city: "Zurich", country: "CH", region: "Zurich", flag: "🇨🇭" },
-	// Europe - South
-	MAD: { city: "Madrid", country: "ES", region: "Madrid", flag: "🇪🇸" },
-	BCN: { city: "Barcelona", country: "ES", region: "Catalonia", flag: "🇪🇸" },
-	LIS: { city: "Lisbon", country: "PT", region: "Lisbon", flag: "🇵🇹" },
-	MXP: { city: "Milan", country: "IT", region: "Lombardy", flag: "🇮🇹" },
-	FCO: { city: "Rome", country: "IT", region: "Lazio", flag: "🇮🇹" },
-	ATH: { city: "Athens", country: "GR", region: "Attica", flag: "🇬🇷" },
-	// Europe - North & East
-	ARN: { city: "Stockholm", country: "SE", region: "Stockholm", flag: "🇸🇪" },
-	CPH: { city: "Copenhagen", country: "DK", region: "Capital", flag: "🇩🇰" },
-	OSL: { city: "Oslo", country: "NO", region: "Oslo", flag: "🇳🇴" },
-	HEL: { city: "Helsinki", country: "FI", region: "Uusimaa", flag: "🇫🇮" },
-	VIE: { city: "Vienna", country: "AT", region: "Vienna", flag: "🇦🇹" },
-	WAW: { city: "Warsaw", country: "PL", region: "Mazovia", flag: "🇵🇱" },
-	PRG: { city: "Prague", country: "CZ", region: "Prague", flag: "🇨🇿" },
-	BUD: { city: "Budapest", country: "HU", region: "Budapest", flag: "🇭🇺" },
-	SOF: { city: "Sofia", country: "BG", region: "Sofia", flag: "🇧🇬" },
-	DME: { city: "Moscow", country: "RU", region: "Moscow", flag: "🇷🇺" },
-	LED: {
-		city: "St. Petersburg",
-		country: "RU",
-		region: "Leningrad",
-		flag: "🇷🇺",
-	},
-	IST: { city: "Istanbul", country: "TR", region: "Istanbul", flag: "🇹🇷" },
+  // Europe - West
+  LHR: { city: "London", country: "GB", region: "England", flag: "🇬🇧" },
+  MAN: { city: "Manchester", country: "GB", region: "England", flag: "🇬🇧" },
+  DUB: { city: "Dublin", country: "IE", region: "Leinster", flag: "🇮🇪" },
+  AMS: {
+    city: "Amsterdam",
+    country: "NL",
+    region: "North Holland",
+    flag: "🇳🇱",
+  },
+  BRU: { city: "Brussels", country: "BE", region: "Brussels", flag: "🇧🇪" },
+  CDG: { city: "Paris", country: "FR", region: "Île-de-France", flag: "🇫🇷" },
+  MRS: { city: "Marseille", country: "FR", region: "PACA", flag: "🇫🇷" },
+  LYS: { city: "Lyon", country: "FR", region: "Auvergne", flag: "🇫🇷" },
+  FRA: { city: "Frankfurt", country: "DE", region: "Hesse", flag: "🇩🇪" },
+  MUC: { city: "Munich", country: "DE", region: "Bavaria", flag: "🇩🇪" },
+  HAM: { city: "Hamburg", country: "DE", region: "Hamburg", flag: "🇩🇪" },
+  ZRH: { city: "Zurich", country: "CH", region: "Zurich", flag: "🇨🇭" },
+  // Europe - South
+  MAD: { city: "Madrid", country: "ES", region: "Madrid", flag: "🇪🇸" },
+  BCN: { city: "Barcelona", country: "ES", region: "Catalonia", flag: "🇪🇸" },
+  LIS: { city: "Lisbon", country: "PT", region: "Lisbon", flag: "🇵🇹" },
+  MXP: { city: "Milan", country: "IT", region: "Lombardy", flag: "🇮🇹" },
+  FCO: { city: "Rome", country: "IT", region: "Lazio", flag: "🇮🇹" },
+  ATH: { city: "Athens", country: "GR", region: "Attica", flag: "🇬🇷" },
+  // Europe - North & East
+  ARN: { city: "Stockholm", country: "SE", region: "Stockholm", flag: "🇸🇪" },
+  CPH: { city: "Copenhagen", country: "DK", region: "Capital", flag: "🇩🇰" },
+  OSL: { city: "Oslo", country: "NO", region: "Oslo", flag: "🇳🇴" },
+  HEL: { city: "Helsinki", country: "FI", region: "Uusimaa", flag: "🇫🇮" },
+  VIE: { city: "Vienna", country: "AT", region: "Vienna", flag: "🇦🇹" },
+  WAW: { city: "Warsaw", country: "PL", region: "Mazovia", flag: "🇵🇱" },
+  PRG: { city: "Prague", country: "CZ", region: "Prague", flag: "🇨🇿" },
+  BUD: { city: "Budapest", country: "HU", region: "Budapest", flag: "🇭🇺" },
+  SOF: { city: "Sofia", country: "BG", region: "Sofia", flag: "🇧🇬" },
+  DME: { city: "Moscow", country: "RU", region: "Moscow", flag: "🇷🇺" },
+  LED: {
+    city: "St. Petersburg",
+    country: "RU",
+    region: "Leningrad",
+    flag: "🇷🇺",
+  },
+  IST: { city: "Istanbul", country: "TR", region: "Istanbul", flag: "🇹🇷" },
 
-	// Asia - East Asia
-	NRT: { city: "Tokyo", country: "JP", region: "Kanto", flag: "🇯🇵" },
-	KIX: { city: "Osaka", country: "JP", region: "Kansai", flag: "🇯🇵" },
-	ICN: { city: "Seoul", country: "KR", region: "Seoul", flag: "🇰🇷" },
-	HKG: { city: "Hong Kong", country: "HK", region: "Hong Kong", flag: "🇭🇰" },
-	TPE: { city: "Taipei", country: "TW", region: "Taipei", flag: "🇹🇼" },
-	// Southeast Asia
-	SIN: { city: "Singapore", country: "SG", region: "Singapore", flag: "🇸🇬" },
-	KUL: { city: "Kuala Lumpur", country: "MY", region: "Selangor", flag: "🇲🇾" },
-	BKK: { city: "Bangkok", country: "TH", region: "Bangkok", flag: "🇹🇭" },
-	MNL: { city: "Manila", country: "PH", region: "Metro Manila", flag: "🇵🇭" },
-	CGK: { city: "Jakarta", country: "ID", region: "Jakarta", flag: "🇮🇩" },
-	HAN: { city: "Hanoi", country: "VN", region: "Hanoi", flag: "🇻🇳" },
-	SGN: { city: "Ho Chi Minh", country: "VN", region: "HCMC", flag: "🇻🇳" },
-	// South Asia
-	BOM: { city: "Mumbai", country: "IN", region: "Maharashtra", flag: "🇮🇳" },
-	DEL: { city: "Delhi", country: "IN", region: "Delhi", flag: "🇮🇳" },
-	BLR: { city: "Bangalore", country: "IN", region: "Karnataka", flag: "🇮🇳" },
-	HYD: { city: "Hyderabad", country: "IN", region: "Telangana", flag: "🇮🇳" },
-	MAA: { city: "Chennai", country: "IN", region: "Tamil Nadu", flag: "🇮🇳" },
-	// Oceania
-	SYD: { city: "Sydney", country: "AU", region: "NSW", flag: "🇦🇺" },
-	MEL: { city: "Melbourne", country: "AU", region: "Victoria", flag: "🇦🇺" },
-	BNE: { city: "Brisbane", country: "AU", region: "Queensland", flag: "🇦🇺" },
-	PER: { city: "Perth", country: "AU", region: "WA", flag: "🇦🇺" },
-	AKL: { city: "Auckland", country: "NZ", region: "Auckland", flag: "🇳🇿" },
+  // Asia - East Asia
+  NRT: { city: "Tokyo", country: "JP", region: "Kanto", flag: "🇯🇵" },
+  KIX: { city: "Osaka", country: "JP", region: "Kansai", flag: "🇯🇵" },
+  ICN: { city: "Seoul", country: "KR", region: "Seoul", flag: "🇰🇷" },
+  HKG: { city: "Hong Kong", country: "HK", region: "Hong Kong", flag: "🇭🇰" },
+  TPE: { city: "Taipei", country: "TW", region: "Taipei", flag: "🇹🇼" },
+  // Southeast Asia
+  SIN: { city: "Singapore", country: "SG", region: "Singapore", flag: "🇸🇬" },
+  KUL: { city: "Kuala Lumpur", country: "MY", region: "Selangor", flag: "🇲🇾" },
+  BKK: { city: "Bangkok", country: "TH", region: "Bangkok", flag: "🇹🇭" },
+  MNL: { city: "Manila", country: "PH", region: "Metro Manila", flag: "🇵🇭" },
+  CGK: { city: "Jakarta", country: "ID", region: "Jakarta", flag: "🇮🇩" },
+  HAN: { city: "Hanoi", country: "VN", region: "Hanoi", flag: "🇻🇳" },
+  SGN: { city: "Ho Chi Minh", country: "VN", region: "HCMC", flag: "🇻🇳" },
+  // South Asia
+  BOM: { city: "Mumbai", country: "IN", region: "Maharashtra", flag: "🇮🇳" },
+  DEL: { city: "Delhi", country: "IN", region: "Delhi", flag: "🇮🇳" },
+  BLR: { city: "Bangalore", country: "IN", region: "Karnataka", flag: "🇮🇳" },
+  HYD: { city: "Hyderabad", country: "IN", region: "Telangana", flag: "🇮🇳" },
+  MAA: { city: "Chennai", country: "IN", region: "Tamil Nadu", flag: "🇮🇳" },
+  // Oceania
+  SYD: { city: "Sydney", country: "AU", region: "NSW", flag: "🇦🇺" },
+  MEL: { city: "Melbourne", country: "AU", region: "Victoria", flag: "🇦🇺" },
+  BNE: { city: "Brisbane", country: "AU", region: "Queensland", flag: "🇦🇺" },
+  PER: { city: "Perth", country: "AU", region: "WA", flag: "🇦🇺" },
+  AKL: { city: "Auckland", country: "NZ", region: "Auckland", flag: "🇳🇿" },
 
-	// Middle East & Africa
-	DXB: { city: "Dubai", country: "AE", region: "Dubai", flag: "🇦🇪" },
-	BAH: { city: "Bahrain", country: "BH", region: "Manama", flag: "🇧🇭" },
-	DOH: { city: "Doha", country: "QA", region: "Doha", flag: "🇶🇦" },
-	AMM: { city: "Amman", country: "JO", region: "Amman", flag: "🇯🇴" },
-	TLV: { city: "Tel Aviv", country: "IL", region: "Tel Aviv", flag: "🇮🇱" },
-	CAI: { city: "Cairo", country: "EG", region: "Cairo", flag: "🇪🇬" },
-	JNB: { city: "Johannesburg", country: "ZA", region: "Gauteng", flag: "🇿🇦" },
-	CPT: { city: "Cape Town", country: "ZA", region: "Western Cape", flag: "🇿🇦" },
-	NBO: { city: "Nairobi", country: "KE", region: "Nairobi", flag: "🇰🇪" },
-	LOS: { city: "Lagos", country: "NG", region: "Lagos", flag: "🇳🇬" },
+  // Middle East & Africa
+  DXB: { city: "Dubai", country: "AE", region: "Dubai", flag: "🇦🇪" },
+  BAH: { city: "Bahrain", country: "BH", region: "Manama", flag: "🇧🇭" },
+  DOH: { city: "Doha", country: "QA", region: "Doha", flag: "🇶🇦" },
+  AMM: { city: "Amman", country: "JO", region: "Amman", flag: "🇯🇴" },
+  TLV: { city: "Tel Aviv", country: "IL", region: "Tel Aviv", flag: "🇮🇱" },
+  CAI: { city: "Cairo", country: "EG", region: "Cairo", flag: "🇪🇬" },
+  JNB: { city: "Johannesburg", country: "ZA", region: "Gauteng", flag: "🇿🇦" },
+  CPT: { city: "Cape Town", country: "ZA", region: "Western Cape", flag: "🇿🇦" },
+  NBO: { city: "Nairobi", country: "KE", region: "Nairobi", flag: "🇰🇪" },
+  LOS: { city: "Lagos", country: "NG", region: "Lagos", flag: "🇳🇬" },
 
-	// South America
-	GRU: { city: "São Paulo", country: "BR", region: "São Paulo", flag: "🇧🇷" },
-	GIG: { city: "Rio de Janeiro", country: "BR", region: "Rio", flag: "🇧🇷" },
-	SCL: { city: "Santiago", country: "CL", region: "Santiago", flag: "🇨🇱" },
-	BOG: { city: "Bogotá", country: "CO", region: "Bogotá", flag: "🇨🇴" },
-	LIM: { city: "Lima", country: "PE", region: "Lima", flag: "🇵🇪" },
-	EZE: {
-		city: "Buenos Aires",
-		country: "AR",
-		region: "Buenos Aires",
-		flag: "🇦🇷",
-	},
+  // South America
+  GRU: { city: "São Paulo", country: "BR", region: "São Paulo", flag: "🇧🇷" },
+  GIG: { city: "Rio de Janeiro", country: "BR", region: "Rio", flag: "🇧🇷" },
+  SCL: { city: "Santiago", country: "CL", region: "Santiago", flag: "🇨🇱" },
+  BOG: { city: "Bogotá", country: "CO", region: "Bogotá", flag: "🇨🇴" },
+  LIM: { city: "Lima", country: "PE", region: "Lima", flag: "🇵🇪" },
+  EZE: {
+    city: "Buenos Aires",
+    country: "AR",
+    region: "Buenos Aires",
+    flag: "🇦🇷",
+  },
 };
 ---
 
@@ -985,8 +993,11 @@ const _COLO_LOCATIONS: Record<
                           <div class="text-xs text-gray-500 font-mono">
                             SID: {s.session_id.substring(0, 8)}
                           </div>
-                          <!-- Client-side UA Parsed Info -->
-                          <div class="ua-parser-container mt-1 text-xs" data-ua={s.user_agent}></div>
+                          {/* Client-side UA Parsed Info */}
+                          <div
+                            class="ua-parser-container mt-1 text-xs"
+                            data-ua={s.user_agent}
+                          />
                         </div>
                       </div>
                     </td>
@@ -1118,9 +1129,12 @@ const _COLO_LOCATIONS: Record<
                     <td class="p-6 text-right">
                       <div class="text-white font-mono text-sm">
                         {s.last_active
-                          ? new Date(s.last_active).toLocaleTimeString("en-SG", {
-                              hour12: false,
-                            })
+                          ? new Date(s.last_active).toLocaleTimeString(
+                              "en-SG",
+                              {
+                                hour12: false,
+                              },
+                            )
                           : "N/A"}
                       </div>
                       <div class="text-xs text-gray-500 mt-1">
@@ -1262,60 +1276,71 @@ const _COLO_LOCATIONS: Record<
                               })}
                             </div>
                             <div class="text-xs text-gray-400 flex items-center gap-1.5">
-                               <span class="i-heroicons-map-pin w-3 h-3 text-brand-accent"></span>
-                               <span>{u.city || "?"}, {u.country || "?"}</span>
+                              <span class="i-heroicons-map-pin w-3 h-3 text-brand-accent" />
+                              <span>
+                                {u.city || "?"}, {u.country || "?"}
+                              </span>
                             </div>
                             <div class="text-[10px] font-mono text-gray-500 bg-white/5 px-1.5 py-0.5 rounded inline-block">
                               {u.ip_address || "Hidden IP"}
                             </div>
-                             {u.as_organization && (
-                              <div class="text-[10px] text-gray-500 truncate max-w-[150px]" title={u.as_organization}>
+                            {u.as_organization && (
+                              <div
+                                class="text-[10px] text-gray-500 truncate max-w-[150px]"
+                                title={u.as_organization}
+                              >
                                 {u.as_organization}
                               </div>
                             )}
 
-                             {/* Network & Security Badges */}
-                             <div class="flex flex-wrap items-center gap-2 mt-1.5">
-                               {/* Network Type (4G/5G/WiFi) */}
-                               {u.connection_type && (
-                                 <span class="flex items-center gap-1 text-[10px] text-blue-300 bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 rounded font-mono uppercase tracking-wider">
-                                   <span class="i-heroicons-signal w-3 h-3"></span>
-                                   {u.connection_type}
-                                 </span>
-                               )}
+                            {/* Network & Security Badges */}
+                            <div class="flex flex-wrap items-center gap-2 mt-1.5">
+                              {/* Network Type (4G/5G/WiFi) */}
+                              {u.connection_type && (
+                                <span class="flex items-center gap-1 text-[10px] text-blue-300 bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 rounded font-mono uppercase tracking-wider">
+                                  <span class="i-heroicons-signal w-3 h-3" />
+                                  {u.connection_type}
+                                </span>
+                              )}
 
-                               {/* Risk Score / VPN */}
-                               {u.client_trust_score && u.client_trust_score < 30 ? (
-                                 <span class="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-red-500/20 border border-red-500/30 text-red-300 font-bold uppercase tracking-wider">
-                                   <span class="i-heroicons-shield-exclamation w-3 h-3"></span>
-                                   VPN
-                                 </span>
-                               ) : u.client_trust_score ? (
-                                  <span class="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-green-500/10 border border-green-500/20 text-green-400 font-mono">
-                                   <span class="i-heroicons-shield-check w-3 h-3"></span>
-                                   Clean
-                                 </span>
-                               ) : null}
+                              {/* Risk Score / VPN */}
+                              {u.client_trust_score &&
+                              u.client_trust_score < 30 ? (
+                                <span class="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-red-500/20 border border-red-500/30 text-red-300 font-bold uppercase tracking-wider">
+                                  <span class="i-heroicons-shield-exclamation w-3 h-3" />
+                                  VPN
+                                </span>
+                              ) : u.client_trust_score ? (
+                                <span class="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-green-500/10 border border-green-500/20 text-green-400 font-mono">
+                                  <span class="i-heroicons-shield-check w-3 h-3" />
+                                  Clean
+                                </span>
+                              ) : null}
 
-                               {/* RTT Latency */}
-                               {u.client_tcp_rtt != null && (
-                                 <span class={`flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded border ${u.client_tcp_rtt < 50 ? "border-green-500/20 text-green-400 bg-green-500/5" : "border-yellow-500/20 text-yellow-400 bg-yellow-500/5"}`}>
-                                   <span class="i-heroicons-bolt w-3 h-3"></span>
-                                   {u.client_tcp_rtt}ms
-                                 </span>
-                               )}
-                               
-                               {/* TLS */}
-                               {u.tls_version && (
-                                 <span class="text-[10px] text-gray-500 border border-white/10 px-1.5 py-0.5 rounded bg-white/5">
-                                   {u.tls_version}
-                                 </span>
-                               )}
-                             </div>
+                              {/* RTT Latency */}
+                              {u.client_tcp_rtt != null && (
+                                <span
+                                  class={`flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded border ${u.client_tcp_rtt < 50 ? "border-green-500/20 text-green-400 bg-green-500/5" : "border-yellow-500/20 text-yellow-400 bg-yellow-500/5"}`}
+                                >
+                                  <span class="i-heroicons-bolt w-3 h-3" />
+                                  {u.client_tcp_rtt}ms
+                                </span>
+                              )}
+
+                              {/* TLS */}
+                              {u.tls_version && (
+                                <span class="text-[10px] text-gray-500 border border-white/10 px-1.5 py-0.5 rounded bg-white/5">
+                                  {u.tls_version}
+                                </span>
+                              )}
+                            </div>
                           </div>
-                          
+
                           {/* Client-side UA Parsed Info (Hidden but functional for tooltip if needed) */}
-                          <div class="ua-parser-container hidden" data-ua={u.user_agent}></div>
+                          <div
+                            class="ua-parser-container hidden"
+                            data-ua={u.user_agent}
+                          />
                         </>
                       ) : (
                         <span class="text-xs text-gray-600 italic">Never</span>
@@ -1324,16 +1349,33 @@ const _COLO_LOCATIONS: Record<
                   </td>
                   <td class="p-6 text-right text-gray-400 font-mono text-xs">
                     {(() => {
-                      const allowedOwners = ["ichimarugin", "ichimarugin728", "gin ichimaru"];
-                      const isOwner = 
-                        (u.github_username && allowedOwners.includes(u.github_username.toLowerCase())) ||
-                        (u.google_username && allowedOwners.includes(u.google_username.toLowerCase())) ||
-                        (u.discord_username && allowedOwners.includes(u.discord_username.toLowerCase()));
-                      
+                      const allowedOwners = [
+                        "ichimarugin",
+                        "ichimarugin728",
+                        "gin ichimaru",
+                      ];
+                      const isOwner =
+                        (u.github_username &&
+                          allowedOwners.includes(
+                            u.github_username.toLowerCase(),
+                          )) ||
+                        (u.google_username &&
+                          allowedOwners.includes(
+                            u.google_username.toLowerCase(),
+                          )) ||
+                        (u.discord_username &&
+                          allowedOwners.includes(
+                            u.discord_username.toLowerCase(),
+                          ));
+
                       if (isOwner) {
-                        return <span class="text-brand-accent font-bold px-2 py-0.5 rounded bg-brand-accent/10 border border-brand-accent/20">👑 Creator</span>;
+                        return (
+                          <span class="text-brand-accent font-bold px-2 py-0.5 rounded bg-brand-accent/10 border border-brand-accent/20">
+                            👑 Creator
+                          </span>
+                        );
                       }
-                      
+
                       if (u.created_at) {
                         return new Date(
                           typeof u.created_at === "number"
@@ -1344,7 +1386,7 @@ const _COLO_LOCATIONS: Record<
                           dateStyle: "medium",
                         });
                       }
-                      
+
                       return <span class="opacity-50">Jan 31, 2026</span>;
                     })()}
                   </td>
@@ -1533,29 +1575,39 @@ const _COLO_LOCATIONS: Record<
           if (entry.isIntersecting) {
             const el = entry.target as HTMLElement;
             const ua = el.dataset.ua;
-            
+
             if (ua) {
               // Parse immediately
               const parser = new UAParser(ua);
               const result = parser.getResult();
-              
+
               // Helper for OS Icons
               let osIcon = "i-heroicons-cpu-chip";
               const osName = result.os.name?.toLowerCase() || "";
-              if (osName.includes("mac") || osName.includes("ios")) osIcon = "i-simple-icons-apple";
-              else if (osName.includes("win")) osIcon = "i-simple-icons-windows";
-              else if (osName.includes("android")) osIcon = "i-simple-icons-android";
-              else if (osName.includes("linux")) osIcon = "i-simple-icons-linux";
-              else if (osName.includes("ubuntu")) osIcon = "i-simple-icons-ubuntu";
-              
+              if (osName.includes("mac") || osName.includes("ios"))
+                osIcon = "i-simple-icons-apple";
+              else if (osName.includes("win"))
+                osIcon = "i-simple-icons-windows";
+              else if (osName.includes("android"))
+                osIcon = "i-simple-icons-android";
+              else if (osName.includes("linux"))
+                osIcon = "i-simple-icons-linux";
+              else if (osName.includes("ubuntu"))
+                osIcon = "i-simple-icons-ubuntu";
+
               // Helper for Browser Icons
               let browserIcon = "i-heroicons-globe-alt";
               const browserName = result.browser.name?.toLowerCase() || "";
-              if (browserName.includes("chrome")) browserIcon = "i-simple-icons-googlechrome";
-              else if (browserName.includes("safari")) browserIcon = "i-simple-icons-safari";
-              else if (browserName.includes("firefox")) browserIcon = "i-simple-icons-firefox";
-              else if (browserName.includes("edge")) browserIcon = "i-simple-icons-microsoftedge";
-              else if (browserName.includes("opera")) browserIcon = "i-simple-icons-opera";
+              if (browserName.includes("chrome"))
+                browserIcon = "i-simple-icons-googlechrome";
+              else if (browserName.includes("safari"))
+                browserIcon = "i-simple-icons-safari";
+              else if (browserName.includes("firefox"))
+                browserIcon = "i-simple-icons-firefox";
+              else if (browserName.includes("edge"))
+                browserIcon = "i-simple-icons-microsoftedge";
+              else if (browserName.includes("opera"))
+                browserIcon = "i-simple-icons-opera";
 
               // Render Content
               el.innerHTML = `
@@ -1568,24 +1620,26 @@ const _COLO_LOCATIONS: Record<
                      <span class="${browserIcon} w-3 h-3"></span>
                      <span class="text-[10px]">${result.browser.name || "Unknown Browser"} ${result.browser.version || ""}</span>
                   </div>
-                  ${result.device.type || result.device.model ? 
-                    `<div class="flex items-center gap-1 mt-0.5">
+                  ${
+                    result.device.type || result.device.model
+                      ? `<div class="flex items-center gap-1 mt-0.5">
                        <span class="i-heroicons-device-phone-mobile w-3 h-3 text-gray-500"></span>
                        <div class="text-[10px] text-gray-500 font-mono border border-white/10 px-1 rounded bg-white/5">
                          ${result.device.vendor || ""} ${result.device.model || "Generic Device"}
                        </div>
-                     </div>` 
-                    : ""}
+                     </div>`
+                      : ""
+                  }
                 </div>
               `;
             }
-            
+
             // Stop observing this element
             observer.unobserve(el);
           }
         });
       },
-      { rootMargin: "50px" } // Preload when getting close
+      { rootMargin: "50px" }, // Preload when getting close
     );
 
     document.querySelectorAll(".ua-parser-container").forEach((el) => {

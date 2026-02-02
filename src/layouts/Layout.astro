@@ -7,14 +7,13 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/jetbrains-mono";
 import "@fontsource-variable/outfit";
 
+import { ClientRouter } from "astro:transitions";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import MobileNav from "../components/MobileNav.astro";
 import SearchModal from "../components/SearchModal.tsx";
-import { ClientRouter } from "astro:transitions";
 
 const lang = getLangFromUrl(Astro.url);
-
 
 interface Props {
 	title: string;
@@ -25,7 +24,6 @@ interface Props {
 	author?: string;
 	keywords?: string;
 }
-
 
 const {
 	title,
