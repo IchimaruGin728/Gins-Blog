@@ -16,22 +16,31 @@ async function safeFetch<T>(promise: Promise<T>, fallback: T): Promise<T> {
 }
 
 // Analytics Data
-const postCount = await safeFetch(
-	env.DB.prepare("SELECT count(*) as count FROM posts").first<number>("count"),
-	0,
-);
+// Analytics Data
+const db = env.DB;
+const postCount = db
+	? await safeFetch(
+			db.prepare("SELECT count(*) as count FROM posts").first<number>("count"),
+			0,
+		)
+	: 0;
 
-const userCount = await safeFetch(
-	env.DB.prepare("SELECT count(*) as count FROM users").first<number>("count"),
-	0,
-);
+const userCount = db
+	? await safeFetch(
+			db.prepare("SELECT count(*) as count FROM users").first<number>("count"),
+			0,
+		)
+	: 0;
 
-const activeSessionCount = await safeFetch(
-	env.DB.prepare("SELECT count(*) as count FROM sessions WHERE expires_at > ?")
-		.bind(Date.now())
-		.first<number>("count"),
-	0,
-);
+const activeSessionCount = db
+	? await safeFetch(
+			db
+				.prepare("SELECT count(*) as count FROM sessions WHERE expires_at > ?")
+				.bind(Date.now())
+				.first<number>("count"),
+			0,
+		)
+	: 0;
 
 // Prevent Caching
 Astro.response.headers.set(
@@ -40,18 +49,23 @@ Astro.response.headers.set(
 );
 Astro.response.headers.set("Pragma", "no-cache");
 Astro.response.headers.set("Expires", "0");
-const recentPosts = await safeFetch(
-	env.DB.prepare(
-		"SELECT * FROM posts ORDER BY published_at DESC LIMIT 10",
-	).all(),
-	// @ts-expect-error
-	{ results: [], success: false, meta: {} },
-);
+const recentPosts = db
+	? await safeFetch(
+			db
+				.prepare("SELECT * FROM posts ORDER BY published_at DESC LIMIT 10")
+				.all(),
+			// @ts-expect-error
+			{ results: [], success: false, meta: {} },
+		)
+	: { results: [], success: false, meta: {} };
 
 // Detailed Lists for Modals
-const activeSessionsList = await safeFetch(
-	env.DB.prepare(
-		`
+// Detailed Lists for Modals
+const activeSessionsList = db
+	? await safeFetch(
+			db
+				.prepare(
+					`
     SELECT 
       sessions.id as session_id,
       sessions.ip_address, 
@@ -102,15 +116,19 @@ const activeSessionsList = await safeFetch(
     WHERE sessions.expires_at > ? 
     ORDER BY sessions.last_active DESC
   `,
-	)
-		.bind(Date.now())
-		.all(),
-	// @ts-expect-error
-	{ results: [] },
-);
+				)
+				.bind(Date.now())
+				.all(),
+			// @ts-expect-error
+			{ results: [] },
+		)
+	: { results: [] };
 
-const usersList = await safeFetch(
-	env.DB.prepare(`
+const usersList = db
+	? await safeFetch(
+			db
+				.prepare(
+					`
     WITH RankedSessions AS (
       SELECT 
         *,
@@ -131,15 +149,20 @@ const usersList = await safeFetch(
     LEFT JOIN RankedSessions rs ON users.id = rs.user_id AND rs.rn = 1
     ORDER BY users.rowid DESC 
     LIMIT 100
-  `).all(),
-	// @ts-expect-error
-	{ results: [] },
-);
+  `,
+				)
+				.all(),
+			// @ts-expect-error
+			{ results: [] },
+		)
+	: { results: [] };
 
 // Edge Analytics Queries
-const edgeNodeStats = await safeFetch(
-	env.DB.prepare(
-		`
+const edgeNodeStats = db
+	? await safeFetch(
+			db
+				.prepare(
+					`
     SELECT 
       colo,
       COUNT(*) as session_count,
@@ -151,16 +174,19 @@ const edgeNodeStats = await safeFetch(
     GROUP BY colo
     ORDER BY session_count DESC
   `,
-	)
-		.bind(Date.now())
-		.all(),
-	// @ts-expect-error
-	{ results: [] },
-);
+				)
+				.bind(Date.now())
+				.all(),
+			// @ts-expect-error
+			{ results: [] },
+		)
+	: { results: [] };
 
-const performanceSummary = await safeFetch(
-	env.DB.prepare(
-		`
+const performanceSummary = db
+	? await safeFetch(
+			db
+				.prepare(
+					`
     SELECT 
       AVG(client_tcp_rtt) as global_avg_rtt,
       MIN(client_tcp_rtt) as min_rtt,
@@ -169,11 +195,12 @@ const performanceSummary = await safeFetch(
     FROM sessions
     WHERE expires_at > ? AND client_tcp_rtt IS NOT NULL
   `,
-	)
-		.bind(Date.now())
-		.first(),
-	null,
-);
+				)
+				.bind(Date.now())
+				.first(),
+			null,
+		)
+	: null;
 
 // Edge Node Location Mapping (100+ Major Cloudflare Nodes)
 const COLO_LOCATIONS: Record<
