@@ -1,5 +1,7 @@
 ---
-const env = Astro.locals.runtime.env;
+// Access Cloudflare bindings from locals
+const runtime = Astro.locals.runtime;
+const env = runtime?.env || ({} as any);
 
 import Layout from "../../../layouts/Layout.astro";
 
