@@ -1,11 +1,11 @@
 ---
-import Layout from "../../layouts/Layout.astro";
 import { and, desc, eq, gt, lt, lte } from "drizzle-orm";
 import { posts } from "../../../db/schema";
-import { getDb } from "../../lib/db";
+import Comments from "../../components/Comments.tsx";
 import MarkdownImage from "../../components/MarkdownImage.astro";
 import ShareButtons from "../../components/ShareButtons.astro";
-import Comments from "../../components/Comments.tsx";
+import Layout from "../../layouts/Layout.astro";
+import { getDb } from "../../lib/db";
 
 const { slug } = Astro.params;
 

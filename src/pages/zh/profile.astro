@@ -1,6 +1,6 @@
 ---
-import Layout from "../../layouts/Layout.astro";
 import { getLangFromUrl, useTranslations } from "../../i18n/utils";
+import Layout from "../../layouts/Layout.astro";
 
 const lang = getLangFromUrl(Astro.url);
 // biome-ignore lint/correctness/noUnusedVariables: Used in template
@@ -20,19 +20,19 @@ let socialLinks: any = {};
 let errorMsg = null;
 
 try {
-  const db = getDb(env);
-  userProfile = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, user.id))
-    .get();
+	const db = getDb(env);
+	userProfile = await db
+		.select()
+		.from(users)
+		.where(eq(users.id, user.id))
+		.get();
 
-  socialLinks = userProfile?.socialLinks
-    ? JSON.parse(userProfile.socialLinks as string)
-    : {};
+	socialLinks = userProfile?.socialLinks
+		? JSON.parse(userProfile.socialLinks as string)
+		: {};
 } catch (e: any) {
-  console.error("Profile Error:", e);
-  errorMsg = e.message;
+	console.error("Profile Error:", e);
+	errorMsg = e.message;
 }
 ---
 

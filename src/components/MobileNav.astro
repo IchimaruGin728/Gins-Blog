@@ -10,23 +10,23 @@ const currentPath = Astro.url.pathname;
 
 // Helper to strip locale from path for comparison
 const getPathWithoutLocale = (path: string) => {
-	if (path.startsWith("/zh/")) {
-		return path.replace("/zh", "") || "/";
-	}
-	if (path === "/zh") {
-		return "/";
-	}
-	return path;
+  if (path.startsWith("/zh/")) {
+    return path.replace("/zh", "") || "/";
+  }
+  if (path === "/zh") {
+    return "/";
+  }
+  return path;
 };
 
 const normalizedPath = getPathWithoutLocale(currentPath);
 
 // biome-ignore lint/correctness/noUnusedVariables: Used in template
 const isActive = (path: string) => {
-	if (path === "/") {
-		return normalizedPath === "/";
-	}
-	return normalizedPath.startsWith(path);
+  if (path === "/") {
+    return normalizedPath === "/";
+  }
+  return normalizedPath.startsWith(path);
 };
 ---
 

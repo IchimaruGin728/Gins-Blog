@@ -50,6 +50,8 @@
 		"@types/node": "latest",
 		"dotenv": "^17.2.3",
 		"drizzle-kit": "latest",
+		"prettier": "^3.8.1",
+		"prettier-plugin-astro": "^0.14.1",
 		"unocss": "latest",
 		"wrangler": "latest"
 	}
