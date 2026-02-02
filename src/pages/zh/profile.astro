@@ -1,4 +1,5 @@
 ---
+import Layout from "../../layouts/Layout.astro";
 import { getLangFromUrl, useTranslations } from "../../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
@@ -14,8 +15,8 @@ import { users } from "../../../db/schema";
 import { getDb } from "../../lib/db";
 
 let userProfile;
-let _socialLinks: any = {};
-let _errorMsg = null;
+let socialLinks: any = {};
+let errorMsg = null;
 
 try {
   const db = getDb(env);
@@ -25,12 +26,12 @@ try {
     .where(eq(users.id, user.id))
     .get();
 
-  _socialLinks = userProfile?.socialLinks
+  socialLinks = userProfile?.socialLinks
     ? JSON.parse(userProfile.socialLinks as string)
     : {};
 } catch (e: any) {
   console.error("Profile Error:", e);
-  _errorMsg = e.message;
+  errorMsg = e.message;
 }
 ---
 

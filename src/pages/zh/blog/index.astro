@@ -1,4 +1,5 @@
 ---
+import Layout from "../../../layouts/Layout.astro";
 import { desc, lte } from "drizzle-orm";
 import { posts } from "../../../../db/schema";
 import { getLangFromUrl, useTranslations } from "../../../i18n/utils";
@@ -11,13 +12,13 @@ const t = useTranslations(lang);
 const runtime = Astro.locals.runtime;
 const env = runtime?.env || ({} as any);
 
-let _allPosts: (typeof posts.$inferSelect)[] = [];
-let _error = null;
+let allPosts: (typeof posts.$inferSelect)[] = [];
+let error = null;
 
 try {
   if (env.DB) {
     const db = getDb(env);
-    _allPosts = await db
+    allPosts = await db
       .select()
       .from(posts)
       .where(lte(posts.publishedAt, Date.now()))
@@ -29,8 +30,8 @@ try {
 } catch (e: any) {
   console.error("Failed to fetch posts:", e);
   // Fallback empty
-  _allPosts = [];
-  _error = e.message;
+  allPosts = [];
+  error = e.message;
 }
 ---
 

@@ -1,4 +1,7 @@
 ---
+import Layout from "../../../layouts/Layout.astro";
+import ShareButtons from "../../../components/ShareButtons.astro";
+import Comments from "../../../components/Comments.tsx";
 import { and, desc, eq, gt, lt, lte, sql } from "drizzle-orm";
 import { posts } from "../../../../db/schema";
 import { getLangFromUrl, useTranslations } from "../../../i18n/utils";
@@ -72,7 +75,7 @@ try {
 }
 const currentPublishedAt = result.publishedAt || 0;
 
-const _prevPost = await db
+const prevPost = await db
   .select({ title: posts.title, slug: posts.slug })
   .from(posts)
   .where(
@@ -85,7 +88,7 @@ const _prevPost = await db
   .limit(1)
   .get();
 
-const _nextPost = await db
+const nextPost = await db
   .select({ title: posts.title, slug: posts.slug })
   .from(posts)
   .where(
