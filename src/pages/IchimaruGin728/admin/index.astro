@@ -16,31 +16,156 @@ async function safeFetch<T>(promise: Promise<T>, fallback: T): Promise<T> {
 }
 
 // Analytics Data
-// Analytics Data
-const db = env.DB;
-const postCount = db
-	? await safeFetch(
-			db.prepare("SELECT count(*) as count FROM posts").first<number>("count"),
-			0,
-		)
-	: 0;
+// Initialize defaults
+let postCount = 0;
+let userCount = 0;
+let activeSessionCount = 0;
+let recentPosts = { results: [], success: false, meta: {} };
+let activeSessionsList = { results: [] };
+let usersList = { results: [] };
+let edgeNodeStats = { results: [] };
+let performanceSummary: any = null;
 
-const userCount = db
-	? await safeFetch(
-			db.prepare("SELECT count(*) as count FROM users").first<number>("count"),
-			0,
-		)
-	: 0;
+// Unified Data Loading
+try {
+  const db = env.DB;
+  if (db) {
+    // Analytics Data
+    postCount = await safeFetch(
+      db.prepare("SELECT count(*) as count FROM posts").first<number>("count"),
+      0
+    );
+    
+    userCount = await safeFetch(
+      db.prepare("SELECT count(*) as count FROM users").first<number>("count"),
+      0
+    );
 
-const activeSessionCount = db
-	? await safeFetch(
-			db
-				.prepare("SELECT count(*) as count FROM sessions WHERE expires_at > ?")
-				.bind(Date.now())
-				.first<number>("count"),
-			0,
-		)
-	: 0;
+    activeSessionCount = await safeFetch(
+      db
+        .prepare("SELECT count(*) as count FROM sessions WHERE expires_at > ?")
+        .bind(Date.now())
+        .first<number>("count"),
+      0
+    );
+
+    // Recent Posts
+    recentPosts = await safeFetch(
+      db
+        .prepare("SELECT * FROM posts ORDER BY published_at DESC LIMIT 10")
+        .all(),
+      // @ts-expect-error
+      { results: [], success: false, meta: {} }
+    );
+
+    // Detailed Lists
+    activeSessionsList = await safeFetch(
+      db.prepare(`
+        SELECT 
+          sessions.id as session_id,
+          sessions.ip_address, 
+          sessions.user_agent, 
+          sessions.last_active, 
+          sessions.created_at as session_created,
+          sessions.city,
+          sessions.country,
+          sessions.asn,
+          sessions.as_organization,
+          sessions.colo,
+          sessions.continent,
+          sessions.timezone,
+          sessions.latitude,
+          sessions.longitude,
+          sessions.postal_code,
+          sessions.region,
+          sessions.region_code,
+          sessions.http_protocol,
+          sessions.tls_version,
+          sessions.tls_cipher,
+          sessions.client_tcp_rtt,
+          sessions.client_trust_score,
+          sessions.is_eu_country,
+          sessions.screen_resolution,
+          sessions.device_memory,
+          sessions.cpu_cores,
+          sessions.connection_type,
+          users.username, 
+          users.avatar,
+          users.id as user_id,
+          users.github_username,
+          users.google_username,
+          users.discord_username
+        FROM sessions 
+        LEFT JOIN users ON sessions.user_id = users.id 
+        WHERE sessions.expires_at > ? 
+        ORDER BY sessions.last_active DESC
+      `).bind(Date.now()).all(),
+      // @ts-expect-error
+      { results: [] }
+    );
+
+    usersList = await safeFetch(
+      db.prepare(`
+        WITH RankedSessions AS (
+          SELECT 
+            *,
+            ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY last_active DESC) as rn
+          FROM sessions
+        )
+        SELECT 
+          users.*,
+          rs.last_active,
+          rs.ip_address,
+          rs.city,
+          rs.country,
+          rs.screen_resolution,
+          rs.device_memory,
+          rs.cpu_cores,
+          rs.connection_type
+        FROM users
+        LEFT JOIN RankedSessions rs ON users.id = rs.user_id AND rs.rn = 1
+        ORDER BY users.rowid DESC 
+        LIMIT 100
+      `).all(),
+      // @ts-expect-error
+      { results: [] }
+    );
+
+    // Edge Analytics
+    edgeNodeStats = await safeFetch(
+      db.prepare(`
+        SELECT 
+          colo,
+          COUNT(*) as session_count,
+          AVG(client_tcp_rtt) as avg_rtt,
+          country,
+          continent
+        FROM sessions
+        WHERE expires_at > ? AND colo IS NOT NULL
+        GROUP BY colo
+        ORDER BY session_count DESC
+      `).bind(Date.now()).all(),
+      // @ts-expect-error
+      { results: [] }
+    );
+
+    performanceSummary = await safeFetch(
+      db.prepare(`
+        SELECT 
+          AVG(client_tcp_rtt) as global_avg_rtt,
+          MIN(client_tcp_rtt) as min_rtt,
+          MAX(client_tcp_rtt) as max_rtt,
+          COUNT(DISTINCT colo) as active_nodes
+        FROM sessions
+        WHERE expires_at > ? AND client_tcp_rtt IS NOT NULL
+      `).bind(Date.now()).first(),
+      null
+    );
+  }
+} catch (e) {
+  console.error("CRITICAL: Admin Dashboard Data Load Failed", e);
+  // Defaults are already set
+}
 
 // Prevent Caching
 Astro.response.headers.set(
@@ -49,158 +174,6 @@ Astro.response.headers.set(
 );
 Astro.response.headers.set("Pragma", "no-cache");
 Astro.response.headers.set("Expires", "0");
-const recentPosts = db
-	? await safeFetch(
-			db
-				.prepare("SELECT * FROM posts ORDER BY published_at DESC LIMIT 10")
-				.all(),
-			// @ts-expect-error
-			{ results: [], success: false, meta: {} },
-		)
-	: { results: [], success: false, meta: {} };
-
-// Detailed Lists for Modals
-// Detailed Lists for Modals
-const activeSessionsList = db
-	? await safeFetch(
-			db
-				.prepare(
-					`
-    SELECT 
-      sessions.id as session_id,
-      sessions.ip_address, 
-      sessions.user_agent, 
-      sessions.last_active, 
-      sessions.created_at as session_created,
-      sessions.city,
-      sessions.country,
-      
-      -- Network & ISP
-      sessions.asn,
-      sessions.as_organization,
-      sessions.colo,
-      sessions.continent,
-      sessions.timezone,
-      
-      -- Enhanced Geolocation
-      sessions.latitude,
-      sessions.longitude,
-      sessions.postal_code,
-      sessions.region,
-      sessions.region_code,
-      
-      -- Connection Details
-      sessions.http_protocol,
-      sessions.tls_version,
-      sessions.tls_cipher,
-      sessions.client_tcp_rtt,
-      
-      -- Security & Trust
-      sessions.client_trust_score,
-      sessions.is_eu_country,
-
-      -- Device Information
-      sessions.screen_resolution,
-      sessions.device_memory,
-      sessions.cpu_cores,
-      sessions.connection_type,
-      
-      users.username, 
-      users.avatar,
-      users.id as user_id,
-      users.github_username,
-      users.google_username,
-      users.discord_username
-    FROM sessions 
-    LEFT JOIN users ON sessions.user_id = users.id 
-    WHERE sessions.expires_at > ? 
-    ORDER BY sessions.last_active DESC
-  `,
-				)
-				.bind(Date.now())
-				.all(),
-			// @ts-expect-error
-			{ results: [] },
-		)
-	: { results: [] };
-
-const usersList = db
-	? await safeFetch(
-			db
-				.prepare(
-					`
-    WITH RankedSessions AS (
-      SELECT 
-        *,
-        ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY last_active DESC) as rn
-      FROM sessions
-    )
-    SELECT 
-      users.*,
-      rs.last_active,
-      rs.ip_address,
-      rs.city,
-      rs.country,
-      rs.screen_resolution,
-      rs.device_memory,
-      rs.cpu_cores,
-      rs.connection_type
-    FROM users
-    LEFT JOIN RankedSessions rs ON users.id = rs.user_id AND rs.rn = 1
-    ORDER BY users.rowid DESC 
-    LIMIT 100
-  `,
-				)
-				.all(),
-			// @ts-expect-error
-			{ results: [] },
-		)
-	: { results: [] };
-
-// Edge Analytics Queries
-const edgeNodeStats = db
-	? await safeFetch(
-			db
-				.prepare(
-					`
-    SELECT 
-      colo,
-      COUNT(*) as session_count,
-      AVG(client_tcp_rtt) as avg_rtt,
-      country,
-      continent
-    FROM sessions
-    WHERE expires_at > ? AND colo IS NOT NULL
-    GROUP BY colo
-    ORDER BY session_count DESC
-  `,
-				)
-				.bind(Date.now())
-				.all(),
-			// @ts-expect-error
-			{ results: [] },
-		)
-	: { results: [] };
-
-const performanceSummary = db
-	? await safeFetch(
-			db
-				.prepare(
-					`
-    SELECT 
-      AVG(client_tcp_rtt) as global_avg_rtt,
-      MIN(client_tcp_rtt) as min_rtt,
-      MAX(client_tcp_rtt) as max_rtt,
-      COUNT(DISTINCT colo) as active_nodes
-    FROM sessions
-    WHERE expires_at > ? AND client_tcp_rtt IS NOT NULL
-  `,
-				)
-				.bind(Date.now())
-				.first(),
-			null,
-		)
-	: null;
 
 // Edge Node Location Mapping (100+ Major Cloudflare Nodes)
 const COLO_LOCATIONS: Record<
