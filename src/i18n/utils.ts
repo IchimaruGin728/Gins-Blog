@@ -1,4 +1,6 @@
-import { defaultLang, ui } from "./ui";
+import { defaultLang, ui, languages } from "./ui";
+
+export { languages };
 
 export function getLangFromUrl(url: URL) {
 	const [, lang] = url.pathname.split("/");
