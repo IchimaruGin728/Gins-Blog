@@ -1,9 +1,7 @@
 ---
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
-// biome-ignore lint/correctness/noUnusedVariables: Used in template
 const lang = getLangFromUrl(Astro.url);
-// biome-ignore lint/correctness/noUnusedVariables: Used in template
 const t = useTranslations(lang);
 ---
 

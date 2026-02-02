@@ -1,8 +1,8 @@
 ---
-import { getLangFromUrl } from "../i18n/utils";
+import { getLangFromUrl, languages, getRouteFromUrl } from "../i18n/utils";
 
 const url = Astro.url;
-const _currentLang = getLangFromUrl(url);
+const currentLang = getLangFromUrl(url);
 
 // Helper to remove current lang from slug if it exists to clean up logic
 // But simpler approach: just map key to URL

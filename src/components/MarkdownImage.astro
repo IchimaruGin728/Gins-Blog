@@ -10,7 +10,7 @@ interface Props {
 const { src, alt, title } = Astro.props;
 
 // Helper to determine if remote
-const _isRemote = src.startsWith("http");
+const isRemote = src.startsWith("http");
 ---
 
 <figure class="my-8">
