@@ -1,26 +1,14 @@
-# 🌸 Gin's Blog ✨
+# Gin's Blog ✨
 
 <div align="center">
 
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square) 
-![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6.svg?style=flat-square&logo=typescript&logoColor=white)
-![Astro](https://img.shields.io/badge/-Astro-883AE2.svg?style=flat-square&logo=astro&logoColor=white)
-![Preact](https://img.shields.io/badge/-Preact-673AB8.svg?style=flat-square&logo=preact&logoColor=white)
-![Cloudflare](https://img.shields.io/badge/-Cloudflare-F38020.svg?style=flat-square&logo=cloudflare&logoColor=white)
-![Hono](https://img.shields.io/badge/-Hono-E36002.svg?style=flat-square&logo=hono&logoColor=white)
-![UnoCSS](https://img.shields.io/badge/-UnoCSS-333333.svg?style=flat-square&logo=unocss&logoColor=white)
-![Biome](https://img.shields.io/badge/-Biome-60A5FA.svg?style=flat-square&logo=biome&logoColor=white)
-![Drizzle ORM](https://img.shields.io/badge/-Drizzle_ORM-C5F74F.svg?style=flat-square&logo=drizzle&logoColor=black)
-![D1](https://img.shields.io/badge/-D1_Database-F38020.svg?style=flat-square&logo=cloudflare&logoColor=white)
-![R2](https://img.shields.io/badge/-R2_Storage-F38020.svg?style=flat-square&logo=cloudflare&logoColor=white)
-![KV](https://img.shields.io/badge/-KV_Store-F38020.svg?style=flat-square&logo=cloudflare&logoColor=white)
-![Vectorize](https://img.shields.io/badge/-Vectorize-F38020.svg?style=flat-square&logo=cloudflare&logoColor=white)
-![Workers AI](https://img.shields.io/badge/-Workers_AI-F38020.svg?style=flat-square&logo=cloudflare&logoColor=white)
-![Arctic](https://img.shields.io/badge/-Arctic-4FC3F7.svg?style=flat-square&logo=oauth&logoColor=white)
-![Oslo](https://img.shields.io/badge/-Oslo-FF6B6B.svg?style=flat-square&logo=auth0&logoColor=white)
-![Zod](https://img.shields.io/badge/-Zod-3E67B1.svg?style=flat-square&logo=zod&logoColor=white)
-![Satori](https://img.shields.io/badge/-Satori-000000.svg?style=flat-square&logo=vercel&logoColor=white)
-![Marked](https://img.shields.io/badge/-Marked-000000.svg?style=flat-square&logo=markdown&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge) 
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Astro](https://img.shields.io/badge/Astro-BC52EE?style=for-the-badge&logo=astro&logoColor=white)
+![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
+![Hono](https://img.shields.io/badge/Hono-E36002?style=for-the-badge&logo=hono&logoColor=white)
+![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=for-the-badge&logo=drizzle&logoColor=black)
+![Biome](https://img.shields.io/badge/Biome-60A5FA?style=for-the-badge&logo=biome&logoColor=white)
 
 **A high-performance, edge-first blog platform built with modern web technologies**
 
