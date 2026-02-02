@@ -1,0 +1,29 @@
+---
+title: "My First MDX Post"
+description: "This is the first post using MDX in this Astro project."
+pubDate: "2024-02-02"
+heroImage: "/placeholder.png"
+tags: ["mdx", "astro"]
+---
+
+import { Image } from 'astro:assets';
+
+# Hello MDX
+
+This is an MDX post. I can write Markdown as usual, but I can also import and use components.
+
+## Using a Component
+
+Here is a button or any other component I want to use:
+
+<div class="p-4 bg-blue-100 dark:bg-blue-900 rounded-lg border border-blue-200 dark:border-blue-800">
+  This is a styled div using **UnoCSS** utility classes directly in MDX!
+</div>
+
+### Icons via UnoCSS
+
+We can also use icons directly using the `i-` preset:
+
+<span class="i-heroicons-sparkles text-yellow-400 text-2xl"></span>
+<span class="i-simple-icons-astro text-orange-500 text-2xl ml-2"></span>
+

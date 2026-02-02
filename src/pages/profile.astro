@@ -1,6 +1,5 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import { useTranslations, getLangFromUrl } from "../i18n/utils";
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 // biome-ignore lint/correctness/noUnusedVariables: Used in template
@@ -26,7 +25,7 @@ const userProfile = await db
   .where(eq(users.id, user.id))
   .get();
 
-const socialLinks = userProfile?.socialLinks
+const _socialLinks = userProfile?.socialLinks
   ? JSON.parse(userProfile.socialLinks as string)
   : {};
 ---
@@ -529,6 +528,7 @@ const socialLinks = userProfile?.socialLinks
 
 <!-- Session Management Script -->
 <script
+  is:inline
   define:vars={{
     tSessionsNone: t("profile.sessions_none"),
     tSessionsCurrent: t("profile.sessions_current"),

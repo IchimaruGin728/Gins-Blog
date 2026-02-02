@@ -16,7 +16,8 @@
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.9.6",
-		"@astrojs/cloudflare": "latest",
+		"@astrojs/cloudflare": "^12.6.12",
+		"@astrojs/mdx": "^4.3.13",
 		"@astrojs/preact": "latest",
 		"@astrojs/rss": "^4.0.15",
 		"@astrojs/sitemap": "^3.7.0",
@@ -28,7 +29,7 @@
 		"@oslojs/encoding": "^1.1.0",
 		"@resvg/resvg-wasm": "^2.6.2",
 		"arctic": "latest",
-		"astro": "latest",
+		"astro": "^5.17.1",
 		"astro-loading-indicator": "^0.7.1",
 		"astro-remote": "^0.3.4",
 		"drizzle-orm": "latest",

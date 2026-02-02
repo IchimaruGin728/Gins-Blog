@@ -1,6 +1,5 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import { useTranslations, getLangFromUrl } from "../../i18n/utils";
+import { getLangFromUrl, useTranslations } from "../../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 // biome-ignore lint/correctness/noUnusedVariables: Used in template
@@ -16,8 +15,8 @@ import { users } from "../../../db/schema";
 import { getDb } from "../../lib/db";
 
 let userProfile;
-let socialLinks: any = {};
-let errorMsg = null;
+let _socialLinks: any = {};
+let _errorMsg = null;
 
 try {
   const db = getDb(env);
@@ -27,12 +26,12 @@ try {
     .where(eq(users.id, user.id))
     .get();
 
-  socialLinks = userProfile?.socialLinks
+  _socialLinks = userProfile?.socialLinks
     ? JSON.parse(userProfile.socialLinks as string)
     : {};
 } catch (e: any) {
   console.error("Profile Error:", e);
-  errorMsg = e.message;
+  _errorMsg = e.message;
 }
 ---
 
@@ -546,6 +545,7 @@ try {
 
 <!-- Session Management Script -->
 <script
+  is:inline
   define:vars={{
     tSessionsNone: t("profile.sessions_none"),
     tSessionsCurrent: t("profile.sessions_current"),

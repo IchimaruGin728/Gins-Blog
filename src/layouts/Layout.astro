@@ -1,11 +1,5 @@
 ---
-import { ClientRouter } from "astro:transitions";
-import { getLangFromUrl, getRouteFromUrl } from "../i18n/utils";
-import LoadingIndicator from "astro-loading-indicator/component";
-import Footer from "../components/Footer.astro";
-import Header from "../components/Header.astro";
-import MobileNav from "../components/MobileNav.astro";
-import SearchModal from "../components/SearchModal.tsx";
+import { getLangFromUrl } from "../i18n/utils";
 import "../styles/global.css";
 
 // Font Optimizations (Self-hosted)
@@ -17,44 +11,44 @@ import "@fontsource-variable/outfit";
 const lang = getLangFromUrl(Astro.url);
 
 interface Props {
-  title: string;
-  description?: string;
-  image?: string;
-  type?: "website" | "article";
-  publishedTime?: string;
-  author?: string;
-  keywords?: string;
+	title: string;
+	description?: string;
+	image?: string;
+	type?: "website" | "article";
+	publishedTime?: string;
+	author?: string;
+	keywords?: string;
 }
 
 const {
-  title,
-  description = "Gin's bleeding edge blog exploring AI, software engineering, and technology.",
-  image,
-  type = "website",
-  publishedTime,
-  author = "IchimaruGin728",
-  keywords = "blog, tech, ai, software engineering, ichimarugin728",
+	title,
+	description = "Gin's bleeding edge blog exploring AI, software engineering, and technology.",
+	image,
+	type = "website",
+	publishedTime,
+	author = "IchimaruGin728",
+	keywords = "blog, tech, ai, software engineering, ichimarugin728",
 } = Astro.props;
 
 // Construct full URL for canonical and social media
-const canonicalURL = new URL(
-  Astro.url.pathname,
-  Astro.site || Astro.url.origin,
+const _canonicalURL = new URL(
+	Astro.url.pathname,
+	Astro.site || Astro.url.origin,
 );
 
 // Determine OG image
 const ogImage =
-  image ||
-  (Astro.url.pathname.startsWith("/blog/")
-    ? `/og${Astro.url.pathname.replace("/blog", "")}.png`
-    : "/og-default.png");
-const fullOgImage = new URL(ogImage, Astro.site || Astro.url.origin).href;
+	image ||
+	(Astro.url.pathname.startsWith("/blog/")
+		? `/og${Astro.url.pathname.replace("/blog", "")}.png`
+		: "/og-default.png");
+const _fullOgImage = new URL(ogImage, Astro.site || Astro.url.origin).href;
 
 // Format title with site name
-const fullTitle =
-  title === "Home"
-    ? "Gin's Blog - AI, Tech & Engineering"
-    : `${title} | Gin's Blog`;
+const _fullTitle =
+	title === "Home"
+		? "Gin's Blog - AI, Tech & Engineering"
+		: `${title} | Gin's Blog`;
 ---
 
 <!doctype html>
@@ -186,9 +180,8 @@ const fullTitle =
         try {
           // Collect Data
           const screenResolution = `${window.screen.width}x${window.screen.height}`;
-          // @ts-ignore
-          const deviceMemory = navigator.deviceMemory
-            ? navigator.deviceMemory.toString()
+          const deviceMemory = (navigator as any).deviceMemory
+            ? (navigator as any).deviceMemory.toString()
             : undefined;
           // @ts-ignore
           const cpuCores = navigator.hardwareConcurrency

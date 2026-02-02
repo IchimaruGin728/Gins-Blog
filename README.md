@@ -2,11 +2,15 @@
 
 <div align="center">
 
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) 
-![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-blue.svg)
-![Astro](https://img.shields.io/badge/Astro-5.0%2B-orange.svg)
-![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square) 
+![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6.svg?style=flat-square&logo=typescript&logoColor=white)
+![Astro](https://img.shields.io/badge/-Astro-883AE2.svg?style=flat-square&logo=astro&logoColor=white)
+![Preact](https://img.shields.io/badge/-Preact-673AB8.svg?style=flat-square&logo=preact&logoColor=white)
+![Cloudflare](https://img.shields.io/badge/-Cloudflare_Workers-F38020.svg?style=flat-square&logo=cloudflare&logoColor=white)
+![Hono](https://img.shields.io/badge/-Hono-E36002.svg?style=flat-square&logo=hono&logoColor=white)
+![UnoCSS](https://img.shields.io/badge/-UnoCSS-333333.svg?style=flat-square&logo=unocss&logoColor=white)
+![Biome](https://img.shields.io/badge/-Biome-60A5FA.svg?style=flat-square&logo=biome&logoColor=white)
+![Drizzle](https://img.shields.io/badge/-Drizzle_ORM-C5F74F.svg?style=flat-square&logo=drizzle&logoColor=black)
 
 **A high-performance, edge-first blog platform built with modern web technologies**
 
@@ -134,20 +138,21 @@
 ## 🛠️ Tech Stack
 
 ### **Frontend**
-| Technology | Purpose | Version |
+| Technology | Version | Purpose |
 |------------|---------|---------|
-| [Astro](https://astro.build) | Static site generator with server-side rendering | Latest |
-| [Preact](https://preactjs.com) | Lightweight React alternative for interactive components | Latest |
-| [UnoCSS](https://unocss.dev) | Instant on-demand atomic CSS engine | Latest |
-| [Satori](https://github.com/vercel/satori) | SVG-based OG image generation | ^0.19.1 |
+| [Astro](https://astro.build) | `v5.17.1` | Static site generator with Server Actions & Server Islands |
+| [Preact](https://preactjs.com) | Latest | Lightweight React alternative for interactive components |
+| [UnoCSS](https://unocss.dev) | Latest | Instant on-demand atomic CSS engine (Replaces Tailwind) |
+| [Satori](https://github.com/vercel/satori) | ^0.19.1 | SVG-based OG image generation |
+| [Biome](https://biomejs.dev) | Latest | Fast All-in-One Formatter & Linter (Replaces ESLint/Prettier) |
 
 ### **Backend & Edge**
-| Technology | Purpose | Version |
+| Technology | Version | Purpose |
 |------------|---------|---------|
-| [Cloudflare Workers](https://workers.cloudflare.com) | Serverless edge compute platform | - |
-| [Cloudflare Pages](https://pages.cloudflare.com) | Static site hosting with edge functions | - |
-| [Hono](https://hono.dev) | Ultrafast web framework for Workers | Latest |
-| [Drizzle ORM](https://orm.drizzle.team) | Type-safe SQL ORM for D1 | Latest |
+| [Cloudflare Workers](https://workers.cloudflare.com) | - | Serverless edge compute platform |
+| [Cloudflare Pages](https://pages.cloudflare.com) | - | Static site hosting with edge functions |
+| [Hono](https://hono.dev) | Latest | Ultrafast web framework for robust API Routes (`/api/*`) |
+| [Drizzle ORM](https://orm.drizzle.team) | Latest | Type-safe SQL ORM for Cloudflare D1 |
 
 ### **Database & Storage**
 | Technology | Purpose |
@@ -175,7 +180,6 @@
 | [Marked](https://marked.js.org) | Markdown parser for content | ^17.0.1 |
 | [Zod](https://zod.dev) | TypeScript-first schema validation | ^3.25.76 |
 | [TypeScript](https://www.typescriptlang.org) | Type-safe JavaScript | ^5.9.3 |
-| [Biome](https://biomejs.dev) | Fast formatter & linter (replaces Prettier/ESLint) | Latest |
 
 ---
 

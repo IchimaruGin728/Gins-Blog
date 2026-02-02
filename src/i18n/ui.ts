@@ -28,7 +28,8 @@ export const ui = {
 		"blog.prev": "Previous Post",
 		"blog.next": "Next Post",
 		"chronicle.biome_fmt": "Standardized with Biome",
-		"chronicle.biome_fmt_desc": "Migrated the entire codebase to Biome for unified formatting and linting, replacing Prettier and ESLint.",
+		"chronicle.biome_fmt_desc":
+			"Migrated the entire codebase to Biome for unified formatting and linting, replacing Prettier and ESLint.",
 		"chronicle.ai_search": "AI Search Redesign",
 		"chronicle.ai_search_desc":
 			"Implemented RAG-based intelligent Q&A system integrated with Vectorize vector database.",
@@ -76,7 +77,8 @@ export const ui = {
 		"404.hero": "Aiyo!",
 		"404.description": "Nothing to see here lah!",
 		"404.text": "Page not found lah!",
-		"404.subtitle": "You lost or what? This signal is transmission dead. Valid coordinates are required for teleportation.",
+		"404.subtitle":
+			"You lost or what? This signal is transmission dead. Valid coordinates are required for teleportation.",
 		"404.home": "Balik Kampung (Home)",
 		"profile.sessions": "Active Sessions",
 		"profile.sessions_desc": "Manage devices where you're currently logged in",
@@ -84,7 +86,8 @@ export const ui = {
 		"profile.sessions_none": "No active sessions found",
 		"profile.sessions_revoke": "Revoke",
 		"profile.sessions_current": "Current",
-		"profile.sessions_confirm_revoke": "Are you sure you want to revoke this session? You will be logged out on that device.",
+		"profile.sessions_confirm_revoke":
+			"Are you sure you want to revoke this session? You will be logged out on that device.",
 		"profile.sessions_error_load": "Failed to load sessions",
 		"profile.sessions_error_revoke": "Failed to revoke session",
 	},
@@ -110,7 +113,8 @@ export const ui = {
 		"blog.prev": "上一篇",
 		"blog.next": "下一篇",
 		"chronicle.biome_fmt": "Biome 格式化标准化",
-		"chronicle.biome_fmt_desc": "全站代码库迁移至 Biome，统一了格式化和 Lint 规则，替代了 Prettier 和 ESLint。",
+		"chronicle.biome_fmt_desc":
+			"全站代码库迁移至 Biome，统一了格式化和 Lint 规则，替代了 Prettier 和 ESLint。",
 		"chronicle.ai_search": "AI 搜索重构",
 		"chronicle.ai_search_desc":
 			"实现了基于 RAG 的智能问答系统，集成了 Vectorize 向量数据库。",
@@ -164,7 +168,8 @@ export const ui = {
 		"profile.sessions_none": "暂无活跃会话",
 		"profile.sessions_revoke": "注销",
 		"profile.sessions_current": "当前设备",
-		"profile.sessions_confirm_revoke": "您确定要注销此会话吗？您将在该设备上退出登录。",
+		"profile.sessions_confirm_revoke":
+			"您确定要注销此会话吗？您将在该设备上退出登录。",
 		"profile.sessions_error_load": "加载会话失败",
 		"profile.sessions_error_revoke": "注销会话失败",
 	},
