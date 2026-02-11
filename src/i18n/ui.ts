@@ -27,9 +27,9 @@ export const ui = {
 		"blog.back": "Back to Overview",
 		"blog.prev": "Previous Post",
 		"blog.next": "Next Post",
-		"chronicle.mcp_agent": "Agentic AI Integration",
+		"chronicle.mcp_agent": "Agentic AI & MCP Integration",
 		"chronicle.mcp_agent_desc":
-			"Added llms.txt support, OpenClaw agent deployment integration, and implemented MCP Server for autonomous content management.",
+			"Added llms.txt, OpenClaw deployment support, and a full Model Context Protocol (MCP) Server for autonomous content management.",
 		"chronicle.biome_fmt": "Standardized with Biome",
 		"chronicle.biome_fmt_desc":
 			"Migrated the entire codebase to Biome for unified formatting and linting, replacing Prettier and ESLint.",
@@ -115,9 +115,9 @@ export const ui = {
 		"blog.back": "返回列表",
 		"blog.prev": "上一篇",
 		"blog.next": "下一篇",
-		"chronicle.mcp_agent": "Agentic AI 集成",
+		"chronicle.mcp_agent": "Agentic AI & MCP 集成",
 		"chronicle.mcp_agent_desc":
-			"新增 llms.txt 支持，集成 OpenClaw 智能体部署管理，并实现 MCP Server 以支持自主内容管理。",
+			"新增 llms.txt 支持、OpenClaw 部署管理，并实现了完整的 MCP (Model Context Protocol) Server 以支持自主内容管理。",
 		"chronicle.biome_fmt": "Biome 格式化标准化",
 		"chronicle.biome_fmt_desc":
 			"全站代码库迁移至 Biome，统一了格式化和 Lint 规则，替代了 Prettier 和 ESLint。",
