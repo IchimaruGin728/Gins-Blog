@@ -121,6 +121,7 @@ Built with an Edge-First MCP Server, you can connect **Claude Desktop**, **OpenC
 ✅ **Zero-Config Ready**: Includes `openclaw.json` and standard MCP client scripts for instant connection.
 
 > 🔗 **Get Started:** Check the [MCP Usage Guide](./MCP_GUIDE.md) to unlock agentic capabilities.
+> 🦞 **Zero-Touch Deployment:** Just tell OpenClaw to "Read [AGENT_GUIDE.md](./AGENT_GUIDE.md) and deploy this for me."
 
 ---
 

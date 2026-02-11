@@ -13,7 +13,7 @@
 **一个基于现代 Web 技术构建的高性能边缘优先博客平台**
 
 [🌐 在线演示](https://blog.ichimarugin728.com) • [📖 English Documentation](./README.md)
-[🦞 OpenClaw Users](./AGENT_GUIDE.md): Just tell your agent: "Read AGENT_GUIDE.md and deploy this for me."
+[🦞 OpenClaw 用户](./AGENT_GUIDE.md): 直接告诉你的 Agent: "Read AGENT_GUIDE.md and deploy this for me."
 
 ![Gins Blog 首页预览](media/home.png)
 
@@ -108,6 +108,7 @@
 ✅ **零配置对接**：根目录内置 `openclaw.json` 和标准 MCP 客户端脚本，一键连接您的 AI 助手。
 
 > 🔗 **开始使用：** 阅读 [MCP 使用指南](./MCP_GUIDE.md) 解锁 AI 操作能力。
+> 🦞 **零人工部署：** 让 OpenClaw 阅读 [AGENT_GUIDE.md](./AGENT_GUIDE.md) 即可全自动部署本项目。
 
 ## 🎨 界面展示
 
