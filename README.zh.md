@@ -7,10 +7,13 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-blue.svg)
 ![Astro](https://img.shields.io/badge/Astro-5.0%2B-orange.svg)
 ![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020.svg)
+![OpenClaw](https://img.shields.io/badge/%F0%9F%A6%9E_OpenClaw-Compatible-00CDAC)
+![MCP](https://img.shields.io/badge/MCP-Ready-7D56F4)
 
 **一个基于现代 Web 技术构建的高性能边缘优先博客平台**
 
 [🌐 在线演示](https://blog.ichimarugin728.com) • [📖 English Documentation](./README.md)
+[🦞 OpenClaw Users](./AGENT_GUIDE.md): Just tell your agent: "Read AGENT_GUIDE.md and deploy this for me."
 
 ![Gins Blog 首页预览](media/home.png)
 
@@ -92,12 +95,19 @@
   - *隐私说明*: 所有分析数据**仅私有部署**，绝不与第三方共享。
 - **统一弹窗 UX** - 背景点击关闭、300ms 淡入淡出动画、统一的红色悬停关闭按钮。
 
-### 🎨 **图标系统优化**
-- ✨ **清晰渲染** - `shape-rendering: geometricPrecision` 确保矢量边缘清晰锐利。
-- 🚀 **零延迟加载** - 本地内联 SVG + **Safelist 预加载**（彻底消除 FOUC 闪烁）。
-- 💨 **加载优化** - 预编译所有图标，无需运行时的额外网络请求。
+### 🧠 **Agentic Core: 博客即是智能体接口**
 
----
+**Gins Blog 不仅仅是一个静态网站，它是一个符合 Model Context Protocol (MCP) 标准的智能体接口。**
+
+您的博客内置了以 Edge-First 为核心的 MCP Server，这意味着您可以直接使用 **Claude Desktop**, **OpenClaw**, 或 **Cursor** 连接到您的博客，把聊天窗口变成您的 **"无头 CMS"**。
+
+- 📝 **自然语言写作** - *"帮我根据最近的科技新闻写一篇草稿，并保存到数据库。"*
+- 🕵️ **智能数据透视** - *"查看过去24小时的流量，并分析哪篇文章最受欢迎。"*
+- 🛡️ **自动化运维** - *"扫描最新的评论，告诉我有没有需要处理的垃圾信息。"*
+
+✅ **零配置对接**：根目录内置 `openclaw.json` 和标准 MCP 客户端脚本，一键连接您的 AI 助手。
+
+> 🔗 **开始使用：** 阅读 [MCP 使用指南](./MCP_GUIDE.md) 解锁 AI 操作能力。
 
 ## 🎨 界面展示
 
@@ -202,122 +212,41 @@ npm install
 
 ---
 
-### **步骤 2：设置 Cloudflare 资源**
+### **步骤 2：自动设置 Cloudflare 资源**
+请选择适合您的部署方式：
 
-您需要创建多个 Cloudflare 资源。请仔细按照以下步骤操作。
-
-#### **2.1 创建 D1 数据库**
-
+#### **方式 A：交互式脚本 (推荐)**
+适合人类用户。脚本将引导您完成所有配置。
 ```bash
-wrangler d1 create gins-blog-db
+npm run setup
 ```
 
-**输出：**
-```
-database_id = "abc123-def456-ghi789"
-```
-
-复制 `database_id` 并更新 `wrangler.jsonc`：
-
-```jsonc
-{
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "gins-blog-db",
-      "database_id": "abc123-def456-ghi789" // <--- 粘贴到这里
-    }
-  ]
-}
-```
-
-#### **2.2 初始化数据库架构**
-
+#### **方式 B：AI / CI Agent 模式**
+适合 OpenClaw、Cursor 等 AI 代理或流水线。
 ```bash
-npm run db:push
+node scripts/setup.js --suffix=prod --setup-ai=false
 ```
 
-这将创建所有必要的表（`users`、`sessions`、`posts`、`comments`、`likes`、`music`）。
+#### **方式 C：手动模式**
+适合高级用户。请参考 `scripts/setup.js` 中的逻辑手动执行 `wrangler` 命令并更新 `wrangler.jsonc`。
 
 ---
 
-#### **2.3 创建 KV 命名空间**
+自动脚本将执行：
+1. **验证环境** - 检查 Wrangler 登录状态。
+2. **创建资源** - 自动创建 D1 数据库、KV 命名空间和 R2 存储桶。
+3. **配置项目** - 自动更新 `wrangler.jsonc`。
+4. **初始化数据库** - 推送最新的数据库架构。
 
-```bash
-# 缓存命名空间
-wrangler kv namespace create GINS_CACHE
+### **步骤 2.1：(可选) 配置 AI 搜索**
 
-# 会话命名空间
-wrangler kv namespace create SESSION
+如果您需要启用 AI 搜索功能（Semantic Search）：
 
-# 通用 KV 命名空间
-wrangler kv namespace create GIN_KV
-```
-
-对于每个命令，您将获得一个 `id`。更新 `wrangler.jsonc`：
-
-```jsonc
-{
-  "kv_namespaces": [
-    {
-      "binding": "GINS_CACHE",
-      "id": "your-cache-namespace-id"
-    },
-    {
-      "binding": "SESSION",
-      "id": "your-session-namespace-id"
-    },
-    {
-      "binding": "GIN_KV",
-      "id": "your-kv-namespace-id"
-    }
-  ]
-}
-```
-
----
-
-#### **2.4 创建 R2 存储桶**
-
-```bash
-wrangler r2 bucket create gins-media
-```
-
-更新 `wrangler.jsonc`：
-
-```jsonc
-{
-  "r2_buckets": [
-    {
-      "binding": "GINS_MEDIA",
-      "bucket_name": "gins-media"
-    }
-  ]
-}
-```
-
----
-
-#### **2.5 创建 Vectorize 索引（可选 - 用于 AI 搜索）**
-
-```bash
-wrangler vectorize create gins-vector --dimensions=768 --metric=cosine
-```
-
-更新 `wrangler.jsonc`：
-
-```jsonc
-{
-  "vectorize": [
-    {
-      "binding": "VECTORIZE",
-      "index_name": "gins-vector"
-    }
-  ]
-}
-```
-
----
+1. 创建 Vectorize 索引：
+   ```bash
+   wrangler vectorize create gins-vector --dimensions=768 --metric=cosine
+   ```
+2. 在 `wrangler.jsonc` 中取消 `vectorize` 和 `ai` 部分的注释，并更新 `index_name`（如果使用了自定义名称）。
 
 ### **步骤 3：配置 OAuth 提供商**
 

@@ -7,6 +7,8 @@
 	},
 	"scripts": {
 		"dev": "astro dev",
+		"setup": "node scripts/setup.js",
+		"deploy:agent": "npm run setup",
 		"start": "astro dev",
 		"build": "astro build",
 		"deploy": "astro build && wrangler deploy",
@@ -35,6 +37,7 @@
 		"drizzle-orm": "latest",
 		"hono": "latest",
 		"marked": "^17.0.1",
+		"minimist": "^1.2.8",
 		"oslo": "latest",
 		"preact": "latest",
 		"satori": "^0.19.1",
@@ -50,6 +53,7 @@
 		"@types/node": "latest",
 		"dotenv": "^17.2.3",
 		"drizzle-kit": "latest",
+		"inquirer": "^13.2.2",
 		"unocss": "latest",
 		"wrangler": "latest"
 	}

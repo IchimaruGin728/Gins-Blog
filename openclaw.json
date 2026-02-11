@@ -1,0 +1,12 @@
+{
+	"mcpServers": {
+		"gins-blog": {
+			"command": "node",
+			"args": ["scripts/mcp-client.js"],
+			"env": {
+				"BLOG_URL": "https://blog.ichimarugin728.com"
+			}
+		}
+	},
+	"instructions": "To use this blog's MCP capabilities:\n1. Ensure you have deployed the blog.\n2. Update BLOG_URL in this file to your deployed URL.\n3. OpenClaw will use the local 'mcp-client.js' script as a bridge to talk to your remote blog API."
+}

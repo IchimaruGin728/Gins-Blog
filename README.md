@@ -12,10 +12,13 @@
 ![UnoCSS](https://img.shields.io/badge/UnoCSS-333333?style=flat&logo=unocss&logoColor=white)
 ![Biome](https://img.shields.io/badge/Biome-60A5FA?style=flat&logo=biome&logoColor=white)
 ![Arctic](https://img.shields.io/badge/Arctic-4FC3F7?style=flat&logo=oauth&logoColor=white)
+![OpenClaw](https://img.shields.io/badge/%F0%9F%A6%9E_OpenClaw-Compatible-00CDAC)
+![MCP](https://img.shields.io/badge/MCP-Ready-7D56F4)
 
 **A high-performance, edge-first blog platform built with modern web technologies**
 
 [🌐 Live Demo](https://blog.ichimarugin728.com) • [📖 中文文档](./README.zh.md)
+[🦞 OpenClaw Users](./AGENT_GUIDE.md): Just tell your agent: "Read AGENT_GUIDE.md and deploy this for me."
 
 ![Gins Blog Home Preview](media/home.png)
 
@@ -104,6 +107,20 @@
 - ✨ **Sharp Rendering** - `shape-rendering: geometricPrecision` for crisp SVG edges.
 - 🚀 **Zero Latency** - Local inline SVGs with **Safelist Preloading** (No FOUC).
 - 💨 **Optimized Loading** - Pre-compiled icons for instant display without external network requests.
+
+### 🧠 **Agentic Core: The First-Class AI Interface**
+
+**Gins Blog is not just a static site; it is a fully compliant Agentic Interface via the Model Context Protocol (MCP).**
+
+Built with an Edge-First MCP Server, you can connect **Claude Desktop**, **OpenClaw**, or **Cursor** to your deployed blog, effectively turning your chat window into a **Headless CMS**.
+
+- 📝 **Conversational Drafting** - *"Draft a new post about my coding session today and save it."*
+- 🕵️ **Intelligent Insights** - *"Analyze traffic from the last 24 hours and identify trends."*
+- 🛡️ **Auto-Moderation** - *"Scan recent comments for spam or sentiment analysis."*
+
+✅ **Zero-Config Ready**: Includes `openclaw.json` and standard MCP client scripts for instant connection.
+
+> 🔗 **Get Started:** Check the [MCP Usage Guide](./MCP_GUIDE.md) to unlock agentic capabilities.
 
 ---
 
@@ -211,122 +228,41 @@ npm install
 
 ---
 
-### **Step 2: Set Up Cloudflare Resources**
+### **Step 2: Automated Cloudflare Setup**
+Select the method that best suits your workflow:
 
-You'll need to create several Cloudflare resources. Follow these steps carefully.
-
-#### **2.1 Create D1 Database**
-
+#### **Method A: Interactive Mode (Recommended)**
+For humans. The script will guide you through all configurations.
 ```bash
-wrangler d1 create gins-blog-db
+npm run setup
 ```
 
-**Output:**
-```
-database_id = "abc123-def456-ghi789"
-```
-
-Copy the `database_id` and update `wrangler.jsonc`:
-
-```jsonc
-{
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "gins-blog-db",
-      "database_id": "abc123-def456-ghi789" // <--- Paste here
-    }
-  ]
-}
-```
-
-#### **2.2 Initialize Database Schema**
-
+#### **Method B: AI / CI Agent Mode**
+For OpenClaw, Cursor, or CI pipelines.
 ```bash
-npm run db:push
+node scripts/setup.js --suffix=prod --setup-ai=false
 ```
 
-This will create all necessary tables (`users`, `sessions`, `posts`, `comments`, `likes`, `music`).
+#### **Method C: Manual Mode**
+For advanced users. Refer to `scripts/setup.js` logic to execute `wrangler` commands and update `wrangler.jsonc` manually.
 
 ---
 
-#### **2.3 Create KV Namespaces**
+The setup script handles:
+1. **Environment Check** - Verifies Wrangler login status.
+2. **Resource Creation** - Creates D1 Database, KV Namespaces, and R2 Bucket.
+3. **Configuration** - Automatically updates `wrangler.jsonc`.
+4. **Initialization** - Pushes the database schema.
 
-```bash
-# Cache namespace
-wrangler kv namespace create GINS_CACHE
+### **Step 2.1: (Optional) Configure AI Search**
 
-# Session namespace
-wrangler kv namespace create SESSION
+If you want to enable AI Semantic Search:
 
-# General KV namespace
-wrangler kv namespace create GIN_KV
-```
-
-For each command, you'll get an `id`. Update `wrangler.jsonc`:
-
-```jsonc
-{
-  "kv_namespaces": [
-    {
-      "binding": "GINS_CACHE",
-      "id": "your-cache-namespace-id"
-    },
-    {
-      "binding": "SESSION",
-      "id": "your-session-namespace-id"
-    },
-    {
-      "binding": "GIN_KV",
-      "id": "your-kv-namespace-id"
-    }
-  ]
-}
-```
-
----
-
-#### **2.4 Create R2 Bucket**
-
-```bash
-wrangler r2 bucket create gins-media
-```
-
-Update `wrangler.jsonc`:
-
-```jsonc
-{
-  "r2_buckets": [
-    {
-      "binding": "GINS_MEDIA",
-      "bucket_name": "gins-media"
-    }
-  ]
-}
-```
-
----
-
-#### **2.5 Create Vectorize Index (Optional - for AI Search)**
-
-```bash
-wrangler vectorize create gins-vector --dimensions=768 --metric=cosine
-```
-
-Update `wrangler.jsonc`:
-
-```jsonc
-{
-  "vectorize": [
-    {
-      "binding": "VECTORIZE",
-      "index_name": "gins-vector"
-    }
-  ]
-}
-```
-
----
+1. Create a Vectorize Index:
+   ```bash
+   wrangler vectorize create gins-vector --dimensions=768 --metric=cosine
+   ```
+2. Uncomment the `vectorize` and `ai` sections in `wrangler.jsonc` and update the `index_name` if needed.
 
 ### **Step 3: Configure OAuth Providers**
 
