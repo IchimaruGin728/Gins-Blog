@@ -149,31 +149,6 @@
 | [UnoCSS](https://unocss.dev) | 即时按需原子化 CSS 引擎 | Latest |
 | [Satori](https://github.com/vercel/satori) | 基于 SVG 的 OG 图片生成 | ^0.19.1 |
 
-### **后端与边缘**
-| 技术 | 用途 | 版本 |
-|------|------|------|
-| [Cloudflare Workers](https://workers.cloudflare.com) | 无服务器边缘计算平台 | - |
-| [Cloudflare Pages](https://pages.cloudflare.com) | 带边缘函数的静态站点托管 | - |
-| [Hono](https://hono.dev) | 适用于 Workers 的超快 Web 框架 | Latest |
-| [Drizzle ORM](https://orm.drizzle.team) | 类型安全的 D1 SQL ORM | Latest |
-
-### **数据库与存储**
-| 技术 | 用途 |
-|------|------|
-| [Cloudflare D1](https://developers.cloudflare.com/d1) | 基于 SQLite 的无服务器 SQL 数据库 |
-| [Cloudflare R2](https://developers.cloudflare.com/r2) | 兼容 S3 的媒体对象存储 |
-| [Cloudflare KV](https://developers.cloudflare.com/kv) | 用于缓存和会话的低延迟键值存储 |
-| [Cloudflare Vectorize](https://developers.cloudflare.com/vectorize) | AI 驱动搜索的向量数据库 |
-
-### **AI 与搜索**
-| 技术 | 用途 |
-|------|------|
-| [Workers AI](https://developers.cloudflare.com/workers-ai) | 用于嵌入的无服务器 AI 模型 |
-| [Vectorize](https://developers.cloudflare.com/vectorize) | 向量相似度搜索（768 维，余弦距离）|
-
-### **认证**
-| 技术 | 用途 | 版本 |
-|------|------|------|
 | [Arctic](https://arctic.js.org) | OAuth 2.0 客户端库 | Latest |
 | [Oslo](https://oslo.js.org) | 认证工具（会话、PKCE 等）| Latest |
 

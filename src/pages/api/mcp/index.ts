@@ -61,6 +61,39 @@ const TOOLS = [
 			properties: {},
 		},
 	},
+	{
+		name: "upload_image",
+		description: "Upload an image to Cloudflare Images via URL.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				url: {
+					type: "string",
+					description: "The public URL of the image to upload",
+				},
+				requireSignedURLs: {
+					type: "boolean",
+					description: "Whether to require signed URLs (default false)",
+				},
+			},
+			required: ["url"],
+		},
+	},
+	{
+		name: "upload_video",
+		description: "Upload a video to Cloudflare Stream via URL.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				url: {
+					type: "string",
+					description: "The public URL of the video to upload",
+				},
+				title: { type: "string", description: "Title for the video" },
+			},
+			required: ["url"],
+		},
+	},
 ];
 
 export const POST: APIRoute = async ({ request, locals }) => {
@@ -191,6 +224,100 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 					resultContent = [
 						{ type: "text", text: JSON.stringify(summary, null, 2) },
+					];
+					break;
+				}
+
+				case "upload_image": {
+					const { url, requireSignedURLs } = args;
+					const accountId = "cd4ce461acea5097153abf9e2deb26ec"; // Gins-Blog Account ID
+					const apiToken = env.CF_API_TOKEN;
+
+					if (!apiToken) {
+						throw new Error("CF_API_TOKEN environment variable is not set.");
+					}
+
+					const formData = new FormData();
+					formData.append("url", url);
+					if (requireSignedURLs) {
+						formData.append("requireSignedURLs", "true");
+					}
+
+					const response = await fetch(
+						`https://api.cloudflare.com/client/v4/accounts/${accountId}/images/v1`,
+						{
+							method: "POST",
+							headers: {
+								Authorization: `Bearer ${apiToken}`,
+							},
+							body: formData,
+						},
+					);
+
+					const data = (await response.json()) as any;
+
+					if (!data.success) {
+						throw new Error(
+							`Image upload failed: ${data.errors[0]?.message || "Unknown error"}`,
+						);
+					}
+
+					// Return a markdown snippet for the user/agent
+					const imageId = data.result.id;
+					const variants = data.result.variants;
+					const publicUrl = variants.find((v: string) => v.endsWith("/public"));
+
+					resultContent = [
+						{
+							type: "text",
+							text: `Image uploaded successfully!\n\nID: ${imageId}\n\nMarkdown Snippet:\n\`\`\`astro\n<CFImage src="${imageId}" alt="Uploaded Image" />\n\`\`\`\n\nDirect URL: ${publicUrl || variants[0]}`,
+						},
+					];
+					break;
+				}
+
+				case "upload_video": {
+					const { url, title } = args;
+					const accountId = "cd4ce461acea5097153abf9e2deb26ec"; // Gins-Blog Account ID
+					const apiToken = env.CF_API_TOKEN;
+
+					if (!apiToken) {
+						throw new Error("CF_API_TOKEN environment variable is not set.");
+					}
+
+					const body: any = {
+						url: url,
+					};
+					if (title) body.meta = { name: title };
+
+					const response = await fetch(
+						`https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/copy`,
+						{
+							method: "POST",
+							headers: {
+								Authorization: `Bearer ${apiToken}`,
+								"Content-Type": "application/json",
+							},
+							body: JSON.stringify(body),
+						},
+					);
+
+					const data = (await response.json()) as any;
+
+					if (!data.success) {
+						throw new Error(
+							`Video upload failed: ${data.errors[0]?.message || "Unknown error"}`,
+						);
+					}
+
+					const videoId = data.result.uid;
+					const thumbnail = data.result.thumbnail;
+
+					resultContent = [
+						{
+							type: "text",
+							text: `Video upload started! (Async)\n\nID: ${videoId}\n\nMarkdown Snippet:\n\`\`\`astro\n<StreamPlayer videoId="${videoId}" title="${title || "Video"}" />\n\`\`\`\n\nThumbnail: ${thumbnail}`,
+						},
 					];
 					break;
 				}

@@ -137,6 +137,38 @@ async function main() {
 				when: (answers) => answers.setupAi,
 				validate: validateName,
 			},
+			{
+				type: "input",
+				name: "vectorIndex",
+				message: "Vectorize Index Name:",
+				default: (answers) => `gins-vector-${answers.suffix}`,
+				when: (answers) => answers.setupAi,
+				validate: validateName,
+			},
+			{
+				type: "confirm",
+				name: "setupMedia",
+				message: "Do you have the Cloudflare Starter Bundle (Images + Stream)?",
+				default: false,
+			},
+			{
+				type: "input",
+				name: "cfAccountHash",
+				message:
+					"Enter your Cloudflare Account Hash (found in Images dashboard):",
+				when: (answers) => answers.setupMedia,
+				validate: (input) =>
+					input ? true : "Account Hash is required for Images.",
+			},
+			{
+				type: "input",
+				name: "cfApiToken",
+				message:
+					"Enter a Cloudflare API Token (Permissions: Account.Images:Edit, Account.Stream:Edit):",
+				when: (answers) => answers.setupMedia,
+				validate: (input) =>
+					input ? true : "API Token is required for uploads.",
+			},
 		]);
 
 		// Confirmation Step
@@ -149,6 +181,9 @@ async function main() {
 		console.log(`R2 Bucket:    \x1b[32m${answers.r2Bucket}\x1b[0m`);
 		console.log(
 			`AI Search:    \x1b[32m${answers.setupAi ? "Enabled (" + answers.vectorIndex + ")" : "Disabled"}\x1b[0m`,
+		);
+		console.log(
+			`Media Optimized:\x1b[32m${answers.setupMedia ? "Enabled (Pro Bundle)" : "Disabled"}\x1b[0m`,
 		);
 		console.log("--------------------------------");
 
@@ -360,13 +395,60 @@ async function main() {
 		}
 	}
 
+	// 10. Handle Secrets & Config
+	if (answers.setupMedia) {
+		console.log("🔐 Designing secrets for Media Bundle...");
+		// We append/update .dev.vars for local dev
+		try {
+			let envContent = "";
+			const envPath = path.resolve(process.cwd(), ".dev.vars");
+			if (fs.existsSync(envPath)) {
+				envContent = fs.readFileSync(envPath, "utf8");
+			}
+
+			if (!envContent.includes("CF_API_TOKEN")) {
+				envContent += `\nCF_API_TOKEN=${answers.cfApiToken}`;
+			}
+			if (!envContent.includes("PUBLIC_CF_ACCOUNT_HASH")) {
+				envContent += `\nPUBLIC_CF_ACCOUNT_HASH=${answers.cfAccountHash}`;
+			}
+
+			fs.writeFileSync(envPath, envContent);
+			console.log("✅ Secrets saved to .dev.vars (local)");
+
+			// Try to put secrets if logged in
+			// This might prompt interactively or fail if not set up, so we just log the manual command
+			console.log("ℹ️  To enable in production, run:");
+			console.log(`   npx wrangler secret put CF_API_TOKEN`);
+			console.log(
+				`   npx wrangler secret put PUBLIC_CF_ACCOUNT_HASH`, // Actually this can be a var in wrangler.toml or just public env, but secret is safe
+			);
+			// Wait, PUBLIC vars should be in wrangler.toml usually, but secrets work too.
+			// Actually better to put PUBLIC_CF_ACCOUNT_HASH in wrangler.jsonc vars if we can, but simpler to just use secrets for now or .env
+		} catch (e) {
+			console.warn("⚠️  Could not save secrets automatically.");
+		}
+	}
+
 	console.log("\n🎉 Setup Complete!");
 	console.log("👉 Next Steps:");
 	console.log("1. Configure OAuth secrets in .dev.vars");
 	if (answers.setupAi) {
 		console.log("2. (AI Enabled) Ensure your account has Workers AI enabled.");
 	}
-	console.log('3. Run "npm run deploy"');
+	if (answers.setupMedia) {
+		console.log("3. (Media Enabled) Run these commands for production:");
+		console.log(
+			`   npx wrangler secret put CF_API_TOKEN (Value: ${answers.cfApiToken.substring(0, 5)}...)`,
+		);
+		// Since Env vars need redeploy, we might suggest adding the public hash to wrangler.jsonc vars manually or just setting it as secret ok?
+		// Astro client-side envs (PUBLIC_) must be build-time or runtime env.
+		// For runtime (Cloudflare), we can set it in dashboard variables.
+		console.log(
+			`   npx wrangler secret put PUBLIC_CF_ACCOUNT_HASH (Value: ${answers.cfAccountHash})`,
+		);
+	}
+	console.log('4. Run "npm run deploy"');
 }
 
 main();

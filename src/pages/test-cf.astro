@@ -1,0 +1,43 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CFImage from "../components/CFImage.astro";
+import StreamPlayer from "../components/StreamPlayer.astro";
+
+// Test Data
+const testImageId = "placeholder-image-id"; // Won't load real image without valid ID, but checks rendering
+const testVideoId = "placeholder-video-id";
+---
+
+<Layout title="Cloudflare Integration Test">
+  <div class="container mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold mb-8">Cloudflare Integration Test</h1>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-semibold mb-4">1. Cloudflare Image (CFImage)</h2>
+      <p class="mb-4">Standard rendering with placeholder ID:</p>
+      <div class="max-w-md">
+        <CFImage
+          src={testImageId}
+          alt="Test Cloudflare Image"
+          width={400}
+          height={300}
+          class="rounded-lg shadow-md"
+        />
+      </div>
+      <p class="mt-4 text-sm text-gray-500">
+        HTML Output Inspection Required: Check if src points to
+        `imagedelivery.net`.
+      </p>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-semibold mb-4">
+        2. Cloudflare Stream (StreamPlayer)
+      </h2>
+      <p class="mb-4">Stream Player Embed:</p>
+      <div class="max-w-2xl">
+        <StreamPlayer videoId={testVideoId} title="Test Video" />
+      </div>
+    </section>
+  </div>
+</Layout>

@@ -180,6 +180,8 @@ Built with an Edge-First MCP Server, you can connect **Claude Desktop**, **OpenC
 | [Cloudflare R2](https://developers.cloudflare.com/r2) | S3-compatible object storage for media |
 | [Cloudflare KV](https://developers.cloudflare.com/kv) | Low-latency key-value store for caching & sessions |
 | [Cloudflare Vectorize](https://developers.cloudflare.com/vectorize) | Vector database for AI-powered search |
+| [Cloudflare Images](https://developers.cloudflare.com/images/) | Image optimization and delivery |
+| [Cloudflare Stream](https://developers.cloudflare.com/stream/) | Video streaming and encoding |
 
 ### **AI & Search**
 | Technology | Purpose |

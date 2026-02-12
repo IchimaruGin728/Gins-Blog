@@ -1,41 +1,25 @@
 ---
-import { Image } from "astro:assets";
+import CFImage from "./CFImage.astro";
 
 interface Props {
   src: string;
   alt: string;
   title?: string;
-  width?: string;
-  height?: string;
 }
 
 const { src, alt, title } = Astro.props;
-
-// Helper to determine if remote
-const isRemote = src.startsWith("http");
 ---
 
 <figure class="my-8">
-  {
-    isRemote ? (
-      <Image
-        src={src}
-        alt={alt}
-        width={800}
-        height={450}
-        format="webp"
-        class="rounded-xl w-full h-auto object-cover border border-white/10 shadow-lg"
-      />
-    ) : (
-      <img
-        src={src}
-        alt={alt}
-        class="rounded-xl w-full h-auto object-cover border border-white/10 shadow-lg"
-        loading="lazy"
-        decoding="async"
-      />
-    )
-  }
+  <CFImage
+    src={src}
+    alt={alt}
+    class="rounded-xl w-full h-auto object-cover border border-white/10 shadow-lg"
+    width={800}
+    height={450}
+    format="auto"
+    fit="cover"
+  />
   {
     title && (
       <figcaption class="text-center text-sm text-gray-500 mt-2">

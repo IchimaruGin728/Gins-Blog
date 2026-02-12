@@ -1,0 +1,55 @@
+---
+interface Props {
+  videoId: string;
+  title?: string;
+  poster?: string;
+  controls?: boolean;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  preload?: "auto" | "metadata" | "none";
+  customerCode?: string; // Optional: customer-<CODE>.cloudflarestream.com
+}
+
+const {
+  videoId,
+  title = "Video",
+  poster,
+  controls = true,
+  autoplay = false,
+  loop = false,
+  muted = false,
+  preload = "metadata",
+  customerCode,
+} = Astro.props;
+
+// Construct the Stream URL
+// If customerCode is provided, use the branded domain, otherwise use the generic one
+// Note: Customer specific domains are recommended for tracking and branding
+const streamDomain = customerCode
+  ? `customer-${customerCode}.cloudflarestream.com`
+  : "iframe.videodelivery.net";
+
+const srcUrl = new URL(`https://${streamDomain}/${videoId}`);
+
+// Add parameters
+srcUrl.searchParams.set("preload", preload);
+if (poster) srcUrl.searchParams.set("poster", poster);
+if (autoplay) srcUrl.searchParams.set("autoplay", "true");
+if (loop) srcUrl.searchParams.set("loop", "true");
+if (muted) srcUrl.searchParams.set("muted", "true");
+if (!controls) srcUrl.searchParams.set("controls", "false");
+---
+
+<div
+  class="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg border border-white/10 my-8"
+>
+  <iframe
+    src={srcUrl.toString()}
+    style="border: none"
+    height="100%"
+    width="100%"
+    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+    allowfullscreen="true"
+    title={title}></iframe>
+</div>

@@ -1,0 +1,75 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  fit?: "scale-down" | "contain" | "cover" | "crop" | "pad";
+  quality?: number;
+  format?: "auto" | "webp" | "avif" | "json";
+  class?: string;
+  loading?: "eager" | "lazy";
+  decoding?: "async" | "auto" | "sync";
+}
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  fit = "scale-down",
+  quality = 80,
+  format = "auto",
+  class: className,
+  loading = "lazy",
+  decoding = "async",
+} = Astro.props;
+
+// Helper to determine if the image is hosted on your domain or external
+const isLocal = src.startsWith("/");
+const isRemote = src.startsWith("http");
+const isCFImageId = !isLocal && !isRemote && !src.includes("/");
+
+let finalSrc = src;
+
+// 1. Check for Account Hash from Environment
+// We try to use a public environment variable if available, or fallback to a placeholder
+const ACCOUNT_HASH = import.meta.env.PUBLIC_CF_ACCOUNT_HASH;
+
+if (isCFImageId && ACCOUNT_HASH) {
+  // Direct delivery for images uploaded to CF Images
+  // https://imagedelivery.net/<account_hash>/<id>/<variant>
+  finalSrc = `https://imagedelivery.net/${ACCOUNT_HASH}/${src}/public`;
+} else if (import.meta.env.PROD) {
+  // Use Cloudflare Image Resizing API for other images in production
+  // Only if running on CF Pages/Workers (PROD)
+  const options = [
+    `width=${width || ""}`,
+    `height=${height || ""}`,
+    `fit=${fit}`,
+    `quality=${quality}`,
+    `format=${format}`,
+  ]
+    .filter((o) => !o.endsWith("="))
+    .join(",");
+
+  if (isLocal) {
+    finalSrc = `/cdn-cgi/image/${options}${src}`;
+  } else if (isRemote) {
+    finalSrc = `/cdn-cgi/image/${options}/${src}`;
+  }
+}
+// Fallback: If dev or no hash, just use src as-is (for local images) or maybe fail for CF IDs?
+// If it's a CF ID but no hash, we can't really display it properly without the hash.
+// For now, let's just output the ID as src (which will break 404), but at least it won't crash build.
+---
+
+<img
+  src={finalSrc}
+  alt={alt}
+  class={className}
+  width={width}
+  height={height}
+  loading={loading}
+  decoding={decoding}
+/>
