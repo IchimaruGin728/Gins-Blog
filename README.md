@@ -1,3 +1,5 @@
+<div id="top"></div>
+
 # Gin's Blog ✨
 
 <div align="center">
@@ -405,7 +407,7 @@ Built with ❤️ using modern web technologies. Special thanks to:
 
 <div align="center">
 
-**[⬆ Back to Top](#gins-blog)**
+**[⬆ Back to Top](#top)**
 
 Made with 💜 by [Ichimaru Gin](https://github.com/IchimaruGin728)
 

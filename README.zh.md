@@ -1,3 +1,5 @@
+<div id="top"></div>
+
 # Gin 的博客 💎
 
 <div align="center">
@@ -358,7 +360,7 @@ export default defineConfig({
 
 <div align="center">
 
-**[⬆ 返回顶部](#gin-的博客-)**
+**[⬆ 返回顶部](#top)**
 
 用 💜 制作 by [Ichimaru Gin](https://github.com/IchimaruGin728)
 
