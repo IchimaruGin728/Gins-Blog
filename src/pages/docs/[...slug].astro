@@ -1,0 +1,52 @@
+---
+import { getEntry } from "astro:content";
+import DocsLayout from "../../layouts/DocsLayout.astro";
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect("/docs");
+}
+
+const entry = await getEntry("docs", slug);
+
+if (!entry) {
+  return Astro.redirect("/404");
+}
+
+const { Content } = await entry.render();
+---
+
+<DocsLayout title={entry.data.title} description={entry.data.description}>
+  <h1 class="text-4xl md:text-5xl font-display font-bold mb-6 text-white">
+    {entry.data.title}
+  </h1>
+  {
+    entry.data.description && (
+      <p class="text-xl text-gray-400 mb-10 leading-relaxed border-b border-white/10 pb-10">
+        {entry.data.description}
+      </p>
+    )
+  }
+
+  <div
+    class="prose prose-invert prose-lg max-w-none prose-headings:font-display prose-a:text-brand-accent hover:prose-a:text-white"
+  >
+    <Content />
+  </div>
+
+  <div
+    class="mt-16 pt-8 border-t border-white/10 flex justify-between items-center text-sm font-mono text-gray-500"
+  >
+    <div>
+      System Record: {entry.id}
+    </div>
+    <a
+      href={`https://github.com/IchimaruGin728/gins-blog/tree/main/src/content/docs/${entry.id}.md`}
+      target="_blank"
+      class="hover:text-white transition-colors flex items-center gap-2"
+    >
+      <span class="i-heroicons-pencil-square"></span> Edit Page
+    </a>
+  </div>
+</DocsLayout>

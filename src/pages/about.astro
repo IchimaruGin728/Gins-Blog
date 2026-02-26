@@ -25,7 +25,6 @@ try {
     const data = (await res.json()) as any;
     const entry = data.entry[0];
 
-    // Helper to map service to icon
     const getServiceIcon = (service: string) => {
       const map: Record<string, string> = {
         github: "i-simple-icons-github",
@@ -45,22 +44,19 @@ try {
       return map[service] || "i-heroicons-link";
     };
 
-    // 1. Verified Accounts
     if (entry.accounts) {
       entry.accounts.forEach((acc: any) => {
         socialLinks.push({
           label: acc.display || acc.username || acc.shortname,
           url: acc.url,
           icon: getServiceIcon(acc.shortname),
-          color: "hover:text-white", // Default white on hover
+          color: "hover:text-white",
         });
       });
     }
 
-    // 2. Custom URLs
     if (entry.urls) {
       entry.urls.forEach((link: any) => {
-        // Simple heuristic for icons based on URL if needed, or fallback
         let icon = "i-heroicons-globe-alt";
         const label = link.title;
         const url = link.value;
@@ -76,7 +72,6 @@ try {
   }
 } catch (e) {
   console.error("Failed to fetch Gravatar profile", e);
-  // Fallback links if fetch fails (or just keep empty)
   socialLinks = [
     {
       label: "GitHub",
@@ -97,14 +92,12 @@ try {
     <div
       class="glass-panel p-12 rounded-[2rem] max-w-4xl w-full relative overflow-hidden group"
     >
-      <!-- Background Glow -->
       <div
         class="absolute top-0 right-0 w-64 h-64 bg-brand-primary/20 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-brand-primary/30 transition-all duration-700"
       >
       </div>
 
       <div class="relative z-10 flex flex-col md:flex-row items-center gap-8">
-        <!-- Avatar -->
         <div class="relative">
           <div
             class="w-32 h-32 rounded-full p-1 bg-gradient-to-br from-brand-accent to-brand-primary"
@@ -127,7 +120,6 @@ try {
           </div>
         </div>
 
-        <!-- Content -->
         <div class="text-center md:text-left">
           <h1 class="text-4xl font-display font-bold mb-2">Ichimaru Gin</h1>
           <div class="flex gap-2 justify-center md:justify-start mb-4">
@@ -174,7 +166,6 @@ try {
       </div>
     </div>
 
-    <!-- Timeline / Chronicle Section -->
     <div class="max-w-4xl w-full mt-24 px-4">
       <h2
         class="text-2xl font-display font-bold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500"
@@ -183,7 +174,6 @@ try {
       </h2>
 
       <div class="relative border-l border-white/10 ml-6 md:ml-12 space-y-12">
-        <!-- Item New (MCP Agent) -->
         <div class="relative pl-8 md:pl-12">
           <span
             class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)]"
@@ -205,7 +195,6 @@ try {
           </div>
         </div>
 
-        <!-- Item 0 (Biome) -->
         <div class="relative pl-8 md:pl-12">
           <span
             class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-orange-400 shadow-[0_0_10px_rgba(251,146,60,0.5)]"
@@ -227,7 +216,6 @@ try {
           </div>
         </div>
 
-        <!-- Item 1 -->
         <div class="relative pl-8 md:pl-12">
           <span
             class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-brand-accent shadow-[0_0_10px_rgba(139,92,246,0.5)]"
@@ -249,7 +237,6 @@ try {
           </div>
         </div>
 
-        <!-- Item 2 -->
         <div class="relative pl-8 md:pl-12">
           <span
             class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-brand-secondary shadow-[0_0_10px_rgba(236,72,153,0.5)]"
@@ -271,7 +258,6 @@ try {
           </div>
         </div>
 
-        <!-- Item 3 -->
         <div class="relative pl-8 md:pl-12">
           <span
             class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-blue-500/50"

@@ -13,7 +13,6 @@ const t = useTranslations(lang);
   <div
     class="max-w-7xl mx-auto glass-panel rounded-full px-6 py-3 min-h-[3.5rem] flex justify-between items-center"
   >
-    <!-- Left: Logo -->
     <a
       href={lang === "en-SG" ? "/" : `/${lang === "zh-SG" ? "zh" : lang}/`}
       class="text-xl md:text-xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-primary z-50 relative leading-none flex items-center"
@@ -21,11 +20,9 @@ const t = useTranslations(lang);
       Gin's Blog
     </a>
 
-    <!-- Center: Dynamic Dock (Navigation + Search) - Hidden on mobile -->
     <div
       class="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 p-1 bg-white/5 rounded-full backdrop-blur-3xl shadow-lg transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group/dock z-50"
     >
-      <!-- Nav Links -->
       <nav
         class="flex items-center gap-1 px-2 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/search:opacity-50 group-hover/search:scale-95 group-hover/search:blur-[1px]"
       >
@@ -45,6 +42,14 @@ const t = useTranslations(lang);
         >
         <a
           href={lang === "en-SG"
+            ? "/docs"
+            : `/${lang === "zh-SG" ? "zh" : lang}/docs/`}
+          data-astro-prefetch
+          class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-full transition-all"
+          >Docs</a
+        >
+        <a
+          href={lang === "en-SG"
             ? "/about"
             : `/${lang === "zh-SG" ? "zh" : lang}/about/`}
           data-astro-prefetch
@@ -53,12 +58,10 @@ const t = useTranslations(lang);
         >
       </nav>
 
-      <!-- Morphing Search Trigger -->
       <button
         id="search-trigger-btn"
         class="group/search relative flex items-center justify-center h-8 w-8 bg-white/10 hover:bg-brand-primary/20 hover:w-48 border border-white/5 hover:border-brand-primary/30 rounded-full transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden cursor-text"
       >
-        <!-- Custom SVG Search Icon -->
         <svg
           class="absolute left-2 w-4 h-4 z-10 transition-all duration-300 group-hover/search:scale-110"
           viewBox="0 0 24 24"
@@ -105,7 +108,6 @@ const t = useTranslations(lang);
             stroke-linecap="round"></line>
         </svg>
 
-        <!-- Text Label (Reveals on Hover) -->
         <div
           class="flex items-center gap-2 pl-8 opacity-0 group-hover/search:opacity-100 translate-x-4 group-hover/search:translate-x-0 transition-all duration-500 delay-75 whitespace-nowrap"
         >
@@ -118,7 +120,6 @@ const t = useTranslations(lang);
       </button>
     </div>
 
-    <!-- Right: Auth/Profile -->
     <div class="flex items-center gap-4 z-50 relative">
       <LanguagePicker />
 
@@ -173,12 +174,9 @@ const t = useTranslations(lang);
   </div>
 
   <script>
-    // Dispatch custom event or toggle state
-    // Use astro:page-load to ensure it works after View Transitions navigation
     document.addEventListener("astro:page-load", () => {
       const btn = document.getElementById("search-trigger-btn");
       if (btn) {
-        // Cloning the element to remove old event listeners to prevent duplicates
         const newBtn = btn.cloneNode(true);
         if (btn.parentNode) {
           btn.parentNode.replaceChild(newBtn, btn);

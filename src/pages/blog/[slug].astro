@@ -120,11 +120,11 @@ const structuredData = {
 
 // Smart Caching Strategy (Stale-While-Revalidate)
 // max-age=0: Browser always revalidates
-// s-maxage=60: Cloudflare caches for 60s
-// stale-while-revalidate=600: Serving stale content for up to 10 mins while background updating
+// s-maxage=3600: Cloudflare caches for 1 hour
+// stale-while-revalidate=86400: Serving stale content for up to 1 day while background updating
 Astro.response.headers.set(
   "Cache-Control",
-  "public, max-age=0, s-maxage=60, stale-while-revalidate=600",
+  "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400",
 );
 ---
 

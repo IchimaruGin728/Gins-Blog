@@ -1,0 +1,157 @@
+---
+import { ClientRouter } from "astro:transitions";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import DocsSidebar from "../components/DocsSidebar.astro";
+import MobileNav from "../components/MobileNav.astro";
+import SearchModal from "../components/SearchModal.tsx";
+import "../styles/global.css";
+
+// Font Optimizations (Self-hosted)
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
+import "@fontsource-variable/outfit";
+import { getLangFromUrl, getRouteFromUrl } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Gin's Blog Documentation" } = Astro.props;
+const fullTitle = `${title} | Gin's Docs`;
+---
+
+<!doctype html>
+<html lang={lang} class="dark">
+  <head>
+    <ClientRouter />
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="theme-color" content="#8b5cf6" />
+    <meta name="description" content={description} />
+    <title>{fullTitle}</title>
+  </head>
+  <body class="bg-[#050505] text-white min-h-screen font-sans flex flex-col">
+    <div
+      class="fixed inset-0 z-0 pointer-events-none overflow-hidden"
+      style="transform: translateZ(0); backface-visibility: hidden; will-change: transform;"
+      transition:persist
+    >
+      <div
+        class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-brand-primary/10 rounded-full blur-[80px]"
+      >
+      </div>
+      <div
+        class="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-brand-accent/5 rounded-full blur-[80px]"
+      >
+      </div>
+    </div>
+
+    <Header />
+
+    <main
+      class="relative z-10 pt-24 px-4 md:px-6 max-w-[1400px] mx-auto w-full flex-grow pb-24 md:pb-0 flex gap-8"
+    >
+      <aside
+        class="hidden md:block w-64 shrink-0 overflow-y-auto custom-scrollbar sticky top-24 max-h-[calc(100vh-8rem)]"
+      >
+        <DocsSidebar />
+      </aside>
+
+      <article class="flex-1 min-w-0 main-content">
+        <div class="glass-panel p-6 md:p-10 rounded-3xl mb-8">
+          <slot />
+        </div>
+      </article>
+
+      <aside class="hidden xl:block w-48 shrink-0 relative">
+        <div class="sticky top-24">
+          <h3
+            class="font-bold text-sm text-gray-400 uppercase tracking-wider mb-4"
+          >
+            Quick Links
+          </h3>
+          <ul class="space-y-3 text-sm text-gray-400">
+            <li>
+              <a
+                href="/"
+                class="hover:text-brand-accent transition-colors flex items-center gap-2"
+                ><span class="i-heroicons-arrow-left"></span> Back to Main</a
+              >
+            </li>
+            <li>
+              <a href="/blog" class="hover:text-brand-accent transition-colors"
+                >Blog Postings</a
+              >
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <MobileNav />
+    <Footer />
+    <SearchModal client:only="preact" />
+
+    <style>
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      :global(.prose) {
+        @apply max-w-none text-gray-300;
+      }
+      :global(.prose h1) {
+        @apply text-3xl md:text-5xl font-display font-bold mb-6 text-white;
+      }
+      :global(.prose h2) {
+        @apply text-2xl font-bold mt-10 mb-4 text-white border-b border-white/10 pb-2;
+      }
+      :global(.prose h3) {
+        @apply text-xl font-bold mt-8 mb-3 text-gray-200;
+      }
+      :global(.prose p) {
+        @apply leading-relaxed mb-6;
+      }
+      :global(.prose a) {
+        @apply text-brand-accent hover:text-white underline decoration-white/20 hover:decoration-brand-accent transition-all duration-300;
+      }
+      :global(.prose code) {
+        @apply bg-black/50 text-brand-accent px-1.5 py-0.5 rounded text-sm font-mono border border-white/5;
+      }
+      :global(.prose pre) {
+        @apply bg-[#0d0d0d] p-4 rounded-xl overflow-x-auto border border-white/10 my-6;
+      }
+      :global(.prose pre code) {
+        @apply bg-transparent text-white p-0 border-none text-sm;
+      }
+      :global(.prose ul) {
+        @apply list-disc list-inside mb-6 space-y-2;
+      }
+      :global(.prose ol) {
+        @apply list-decimal list-inside mb-6 space-y-2;
+      }
+      :global(.prose blockquote) {
+        @apply border-l-4 border-brand-accent pl-4 italic text-gray-400 bg-white/5 py-2 pr-4 rounded-r-lg my-6;
+      }
+    </style>
+  </body>
+</html>

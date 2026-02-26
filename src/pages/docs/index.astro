@@ -1,0 +1,110 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+
+const features = [
+  {
+    title: "Edge-Native SSR",
+    desc: "Zero cold starts. Globally distributed rendering via Cloudflare Workers.",
+    icon: "i-heroicons-globe-alt",
+    color: "from-blue-500/20 to-cyan-500/20",
+    iconColor: "text-cyan-400",
+  },
+  {
+    title: "Liquid Glass UI",
+    desc: "Hardware-accelerated glassmorphism, fluid micro-animations, and cinematic transitions.",
+    icon: "i-heroicons-sparkles",
+    color: "from-purple-500/20 to-pink-500/20",
+    iconColor: "text-pink-400",
+  },
+  {
+    title: "Zero Trust Security",
+    desc: "Integrated auth, WebAuthn ready, WebSocket protection built-in.",
+    icon: "i-heroicons-shield-check",
+    color: "from-emerald-500/20 to-green-500/20",
+    iconColor: "text-emerald-400",
+  },
+  {
+    title: "Serverless D1 Engine",
+    desc: "Ultra-fast SQLite at the edge, seamless schema typing with Drizzle ORM.",
+    icon: "i-heroicons-circle-stack",
+    color: "from-orange-500/20 to-amber-500/20",
+    iconColor: "text-orange-400",
+  },
+  {
+    title: "AI-Native Search",
+    desc: "Vectorized semantic indexing, LLM textual endpoints, MCP tools integrated.",
+    icon: "i-heroicons-cpu-chip",
+    color: "from-indigo-500/20 to-violet-500/20",
+    iconColor: "text-indigo-400",
+  },
+  {
+    title: "Sub-millisecond API",
+    desc: "Hono-powered backend, strict Zod validation, RPC unified types.",
+    icon: "i-heroicons-bolt",
+    color: "from-yellow-500/20 to-lime-500/20",
+    iconColor: "text-yellow-400",
+  },
+];
+---
+
+<DocsLayout title="Documentation Home">
+  <div class="mb-12">
+    <div
+      class="inline-block px-4 py-1.5 rounded-full bg-brand-primary/10 text-brand-accent font-mono text-xs font-bold mb-6 border border-brand-primary/30 shadow-[0_0_15px_rgba(88,28,135,0.5)]"
+    >
+      v1.0.0 NUCLEUS
+    </div>
+    <h1
+      class="text-4xl md:text-6xl font-display font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-500"
+    >
+      Gins-Blog Architecture
+    </h1>
+    <p class="text-xl text-gray-400 max-w-2xl leading-relaxed">
+      Explore the technical architecture, deployment strategies, and system
+      internals of the Gin's Blog ecosystem.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {
+      features.map((feature) => (
+        <a
+          href="/docs/introduction"
+          class="glass-panel p-6 rounded-3xl relative overflow-hidden group flex flex-col h-full hover:-translate-y-2 transition-transform duration-500 will-change-transform min-h-[220px]"
+        >
+          <div
+            class={`absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none ${feature.color}`}
+          />
+          <div
+            class={`w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 shadow-inner ${feature.iconColor} group-hover:scale-110 transition-transform duration-500`}
+          >
+            <span class={`${feature.icon} text-3xl`} />
+          </div>
+          <h3 class="text-xl font-bold font-display mb-3 text-white group-hover:text-brand-accent transition-colors duration-300">
+            {feature.title}
+          </h3>
+          <p class="text-sm text-gray-400 leading-relaxed flex-grow">
+            {feature.desc}
+          </p>
+        </a>
+      ))
+    }
+  </div>
+
+  <div
+    class="mt-16 pt-12 border-t border-white/10 flex flex-col md:flex-row gap-6 items-center justify-between"
+  >
+    <div>
+      <h3 class="text-2xl font-bold font-display mb-2">Getting Started</h3>
+      <p class="text-gray-400 text-sm">
+        Follow the technical deployment guide to configure the environment.
+      </p>
+    </div>
+    <a
+      href="/docs/deployment"
+      class="px-8 py-4 rounded-xl bg-white text-black font-bold flex items-center gap-2 hover:bg-gray-200 transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+    >
+      Start Deployment <span class="i-heroicons-arrow-right"></span>
+    </a>
+  </div>
+</DocsLayout>

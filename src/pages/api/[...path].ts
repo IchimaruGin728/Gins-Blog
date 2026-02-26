@@ -1,6 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import type { APIRoute } from "astro";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNotNull, like, or } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import * as schema from "../../../db/schema";
@@ -8,10 +8,8 @@ import { posts } from "../../../db/schema";
 import { getDb } from "../../lib/db";
 import { deletePostVector, insertPostVector } from "../../lib/vectorize";
 
-// Initialize Hono
 const app = new Hono().basePath("/api");
 
-// RPC Route Definitions
 app.post(
 	"/posts",
 	zValidator(
@@ -26,7 +24,6 @@ app.post(
 		}),
 	),
 	async (c) => {
-		// Check for User ID (Session or ZT)
 		const userId = c.req.header("X-User-Id");
 		if (!userId) return c.json({ error: "Unauthorized" }, 401);
 
@@ -42,7 +39,6 @@ app.post(
 
 		const db = getDb(env);
 
-		// Use existing ID if provided (Edit Mode), or generate new
 		const id = existingId || crypto.randomUUID();
 		const timestamp = publishedAt
 			? new Date(publishedAt).getTime()
@@ -50,11 +46,6 @@ app.post(
 		const updateTimestamp = updatedAt
 			? new Date(updatedAt).getTime()
 			: Date.now();
-
-		// Upsert (Insert or Replce)
-		// SQLite Drizzle: .onConflictDoUpdate
-		// However, onConflict needs a target. `id` is PK.
-		// If we provide ID, it might exist.
 
 		await db
 			.insert(posts)
@@ -78,7 +69,6 @@ app.post(
 				},
 			});
 
-		// CACHE UPDATE: Write-through to KV Layer (Immediate consistency)
 		try {
 			const CACHE_KEY = `post:${slug}`;
 			const postData = {
@@ -97,7 +87,6 @@ app.post(
 			console.error("KV Cache Update failed", e);
 		}
 
-		// Vectorize Indexing (Semantic Search)
 		try {
 			await insertPostVector(env.AI, env.VECTOR_INDEX, {
 				id,
@@ -112,7 +101,6 @@ app.post(
 	},
 );
 
-// Get Single Post (for Admin Editor)
 app.get("/posts/:slug", async (c) => {
 	const db = getDb(c.env as Env);
 	const slug = c.req.param("slug");
@@ -122,7 +110,6 @@ app.get("/posts/:slug", async (c) => {
 	return c.json(post);
 });
 
-// Get Recent Posts (for Admin List)
 app.get("/posts", async (c) => {
 	const db = getDb(c.env as Env);
 	const limitParam = c.req.query("limit");
@@ -146,62 +133,40 @@ app.get("/posts", async (c) => {
 	return c.json(allPosts);
 });
 
-// Search Posts (Admin)
 app.get("/search", async (c) => {
 	const db = getDb(c.env as Env);
 	const query = c.req.query("q");
 
 	if (!query) return c.json([]);
 
-	// Fallback to JS filtering for reliable robust search
-	// We fetch all posts and filter in memory since the dataset is small and we need custom scoring logic
+	const qLower = query.toLowerCase();
+	const wildcardQuery = `%${qLower}%`;
 
-	// Fix: db.select return type might not match exact structure needed by frontend if we don't alias correctly
-	// Frontend expects: { metadata: { title, slug }, score }
-	// Drizzle SELECT logic is structured differently usually.
-	// Let's use raw SQL for simplicity if Drizzle helper is tricky with 'like' wrapper
-
-	// Fallback to JS filtering if SQL 'LIKE' is unsafe or tricky in this setup without 'like' import
-	const all = await db
+	const matches = await db
 		.select({
 			title: posts.title,
 			slug: posts.slug,
-			content: posts.content,
-			publishedAt: posts.publishedAt,
 		})
 		.from(posts)
-		.all();
+		.where(
+			and(
+				isNotNull(posts.publishedAt),
+				or(
+					like(posts.title, wildcardQuery),
+					like(posts.content, wildcardQuery),
+				),
+			),
+		)
+		.limit(5);
 
-	// DEBUG LOG
-	console.log(`[Search] Found ${all.length} total posts in DB`);
+	const formattedMatches = matches.map((p) => ({
+		metadata: { title: p.title, slug: p.slug },
+		score: p.title.toLowerCase().includes(qLower) ? 1.0 : 0.5,
+	}));
 
-	const qLower = query.toLowerCase();
-
-	const matches = all
-		.filter((p: any) => {
-			// Strict check: Must have publishedAt and it must be a valid number > 0
-			const isPublished =
-				p.publishedAt !== null &&
-				typeof p.publishedAt === "number" &&
-				p.publishedAt > 0;
-
-			if (!isPublished) return false;
-
-			return (
-				p.title.toLowerCase().includes(qLower) ||
-				p.content.toLowerCase().includes(qLower)
-			);
-		})
-		.map((p: any) => ({
-			metadata: { title: p.title, slug: p.slug },
-			score: p.title.toLowerCase().includes(qLower) ? 1.0 : 0.5,
-		}))
-		.slice(0, 5);
-
-	return c.json(matches);
+	return c.json(formattedMatches);
 });
 
-// Toggle Post Status (Hide/Publish)
 app.patch(
 	"/posts/:slug/status",
 	zValidator(
@@ -221,7 +186,6 @@ app.patch(
 				.set({ publishedAt: action === "publish" ? Date.now() : null })
 				.where(eq(posts.slug, slug));
 
-			// Invalidate Cache
 			const env = c.env as Env;
 			await env.GINS_CACHE.delete(`post:${slug}`);
 
@@ -232,14 +196,12 @@ app.patch(
 	},
 );
 
-// Delete Post
 app.delete("/posts/:slug", async (c) => {
 	const db = getDb(c.env as Env);
 	const slug = c.req.param("slug");
 	const env = c.env as Env;
 
 	try {
-		// Get ID before deleting for Vectorize cleanup
 		const post = await db
 			.select({ id: posts.id })
 			.from(posts)
@@ -249,10 +211,8 @@ app.delete("/posts/:slug", async (c) => {
 
 		await db.delete(posts).where(eq(posts.slug, slug));
 
-		// Invalidate Cache
 		await env.GINS_CACHE.delete(`post:${slug}`);
 
-		// Remove from Vector Index
 		if (id) {
 			try {
 				await deletePostVector(env.VECTOR_INDEX, id);
@@ -320,11 +280,6 @@ export const ALL: APIRoute = async (context) => {
 	if (context.locals.user) {
 		request.headers.set("X-User-Id", context.locals.user.id);
 	} else {
-		// Fallback: Check if request is from ZT Admin (e.g. Dashboard calls)
-		// Since API is outside /IchimaruGin728/admin prefix, it might not be protected by Middleware ZT Check
-		// BUT, if the dashboard calls it, the cookies/headers are passed?
-		// ZT headers are passed if the zone is protected.
-		// Assuming we are in a protected environment or local dev mock.
 		const ztUser = getZeroTrustUser(context.request);
 		if (ztUser) {
 			request.headers.set("X-User-Id", ztUser.id);

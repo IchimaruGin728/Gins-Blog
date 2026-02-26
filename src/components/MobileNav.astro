@@ -1,5 +1,4 @@
 ---
-// MobileNav component - Bottom navigation for mobile devices
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
@@ -7,7 +6,6 @@ const t = useTranslations(lang);
 
 const currentPath = Astro.url.pathname;
 
-// Helper to strip locale from path for comparison
 const getPathWithoutLocale = (path: string) => {
   if (path.startsWith("/zh/")) {
     return path.replace("/zh", "") || "/";
@@ -28,7 +26,6 @@ const isActive = (path: string) => {
 };
 ---
 
-<!-- Mobile Bottom Navigation (Only visible on mobile) -->
 <nav
   class="md:hidden fixed bottom-0 left-0 right-0 z-50"
   style="padding-bottom: max(1rem, env(safe-area-inset-bottom)); padding-left: max(1rem, env(safe-area-inset-left)); padding-right: max(1rem, env(safe-area-inset-right));"
@@ -38,7 +35,6 @@ const isActive = (path: string) => {
     class="mx-4 mb-4 glass-panel rounded-2xl px-6 py-3 border border-white/10 backdrop-blur-xl shadow-2xl transition-all duration-500 ease-in-out"
   >
     <div class="flex justify-around items-center gap-1">
-      <!-- Home -->
       <a
         href={lang === "en-SG" ? "/" : `/${lang === "zh-SG" ? "zh" : lang}/`}
         data-astro-prefetch
@@ -128,6 +124,52 @@ const isActive = (path: string) => {
         }
       </a>
 
+      <!-- Docs -->
+      <a
+        href={lang === "en-SG"
+          ? "/docs"
+          : `/${lang === "zh-SG" ? "zh" : lang}/docs/`}
+        data-astro-prefetch
+        class={`group relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-out ${
+          isActive("/docs")
+            ? "bg-brand-accent/20 scale-110"
+            : "hover:bg-white/5 active:scale-90 active:bg-white/10"
+        }`}
+      >
+        <svg
+          class={`w-6 h-6 transition-all duration-300 ${
+            isActive("/docs")
+              ? "text-brand-accent scale-110"
+              : "text-gray-400 group-hover:text-white group-hover:scale-105"
+          }`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+          ></path>
+        </svg>
+        <span
+          class={`nav-label text-xs font-medium transition-all duration-300 ease-out ${
+            isActive("/docs")
+              ? "text-brand-accent font-bold"
+              : "text-gray-500 group-hover:text-gray-300"
+          }`}
+          style="white-space: nowrap;"
+        >
+          Docs
+        </span>
+        {
+          isActive("/docs") && (
+            <div class="absolute -top-1 w-1 h-1 bg-brand-accent rounded-full animate-pulse" />
+          )
+        }
+      </a>
+
       <!-- Search -->
       <button
         id="mobile-search-btn"
@@ -203,12 +245,9 @@ const isActive = (path: string) => {
 </nav>
 
 <script>
-  // Trigger search modal when clicking mobile search button
-  // Use astro:page-load for View Transitions support
   document.addEventListener("astro:page-load", () => {
     const mobileSearchBtn = document.getElementById("mobile-search-btn");
     if (mobileSearchBtn) {
-      // Cloning to remove duplicates
       const newBtn = mobileSearchBtn.cloneNode(true);
       if (mobileSearchBtn.parentNode) {
         mobileSearchBtn.parentNode.replaceChild(newBtn, mobileSearchBtn);
@@ -219,7 +258,6 @@ const isActive = (path: string) => {
       });
     }
 
-    // Scroll Logic for Shrinking Nav
     let lastScrollY = window.scrollY;
     const navPanel = document.getElementById("mobile-nav-panel");
     const navLabels = document.querySelectorAll(".nav-label");
@@ -230,12 +268,10 @@ const isActive = (path: string) => {
         () => {
           const currentScrollY = window.scrollY;
 
-          // Threshold: 50px scroll to trigger
           const isScrollingDown =
             currentScrollY > lastScrollY && currentScrollY > 50;
 
           if (isScrollingDown) {
-            // Shrink: Use transform and opacity only (no reflow)
             navLabels.forEach((el) => {
               (el as HTMLElement).style.transform = "scale(0)";
               (el as HTMLElement).style.opacity = "0";
@@ -244,7 +280,6 @@ const isActive = (path: string) => {
             navPanel.classList.remove("py-3");
             navPanel.classList.add("py-2");
           } else {
-            // Expand: Restore
             navLabels.forEach((el) => {
               (el as HTMLElement).style.transform = "scale(1)";
               (el as HTMLElement).style.opacity = "1";

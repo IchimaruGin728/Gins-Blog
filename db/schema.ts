@@ -1,4 +1,5 @@
 import {
+	index,
 	integer,
 	primaryKey,
 	sqliteTable,
@@ -71,29 +72,44 @@ export const sessions = sqliteTable("sessions", {
 export type User = typeof users.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
 
-export const posts = sqliteTable("posts", {
-	id: text("id").primaryKey(),
-	title: text("title").notNull(),
-	slug: text("slug").notNull().unique(),
-	content: text("content").notNull(),
-	publishedAt: integer("published_at"),
-	createdAt: integer("created_at").notNull(),
-	updatedAt: integer("updated_at").notNull(),
-	views: integer("views").notNull().default(0),
-});
+export const posts = sqliteTable(
+	"posts",
+	{
+		id: text("id").primaryKey(),
+		title: text("title").notNull(),
+		slug: text("slug").notNull().unique(),
+		content: text("content").notNull(),
+		publishedAt: integer("published_at"),
+		createdAt: integer("created_at").notNull(),
+		updatedAt: integer("updated_at").notNull(),
+		views: integer("views").notNull().default(0),
+	},
+	(t) => ({
+		publishedAtIndex: index("posts_published_at_idx").on(t.publishedAt),
+	}),
+);
 
-export const comments = sqliteTable("comments", {
-	id: text("id").primaryKey(),
-	userId: text("user_id")
-		.notNull()
-		.references(() => users.id),
-	postId: text("post_id")
-		.notNull()
-		.references(() => posts.id), // Link to posts table if we want foreign key constraint, or just store slug/id
-	content: text("content").notNull(),
-	parentId: text("parent_id"), // For nested comments
-	createdAt: integer("created_at", { mode: "number" }).notNull(),
-});
+export const comments = sqliteTable(
+	"comments",
+	{
+		id: text("id").primaryKey(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id),
+		postId: text("post_id")
+			.notNull()
+			.references(() => posts.id), // Link to posts table if we want foreign key constraint, or just store slug/id
+		content: text("content").notNull(),
+		parentId: text("parent_id"), // For nested comments
+		createdAt: integer("created_at", { mode: "number" }).notNull(),
+	},
+	(t) => ({
+		postIdCreatedAtIndex: index("comments_post_id_created_at_idx").on(
+			t.postId,
+			t.createdAt,
+		),
+	}),
+);
 
 export const likes = sqliteTable(
 	"likes",

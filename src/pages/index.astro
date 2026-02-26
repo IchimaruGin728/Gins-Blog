@@ -17,9 +17,9 @@ import { getCache } from "../lib/cache";
 
 let cache;
 try {
-	cache = getCache(env);
+  cache = getCache(env);
 } catch (e) {
-	console.error("Cache initialization failed:", e);
+  console.error("Cache initialization failed:", e);
 }
 
 // Fetch recent posts with caching
@@ -28,38 +28,36 @@ const CACHE_KEY = "home_recent_posts_en";
 const CACHE_TTL = 300; // 5 minutes
 
 try {
-	// Initialize defaults
-	recentPosts = [];
+  // Initialize defaults
+  recentPosts = [];
 
-	if (env.DB) {
-		const fetchPosts = async () => {
-			const db = getDb(env);
-			return await db
-				.select()
-				.from(posts)
-				.where(lte(posts.publishedAt, Date.now()))
-				.orderBy(desc(posts.publishedAt))
-				.limit(3);
-		};
+  if (env.DB) {
+    const fetchPosts = async () => {
+      const db = getDb(env);
+      return await db
+        .select()
+        .from(posts)
+        .where(lte(posts.publishedAt, Date.now()))
+        .orderBy(desc(posts.publishedAt))
+        .limit(3);
+    };
 
-		if (cache) {
-			recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
-		} else {
-			recentPosts = await fetchPosts();
-		}
-	}
+    if (cache) {
+      recentPosts = await cache.getOrSet(CACHE_KEY, fetchPosts, CACHE_TTL);
+    } else {
+      recentPosts = await fetchPosts();
+    }
+  }
 } catch (e) {
-	console.error("Failed to fetch posts:", e);
-	// Fallback to empty array is already set
+  console.error("Failed to fetch posts:", e);
+  // Fallback to empty array is already set
 }
 ---
 
 <Layout title={t("hero.title")}>
-  <!-- Top Banner / Header already in Layout, but we might want a specific layout adjustment or spacer -->
   <div
     class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(180px,auto)] mb-12"
   >
-    <!-- The Crystal Logic Hero (2x1) -->
     <div
       class="md:col-span-2 glass-panel p-6 md:p-10 flex flex-col justify-center rounded-3xl relative overflow-hidden group animate-fade-in-up"
     >
@@ -83,7 +81,6 @@ try {
       </div>
     </div>
 
-    <!-- System Status (1x1) -->
     <div
       class="glass-panel p-8 flex flex-col justify-between rounded-3xl relative overflow-hidden animate-fade-in-up animate-delay-100"
     >
@@ -105,7 +102,6 @@ try {
       </div>
     </div>
 
-    <!-- Recent Posts (1x2 Vertical) -->
     <div
       class="glass-panel p-8 rounded-3xl flex flex-col justify-between relative overflow-hidden group md:row-span-2 max-h-[500px] animate-fade-in-up animate-delay-200"
     >
@@ -153,7 +149,6 @@ try {
       </div>
     </div>
 
-    <!-- Gallery (1x1) -->
     <a
       href="/gallery"
       data-astro-prefetch
@@ -168,7 +163,6 @@ try {
       </div>
     </a>
 
-    <!-- Projects (1x1) -->
     <a
       href="/projects"
       data-astro-prefetch
@@ -183,7 +177,6 @@ try {
       </div>
     </a>
 
-    <!-- Bottom Spacer / Infinite Scroll Placeholder -->
     <div
       class="md:col-span-3 h-32 flex items-center justify-center opacity-30 mt-8"
     >
