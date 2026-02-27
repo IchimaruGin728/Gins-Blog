@@ -175,11 +175,11 @@ Built with an Edge-First MCP Server, you can connect **Claude Desktop**, **OpenC
 ### **Frontend**
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| [Astro](https://astro.build) | `v5.17.1` | Static site generator with Server Actions & Server Islands |
+| [Astro](https://astro.build) | `v5.18.0` | Static site generator with Server Actions & Server Islands |
 | [Preact](https://preactjs.com) | Latest | Lightweight React alternative for interactive components |
 | [UnoCSS](https://unocss.dev) | Latest | Instant on-demand atomic CSS engine (Replaces Tailwind) |
-| [Satori](https://github.com/vercel/satori) | ^0.19.1 | SVG-based OG image generation |
-| [Biome](https://biomejs.dev) | Latest | Fast All-in-One Formatter & Linter (Replaces ESLint/Prettier) |
+| [Satori](https://github.com/vercel/satori) | ^0.19.2 | SVG-based OG image generation |
+| [Biome](https://biomejs.dev) | ^2.4.4 | Fast All-in-One Formatter & Linter (Replaces ESLint/Prettier) |
 
 ### **Backend & Edge**
 | Technology | Version | Purpose |
@@ -214,8 +214,8 @@ Built with an Edge-First MCP Server, you can connect **Claude Desktop**, **OpenC
 ### **Utilities**
 | Technology | Purpose | Version |
 |------------|---------|---------|
-| [Marked](https://marked.js.org) | Markdown parser for content | ^17.0.1 |
-| [Zod](https://zod.dev) | TypeScript-first schema validation | ^3.25.76 |
+| [Marked](https://marked.js.org) | Markdown parser for content | ^17.0.3 |
+| [Zod](https://zod.dev) | TypeScript-first schema validation | ^4.3.6 |
 | [TypeScript](https://www.typescriptlang.org) | Type-safe JavaScript | ^5.9.3 |
 
 ---

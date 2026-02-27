@@ -161,10 +161,10 @@
 ### **前端**
 | 技术 | 用途 | 版本 |
 |------|------|------|
-| [Astro](https://astro.build) | 支持服务端渲染的静态站点生成器 | Latest |
+| [Astro](https://astro.build) | 支持服务端渲染的静态站点生成器 | `v5.18.0` |
 | [Preact](https://preactjs.com) | 用于交互组件的轻量级 React 替代品 | Latest |
 | [UnoCSS](https://unocss.dev) | 即时按需原子化 CSS 引擎 | Latest |
-| [Satori](https://github.com/vercel/satori) | 基于 SVG 的 OG 图片生成 | ^0.19.1 |
+| [Satori](https://github.com/vercel/satori) | 基于 SVG 的 OG 图片生成 | ^0.19.2 |
 
 | [Arctic](https://arctic.js.org) | OAuth 2.0 客户端库 | Latest |
 | [Oslo](https://oslo.js.org) | 认证工具（会话、PKCE 等）| Latest |
@@ -172,8 +172,8 @@
 ### **工具**
 | 技术 | 用途 | 版本 |
 |------|------|------|
-| [Marked](https://marked.js.org) | 内容的 Markdown 解析器 | ^17.0.1 |
-| [Zod](https://zod.dev) | TypeScript 优先的模式验证 | ^3.25.76 |
+| [Marked](https://marked.js.org) | 内容的 Markdown 解析器 | ^17.0.3 |
+| [Zod](https://zod.dev) | TypeScript 优先的模式验证 | ^4.3.6 |
 | [TypeScript](https://www.typescriptlang.org) | 类型安全的 JavaScript | ^5.9.3 |
 
 ---
