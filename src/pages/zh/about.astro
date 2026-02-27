@@ -1,7 +1,11 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import SocialLinks from "../../components/SocialLinks.tsx";
+import CloudflareImage from "../../components/CloudflareImage.astro";
 import { getLangFromUrl, useTranslations } from "../../i18n/utils";
+
+const gravatarHash = "60eb98ab51a815a519feeca028e08573";
+const cfAvatarId = import.meta.env.PUBLIC_CF_AVATAR_ID;
 
 const lang = getLangFromUrl(Astro.url);
 // biome-ignore lint/correctness/noUnusedVariables: Used in template
@@ -25,11 +29,22 @@ const t = useTranslations(lang);
           <div
             class="w-32 h-32 rounded-full p-1 bg-gradient-to-br from-brand-accent to-brand-primary"
           >
-            <img
-              src="https://secure.gravatar.com/avatar/60eb98ab51a815a519feeca028e08573?s=512&d=https%3A%2F%2Fgithub.com%2FIchimaruGin728.png"
-              alt="Ichimaru Gin"
-              class="w-full h-full rounded-full object-cover border-4 border-black group-hover:scale-105 transition-transform duration-500 shadow-2xl shadow-brand-primary/50"
-            />
+            {
+              cfAvatarId ? (
+                <CloudflareImage
+                  imageId={cfAvatarId}
+                  variant="public"
+                  alt="Ichimaru Gin"
+                  class="w-full h-full rounded-full object-cover border-4 border-black group-hover:scale-105 transition-transform duration-500 shadow-2xl shadow-brand-primary/50"
+                />
+              ) : (
+                <img
+                  src={`https://secure.gravatar.com/avatar/${gravatarHash}?s=512&d=https%3A%2F%2Fgithub.com%2FIchimaruGin728.png`}
+                  alt="Ichimaru Gin"
+                  class="w-full h-full rounded-full object-cover border-4 border-black group-hover:scale-105 transition-transform duration-500 shadow-2xl shadow-brand-primary/50"
+                />
+              )
+            }
           </div>
           <div
             class="absolute bottom-1 right-1 w-6 h-6 bg-green-500 rounded-full border-4 border-black animate-pulse"
