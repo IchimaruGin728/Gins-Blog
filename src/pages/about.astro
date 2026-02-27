@@ -5,7 +5,8 @@ import Layout from "../layouts/Layout.astro";
 import CloudflareImage from "../components/CloudflareImage.astro";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
-const cfAvatarId = import.meta.env.PUBLIC_CF_AVATAR_ID;
+const cfAvatarId =
+  import.meta.env.PUBLIC_CF_AVATAR_ID || "d0a6d84a-f3b2-4be8-1c43-f17ea5abc000";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);

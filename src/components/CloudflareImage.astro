@@ -26,7 +26,8 @@ const accountHash =
   import.meta.env.CLOUDFLARE_ACCOUNT_HASH ||
   Astro.locals.runtime?.env?.CLOUDFLARE_ACCOUNT_HASH ||
   process.env.CLOUDFLARE_ACCOUNT_HASH ||
-  "MISSING_HASH";
+  "M82pPQiNYSyK_UjCktOIJA";
+// Fallback to Ichimaru's known hash if all else fails
 
 // Construct the imagedelivery.net URL
 // Format: https://imagedelivery.net/<ACCOUNT_HASH>/<IMAGE_ID>/<VARIANT>
