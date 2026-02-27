@@ -21,9 +21,12 @@ const {
   fetchpriority = "auto",
 } = Astro.props;
 
-// Read the Cloudflare Account Hash from environment variables at runtime/buildtime
-const { env } = Astro.locals.runtime || { env: process.env };
-const accountHash = env.CLOUDFLARE_ACCOUNT_HASH || "MISSING_HASH";
+// Read the Cloudflare Account Hash from environment variables
+const accountHash =
+  import.meta.env.CLOUDFLARE_ACCOUNT_HASH ||
+  Astro.locals.runtime?.env?.CLOUDFLARE_ACCOUNT_HASH ||
+  process.env.CLOUDFLARE_ACCOUNT_HASH ||
+  "MISSING_HASH";
 
 // Construct the imagedelivery.net URL
 // Format: https://imagedelivery.net/<ACCOUNT_HASH>/<IMAGE_ID>/<VARIANT>

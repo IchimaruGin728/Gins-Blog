@@ -6,6 +6,7 @@ import CloudflareImage from "../components/CloudflareImage.astro";
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
 const cfAvatarId = import.meta.env.PUBLIC_CF_AVATAR_ID;
+console.log("DEBUG: PUBLIC_CF_AVATAR_ID =", cfAvatarId);
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
