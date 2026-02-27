@@ -51,6 +51,7 @@
 		"@iconify-json/logos": "^1.2.10",
 		"@iconify-json/simple-icons": "^1.2.71",
 		"@types/node": "^25.3.2",
+		"@unocss/astro": "^66.6.2",
 		"dotenv": "^17.3.1",
 		"drizzle-kit": "^0.31.9",
 		"inquirer": "^13.3.0",

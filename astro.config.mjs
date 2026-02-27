@@ -3,7 +3,7 @@ import mdx from "@astrojs/mdx";
 import preact from "@astrojs/preact";
 import sitemap from "@astrojs/sitemap";
 import { defineConfig } from "astro/config";
-import unocss from "unocss/astro";
+import unocss from "@unocss/astro";
 
 // https://astro.build/config
 export default defineConfig({
