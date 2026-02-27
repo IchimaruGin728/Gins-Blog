@@ -55,4 +55,4 @@ Once the database is primed and the bindings are set, you can deploy the applica
 npm run deploy
 ```
 
-Watch as the application distributes itself across the edge network in seconds. The terminal will output your `.workers.dev` domain, which you can later map to a custom domain in your Cloudflare Dash.
+The application will be distributed across the edge network in a matter of seconds. The terminal will output your `.workers.dev` domain, which you can later map to a custom domain in your Cloudflare Dash.

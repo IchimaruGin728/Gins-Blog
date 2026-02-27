@@ -6,12 +6,12 @@ order: 2
 
 # Edge-Native Architecture
 
-Gins-Blog isn't merely hosted; it exists simultaneously across hundreds of data centers globally. By leveraging the Cloudflare ecosystem, the application achieves sub-centisecond TTFB (Time To First Byte).
+Gins-Blog isn't merely hosted; it exists simultaneously across hundreds of data centers globally. By leveraging the Cloudflare ecosystem, the application achieves extremely fast TTFB (Time To First Byte).
 
 ## The Astro/Hono Symbiosis
 
 We utilize a unique hybrid approach:
-- **Astro** handles the heavy lifting of Server-Side Rendering (SSR). It compiles components to extremely lightweight HTML/CSS, perfectly suited for V8 Isolates.
+- **Astro** handles the core of Server-Side Rendering (SSR). It compiles components to extremely lightweight HTML/CSS, perfectly suited for V8 Isolates.
 - **Hono** is mounted within Astro's server execution context to handle raw API routes, RPC (Remote Procedure Calls), and strict data validation using Zod.
 
 ### D1 Database & Drizzle
@@ -29,7 +29,7 @@ export const posts = sqliteTable("posts", {
 });
 ```
 
-Because D1 operates via HTTP APIs rather than traditional TCP sockets, connection limits are fundamentally nonexistent. Drizzle ORM provides absolute type-safety from the database schema up to the frontend UI components.
+Because D1 operates via HTTP APIs rather than traditional TCP sockets, connection limits are no longer a bottleneck. Drizzle ORM provides absolute type-safety from the database schema up to the frontend UI components.
 
 > [!TIP]
 > For heavy read operations on the homepage, the API utilizes a dual-layer caching strategy: memory cache (`Map`) fallback to Cloudflare KV.

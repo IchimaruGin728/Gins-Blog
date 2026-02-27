@@ -1,0 +1,77 @@
+---
+import { getCollection } from "astro:content";
+
+const docsZh = await getCollection("docsZh");
+
+const sortedDocs = docsZh.sort((a, b) => {
+  const orderA = a.data.order ?? 999;
+  const orderB = b.data.order ?? 999;
+  if (orderA !== orderB) {
+    return orderA - orderB;
+  }
+  return a.data.title.localeCompare(b.data.title);
+});
+
+const currentPath = Astro.url.pathname;
+---
+
+<div class="pr-6">
+  <h2
+    class="text-xs font-bold text-brand-accent uppercase tracking-widest mb-4 font-mono"
+  >
+    官方文档
+  </h2>
+
+  <nav class="space-y-1">
+    {
+      sortedDocs.map((doc) => {
+        const routeSlug = doc.id.replace(/\.[^/.]+$/, "");
+        const href = `/zh/docs/${routeSlug === "index" ? "" : routeSlug}`;
+        const isActive =
+          currentPath.replace(/\/$/, "") === href.replace(/\/$/, "");
+
+        return (
+          <a
+            href={href}
+            class:list={[
+              "block px-3 py-2 rounded-lg text-sm transition-all duration-200",
+              isActive
+                ? "bg-brand-primary/20 text-brand-accent font-bold border-l-2 border-brand-accent"
+                : "text-gray-400 hover:bg-white/5 hover:text-white border-l-2 border-transparent",
+            ]}
+          >
+            {doc.data.title}
+          </a>
+        );
+      })
+    }
+  </nav>
+
+  <div class="mt-8 pt-8 border-t border-white/10">
+    <h2
+      class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 font-mono"
+    >
+      相关资源
+    </h2>
+    <nav class="space-y-2">
+      <a
+        href="https://github.com/IchimaruGin728"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+      >
+        <span class="i-simple-icons-github text-lg"></span>
+        GitHub
+      </a>
+      <a
+        href="https://x.com/IchimaruGin728"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+      >
+        <span class="i-simple-icons-x text-lg"></span>
+        Twitter
+      </a>
+    </nav>
+  </div>
+</div>

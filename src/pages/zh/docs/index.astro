@@ -1,0 +1,110 @@
+---
+import DocsLayout from "../../../layouts/DocsLayout.astro";
+
+const features = [
+  {
+    title: "边缘原生 SSR",
+    desc: "零冷启动。完全依托 Cloudflare Workers 实现的全球分布式服务端渲染。",
+    icon: "i-heroicons-globe-alt",
+    color: "from-blue-500/20 to-cyan-500/20",
+    iconColor: "text-cyan-400",
+  },
+  {
+    title: "Liquid Glass 视觉表现",
+    desc: "全硬件加速的玻璃拟态 UI，极其流畅的微动画与电影级平滑转场。",
+    icon: "i-heroicons-sparkles",
+    color: "from-purple-500/20 to-pink-500/20",
+    iconColor: "text-pink-400",
+  },
+  {
+    title: "零信任安全",
+    desc: "已集成身份中心，为 WebAuthn 做好准备，内置 WebSocket 频次限制防护。",
+    icon: "i-heroicons-shield-check",
+    color: "from-emerald-500/20 to-green-500/20",
+    iconColor: "text-emerald-400",
+  },
+  {
+    title: "无服务器 D1 引擎",
+    desc: "极其快速的边缘 SQLite，由 Drizzle ORM 提供无缝的全链路类型保障。",
+    icon: "i-heroicons-circle-stack",
+    color: "from-orange-500/20 to-amber-500/20",
+    iconColor: "text-orange-400",
+  },
+  {
+    title: "原生 AI 搜索",
+    desc: "基于向量化语义检索，搭配大语言模型问答接口及原生 MCP Agentic 工具。",
+    icon: "i-heroicons-cpu-chip",
+    color: "from-indigo-500/20 to-violet-500/20",
+    iconColor: "text-indigo-400",
+  },
+  {
+    title: "亚毫秒极速 API",
+    desc: "基于 Hono 驱动的高速流体 API 中间件，辅以严格的 Zod 数据校验与 RPC 接口化类型。",
+    icon: "i-heroicons-bolt",
+    color: "from-yellow-500/20 to-lime-500/20",
+    iconColor: "text-yellow-400",
+  },
+];
+---
+
+<DocsLayout title="文档中心" hideRightSidebar={true}>
+  <div class="mb-12">
+    <div
+      class="inline-block px-4 py-1.5 rounded-full bg-brand-primary/10 text-brand-accent font-mono text-xs font-bold mb-6 border border-brand-primary/30 shadow-[0_0_15px_rgba(88,28,135,0.5)]"
+    >
+      v1.0.0 NUCLEUS
+    </div>
+    <h1
+      class="text-4xl md:text-6xl font-display font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-500"
+    >
+      Gins-Blog 内核架构
+    </h1>
+    <p class="text-xl text-gray-400 max-w-2xl leading-relaxed">
+      深入探索 Gins-Blog
+      生态系统的底层技术架构、全流程部署策略以及系统工程剖析。
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {
+      features.map((feature) => (
+        <a
+          href="/zh/docs/introduction"
+          class="glass-panel p-6 rounded-3xl relative overflow-hidden group flex flex-col h-full hover:-translate-y-2 transition-transform duration-500 will-change-transform min-h-[220px]"
+        >
+          <div
+            class={`absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none ${feature.color}`}
+          />
+          <div
+            class={`w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 shadow-inner ${feature.iconColor} group-hover:scale-110 transition-transform duration-500`}
+          >
+            <span class={`${feature.icon} text-3xl`} />
+          </div>
+          <h3 class="text-xl font-bold font-display mb-3 text-white group-hover:text-brand-accent transition-colors duration-300">
+            {feature.title}
+          </h3>
+          <p class="text-sm text-gray-400 leading-relaxed flex-grow">
+            {feature.desc}
+          </p>
+        </a>
+      ))
+    }
+  </div>
+
+  <div
+    class="mt-16 pt-12 border-t border-white/10 flex flex-col md:flex-row gap-6 items-center justify-between"
+  >
+    <div>
+      <h3 class="text-2xl font-bold font-display mb-2">快速开始</h3>
+      <p class="text-gray-400 text-sm">
+        跟随技术部署指南，全自动配置您的线上架构环境。
+      </p>
+    </div>
+    <a
+      href="/zh/docs/deployment"
+      class="px-8 py-4 rounded-xl bg-white text-black font-bold flex items-center gap-2 hover:bg-gray-200 transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+    >
+      开始部署配置 <span class="i-heroicons-arrow-right"></span>
+    </a>
+  </div>
+</DocsLayout>
