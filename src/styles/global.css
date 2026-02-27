@@ -72,24 +72,24 @@ body {
 	}
 }
 
-/* Liquid Crossfade Page Transition (120Hz Optimized) */
 @keyframes liquid-fade-exit {
 	0% {
 		opacity: 1;
 		filter: blur(0px);
-		transform: translateY(0) scale(1) translateZ(0); /* Force GPU acceleration */
+		transform: translateY(0) scale(1) translateZ(0);
 	}
 	100% {
 		opacity: 0;
-		filter: blur(8px);
-		transform: translateY(-8px) scale(0.985) translateZ(0);
+		filter: blur(3px);
+		transform: translateY(-2px) scale(0.995) translateZ(0);
 	}
 }
+
 @keyframes liquid-fade-enter {
 	0% {
 		opacity: 0;
-		filter: blur(8px);
-		transform: translateY(12px) scale(0.985) translateZ(0);
+		filter: blur(3px);
+		transform: translateY(4px) scale(0.995) translateZ(0);
 	}
 	100% {
 		opacity: 1;
@@ -100,18 +100,13 @@ body {
 
 .main-content {
 	view-transition-name: main-content;
-	/* Disable native scroll anchoring jitter during transition */
 	overflow-anchor: none; 
 }
 
-/* 
-  Custom Spring Physics Curve for 120Hz: 
-  Extremely fast start (0.22), slight overshoot (1.05), very long smooth damping tail (0.36) 
-*/
 ::view-transition-old(main-content) {
-	animation: 0.35s cubic-bezier(0.4, 0, 1, 1) both liquid-fade-exit;
+	animation: 0.35s ease-in-out both liquid-fade-exit;
 }
 
 ::view-transition-new(main-content) {
-	animation: 0.55s cubic-bezier(0.22, 1.05, 0.36, 1) both liquid-fade-enter;
+	animation: 0.45s ease-in-out both liquid-fade-enter;
 }
