@@ -46,7 +46,7 @@ const t = useTranslations(lang);
             : `/${lang === "zh-SG" ? "zh" : lang}/docs/`}
           data-astro-prefetch
           class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-full transition-all"
-          >Docs</a
+          >{lang === "zh-SG" ? "文档" : "Docs"}</a
         >
         <a
           href={lang === "en-SG"
