@@ -21,7 +21,7 @@ const { title, items, icon, color, iconColor } = Astro.props;
 
   <!-- Main Card Content Area -->
   <div
-    class="relative h-full bg-[#050505]/90 backdrop-blur-xl rounded-[23px] p-6 lg:p-8 flex flex-col items-start overflow-hidden z-10 transition-transform duration-300 ease-out will-change-transform feature-card-inner"
+    class="relative h-full bg-[#050505]/90 backdrop-blur-xl rounded-[23px] p-6 lg:p-7 flex flex-col items-start overflow-hidden z-10 transition-transform duration-300 ease-out will-change-transform feature-card-inner"
   >
     <!-- Spotlight effect tracking cursor -->
     <div
@@ -31,9 +31,9 @@ const { title, items, icon, color, iconColor } = Astro.props;
 
     <!-- Icon -->
     <div
-      class={`w-10 h-10 lg:w-12 lg:h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 shadow-inner ${iconColor} group-hover:scale-110 transition-transform duration-500 ease-out relative z-10`}
+      class={`w-11 h-11 lg:w-12 lg:h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 shadow-inner ${iconColor} group-hover:scale-110 transition-transform duration-500 ease-out relative z-10`}
     >
-      <span class={`${icon} text-xl lg:text-2xl`}></span>
+      <span class={`${icon} text-2xl`}></span>
     </div>
 
     <!-- Title -->
@@ -47,7 +47,7 @@ const { title, items, icon, color, iconColor } = Astro.props;
     <ul class="space-y-3 relative z-10 mt-2 flex-grow">
       {
         items.map((item) => (
-          <li class="flex items-start gap-3 text-xs lg:text-sm text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
+          <li class="flex items-start gap-3 text-sm text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
             <span class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0 bg-brand-accent/50 group-hover:bg-brand-accent transition-colors duration-300 shadow-[0_0_8px_rgba(168,85,247,0.4)]" />
             <span>{item}</span>
           </li>
