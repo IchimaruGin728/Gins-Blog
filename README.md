@@ -146,25 +146,25 @@ Built with an Edge-First MCP Server, you can connect **Claude Desktop**, **OpenC
 | :---: | :---: |
 | ![Blog Page](media/blog.png) | ![About Page](media/about.png) |
 
-### � Documentation Hub
-| Docs Landing | Content Layout |
-| :---: | :---: |
-| ![Docs Landing](media/docs_landing.png) | ![Docs Content](media/docs_content.png) |
+### 🔍 Explore & Learn
+| AI Vector Search | Documentation Hub | I18n Support |
+| :---: | :---: | :---: |
+| ![Search](media/search.png) | ![Docs](media/docs.png) | ![I18n](media/i18n.png) |
 
-### �👤 User System
-| Profile Customization | Identity Switching |
-| :---: | :---: |
-| ![Profile Page](media/profile.png) | ![Profile Switching](media/switch-profile.png) |
+### 👤 User System
+| Authentication | Profile Customization | Identity Switching |
+| :---: | :---: | :---: |
+| ![OAuth Login](media/login.png) | ![Profile Page](media/profile.png) | ![Profile Switching](media/switch-profile.png) |
 
-### 🛡️ Admin Suite
-| Dashboard | CMS Editor |
-| :---: | :---: |
-| ![Admin Panel](media/admin.png) | ![Editor Interface](media/editor.png) |
+### 🛡️ Admin & Content
+| Dashboard | CMS Editor | Music Manager |
+| :---: | :---: | :---: |
+| ![Admin Panel](media/admin.png) | ![Editor & Publish](media/editor&publish.png) | ![Music Console](media/music-manager.png) |
 
-### 📱 Mobile Experience
-| Music Manager | Mobile View |
-| :---: | :---: |
-| ![Music Console](media/music-manager.png) | <img src="media/mobile.jpg" width="300" /> |
+### 📱 Responsive Design
+| Mobile View |
+| :---: |
+| <img src="media/mobile.jpeg" width="300" /> |
 
 </details>
 

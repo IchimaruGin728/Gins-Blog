@@ -132,25 +132,25 @@
 | :---: | :---: |
 | ![博客页面](media/blog.png) | ![关于页面](media/about.png) |
 
-### 📚 官方文档
-| 文档主页 | 内容布局 |
-| :---: | :---: |
-| ![文档主页](media/docs_landing.png) | ![文档内容](media/docs_content.png) |
+### 🔍 探索与学习
+| AI 向量搜索 | 官方文档 | 多语言支持 |
+| :---: | :---: | :---: |
+| ![搜索](media/search.png) | ![文档](media/docs.png) | ![多语言](media/i18n.png) |
 
 ### 👤 用户系统
-| 个人资料自定义 | 身份切换 |
-| :---: | :---: |
-| ![个人资料页面](media/profile.png) | ![个人资料切换](media/switch-profile.png) |
+| 授权登录 | 资料自定义 | 身份切换 |
+| :---: | :---: | :---: |
+| ![登录页面](media/login.png) | ![个人资料](media/profile.png) | ![账号切换](media/switch-profile.png) |
 
-### 🛡️ 管理套件
-| 仪表板 | CMS 编辑器 |
-| :---: | :---: |
-| ![管理面板](media/admin.png) | ![编辑器界面](media/editor.png) |
+### 🛡️ 管理与内容
+| 后台仪表盘 | CMS 编辑器 | 音乐管理器 |
+| :---: | :---: | :---: |
+| ![仪表盘](media/admin.png) | ![编辑与发布](media/editor&publish.png) | ![音乐控制台](media/music-manager.png) |
 
-### 📱 移动体验
-| 音乐管理器 | 移动视图 |
-| :---: | :---: |
-| ![音乐控制台](media/music-manager.png) | <img src="media/mobile.jpg" width="300" /> |
+### 📱 响应式设计
+| 移动端视图 |
+| :---: |
+| <img src="media/mobile.jpeg" width="300" /> |
 
 </details>
 
