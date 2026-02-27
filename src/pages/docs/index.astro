@@ -93,10 +93,7 @@ const features = [
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {
       features.map((feature) => (
-        <a
-          href="/docs/introduction"
-          class="block h-full transition-transform hover:-translate-y-2 duration-500 will-change-transform"
-        >
+        <a href="/docs/introduction" class="block h-full">
           <DocsFeatureCard
             title={feature.title}
             items={feature.items}
