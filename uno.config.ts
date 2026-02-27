@@ -38,6 +38,9 @@ export default defineConfig({
 		"i-heroicons-check",
 		"i-heroicons-pencil-square",
 		"i-heroicons-eye-slash",
+		"i-heroicons-sparkles",
+		"i-heroicons-shield-check",
+		"i-heroicons-circle-stack",
 		// Additional icons
 		"i-heroicons-exclamation-triangle",
 		"i-heroicons-arrow-left",

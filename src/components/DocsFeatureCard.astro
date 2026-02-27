@@ -19,9 +19,9 @@ const { title, items, icon, color, iconColor } = Astro.props;
   >
   </div>
 
-  <!-- Main Card Content Area -->
+    <!-- Main Card Content Area -->
   <div
-    class="relative h-full bg-[#050505]/90 backdrop-blur-xl rounded-[23px] p-6 lg:p-7 flex flex-col items-start overflow-hidden z-10 transition-transform duration-300 ease-out will-change-transform feature-card-inner"
+    class="relative h-full bg-[#050505]/90 backdrop-blur-xl rounded-[23px] p-6 lg:p-7 flex flex-col items-start overflow-hidden z-10 will-change-transform feature-card-inner transition-all duration-500 ease-out"
   >
     <!-- Spotlight effect tracking cursor -->
     <div
@@ -67,14 +67,11 @@ const { title, items, icon, color, iconColor } = Astro.props;
   .feature-spotlight {
     width: 400px;
     height: 400px;
-    top: -200px; /* offset by half height */
-    left: -200px; /* offset by half width */
+    top: -200px;
+    left: -200px;
     transform: translate(var(--mouse-x, 0), var(--mouse-y, 0));
     filter: blur(80px);
     will-change: transform;
-    transition:
-      opacity 0.4s ease,
-      transform 0.1s linear; /* Smooth but fast tracking */
   }
 
   /* 3D tilt target */
@@ -89,45 +86,53 @@ const { title, items, icon, color, iconColor } = Astro.props;
     const cards = document.querySelectorAll(".feature-card");
 
     cards.forEach((card) => {
-      const inner = card.querySelector(
-        ".feature-card-inner",
-      ) as HTMLElement | null;
+      const inner = card.querySelector(".feature-card-inner") as HTMLElement | null;
       if (!inner) return;
 
       const handleMouseMove = (e: MouseEvent) => {
         const rect = card.getBoundingClientRect();
-
-        // Calculate mouse position relative to card (0 to 1)
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        // Calculate percentage from center (-0.5 to 0.5)
         const centerX = x / rect.width - 0.5;
         const centerY = y / rect.height - 0.5;
 
-        // Update spotlight position
-        inner.style.setProperty("--mouse-x", `${x}px`);
-        inner.style.setProperty("--mouse-y", `${y}px`);
+        // Use requestAnimationFrame for smoother performance
+        requestAnimationFrame(() => {
+          inner.style.setProperty("--mouse-x", `${x}px`);
+          inner.style.setProperty("--mouse-y", `${y}px`);
 
-        // Update 3D tilt (max 20 degrees flip)
-        // Note: rotating X based on Y axis requires inversion
-        const rotateX = centerY * -20;
-        const rotateY = centerX * 20;
-        inner.style.setProperty("--rotate-x", `${rotateX}deg`);
-        inner.style.setProperty("--rotate-y", `${rotateY}deg`);
+          const rotateX = centerY * -12; // Slightly reduced for subtler premium feel
+          const rotateY = centerX * 12;
+          inner.style.setProperty("--rotate-x", `${rotateX}deg`);
+          inner.style.setProperty("--rotate-y", `${rotateY}deg`);
+          
+          // Disable transition while moving for instant feedback
+          inner.style.transition = "none";
+        });
       };
 
       const handleMouseLeave = () => {
-        // Reset tilt
-        inner.style.setProperty("--rotate-x", "0deg");
-        inner.style.setProperty("--rotate-y", "0deg");
+        requestAnimationFrame(() => {
+          // Re-enable transition for smooth reset
+          inner.style.transition = "all 0.5s cubic-bezier(0.23, 1, 0.32, 1)";
+          inner.style.setProperty("--rotate-x", "0deg");
+          inner.style.setProperty("--rotate-y", "0deg");
+        });
       };
+
+      const handleMouseEnter = () => {
+          // Reset transition when entering
+          inner.style.transition = "none";
+      }
 
       card.addEventListener("mousemove", handleMouseMove as EventListener);
       card.addEventListener("mouseleave", handleMouseLeave);
+      card.addEventListener("mouseenter", handleMouseEnter);
     });
   }
 
-  // Initialize on Astro view transitions
+  // Initialize on load and on transitions
+  initFeatureCards();
   document.addEventListener("astro:page-load", initFeatureCards);
 </script>
