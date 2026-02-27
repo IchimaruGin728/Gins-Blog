@@ -6,6 +6,7 @@ import { getLangFromUrl, useTranslations } from "../../i18n/utils";
 
 const gravatarHash = "60eb98ab51a815a519feeca028e08573";
 const cfAvatarId = import.meta.env.PUBLIC_CF_AVATAR_ID;
+const cfCheemsId = "29d8d5a1-1d20-47db-9eaf-6347606fee00";
 
 const lang = getLangFromUrl(Astro.url);
 // biome-ignore lint/correctness/noUnusedVariables: Used in template
@@ -31,12 +32,20 @@ const t = useTranslations(lang);
           >
             {
               cfAvatarId ? (
-                <CloudflareImage
-                  imageId={cfAvatarId}
-                  variant="public"
-                  alt="Ichimaru Gin"
-                  class="w-full h-full rounded-full object-cover border-4 border-black group-hover:scale-105 transition-transform duration-500 shadow-2xl shadow-brand-primary/50"
-                />
+                <div class="relative w-full h-full group/avatar">
+                  <CloudflareImage
+                    imageId={cfAvatarId}
+                    variant="avatar"
+                    alt="Ichimaru Gin"
+                    class="w-full h-full rounded-full object-cover border-4 border-black group-hover:scale-105 transition-all duration-500 shadow-2xl shadow-brand-primary/50 absolute top-0 left-0 z-10 group-hover/avatar:opacity-0"
+                  />
+                  <CloudflareImage
+                    imageId={cfCheemsId}
+                    variant="avatar"
+                    alt="Cheems mode"
+                    class="w-full h-full rounded-full object-cover border-4 border-black scale-95 opacity-0 group-hover/avatar:scale-105 group-hover/avatar:opacity-100 transition-all duration-500 shadow-2xl shadow-brand-secondary/50 absolute top-0 left-0"
+                  />
+                </div>
               ) : (
                 <img
                   src={`https://secure.gravatar.com/avatar/${gravatarHash}?s=512&d=https%3A%2F%2Fgithub.com%2FIchimaruGin728.png`}
