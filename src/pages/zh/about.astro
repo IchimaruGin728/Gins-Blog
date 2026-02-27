@@ -1,11 +1,12 @@
 ---
-export const prerender = true;
 import Layout from "../../layouts/Layout.astro";
 import SocialLinks from "../../components/SocialLinks.tsx";
 import CloudflareImage from "../../components/CloudflareImage.astro";
 import { getLangFromUrl, useTranslations } from "../../i18n/utils";
 
-const cfAvatarId = import.meta.env.PUBLIC_CF_AVATAR_ID;
+const cfAvatarId =
+  import.meta.env.PUBLIC_CF_AVATAR_ID ||
+  Astro.locals.runtime?.env?.PUBLIC_CF_AVATAR_ID;
 
 const lang = getLangFromUrl(Astro.url);
 // biome-ignore lint/correctness/noUnusedVariables: Used in template
