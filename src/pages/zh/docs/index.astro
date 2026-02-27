@@ -1,45 +1,70 @@
 ---
 import DocsLayout from "../../../layouts/DocsLayout.astro";
+import DocsFeatureCard from "../../../components/DocsFeatureCard.astro";
 
 const features = [
   {
     title: "边缘原生 SSR",
-    desc: "零冷启动。完全依托 Cloudflare Workers 实现的全球分布式服务端渲染。",
+    items: [
+      "告别令人烦躁的服务器冷启动",
+      "完全依托 Cloudflare Workers",
+      "近乎无限的全球边缘渲染节点",
+    ],
     icon: "i-heroicons-globe-alt",
     color: "from-blue-500/20 to-cyan-500/20",
     iconColor: "text-cyan-400",
   },
   {
     title: "Liquid Glass 视觉表现",
-    desc: "全硬件加速的玻璃拟态 UI，极其流畅的微动画与电影级平滑转场。",
+    items: [
+      "GPU 强制硬件加速的玻璃拟态",
+      "鼠标指针捕捉的 3D 泛光效果",
+      "无缝衔接的电影级路由过渡转场",
+    ],
     icon: "i-heroicons-sparkles",
     color: "from-purple-500/20 to-pink-500/20",
     iconColor: "text-pink-400",
   },
   {
     title: "零信任安全",
-    desc: "已集成身份中心，为 WebAuthn 做好准备，内置 WebSocket 频次限制防护。",
+    items: [
+      "深度集成 Cloudflare 身份验证中心",
+      "原生支持企业级 WebAuthn 硬件密匙",
+      "底层防护与细粒度 WebSocket 频次限制",
+    ],
     icon: "i-heroicons-shield-check",
     color: "from-emerald-500/20 to-green-500/20",
     iconColor: "text-emerald-400",
   },
   {
     title: "无服务器 D1 引擎",
-    desc: "极其快速的边缘 SQLite，由 Drizzle ORM 提供无缝的全链路类型保障。",
+    items: [
+      "毫无传统 TCP 连接池耗尽的焦虑",
+      "部署极快的边缘分布 SQLite 引擎",
+      "基于 Drizzle ORM 的端到端全链路类型推断",
+    ],
     icon: "i-heroicons-circle-stack",
     color: "from-orange-500/20 to-amber-500/20",
     iconColor: "text-orange-400",
   },
   {
-    title: "原生 AI 搜索",
-    desc: "基于向量化语义检索，搭配大语言模型问答接口及原生 MCP Agentic 工具。",
+    title: "原生 AI 处理中枢",
+    items: [
+      "毫秒级响应的纯边端向量化语义检索",
+      "与大语言模型直连的 Textual 知识问答",
+      "完美兼容前沿的 MCP Agentic 工具调用",
+    ],
     icon: "i-heroicons-cpu-chip",
     color: "from-indigo-500/20 to-violet-500/20",
     iconColor: "text-indigo-400",
   },
   {
     title: "亚毫秒极速 API",
-    desc: "基于 Hono 驱动的高速流体 API 中间件，辅以严格的 Zod 数据校验与 RPC 接口化类型。",
+    items: [
+      "使用极其轻量化的 Hono 中间件作为宿主",
+      "由 Zod 在边缘把关的苛刻数据验证拦截",
+      "抹平前后端差异的 RPC (Remote Procedure Call)",
+    ],
     icon: "i-heroicons-bolt",
     color: "from-yellow-500/20 to-lime-500/20",
     iconColor: "text-yellow-400",
@@ -70,22 +95,15 @@ const features = [
       features.map((feature) => (
         <a
           href="/zh/docs/introduction"
-          class="glass-panel p-6 rounded-3xl relative overflow-hidden group flex flex-col h-full hover:-translate-y-2 transition-transform duration-500 will-change-transform min-h-[220px]"
+          class="block h-full transition-transform hover:-translate-y-2 duration-500 will-change-transform"
         >
-          <div
-            class={`absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none ${feature.color}`}
+          <DocsFeatureCard
+            title={feature.title}
+            items={feature.items}
+            icon={feature.icon}
+            color={feature.color}
+            iconColor={feature.iconColor}
           />
-          <div
-            class={`w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 shadow-inner ${feature.iconColor} group-hover:scale-110 transition-transform duration-500`}
-          >
-            <span class={`${feature.icon} text-3xl`} />
-          </div>
-          <h3 class="text-xl font-bold font-display mb-3 text-white group-hover:text-brand-accent transition-colors duration-300">
-            {feature.title}
-          </h3>
-          <p class="text-sm text-gray-400 leading-relaxed flex-grow">
-            {feature.desc}
-          </p>
         </a>
       ))
     }

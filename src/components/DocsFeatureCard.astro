@@ -1,0 +1,133 @@
+---
+interface Props {
+  title: string;
+  items: string[];
+  icon: string;
+  color: string;
+  iconColor: string;
+}
+
+const { title, items, icon, color, iconColor } = Astro.props;
+---
+
+<div
+  class="feature-card glass-panel w-full rounded-3xl relative p-[1px] group cursor-pointer h-full"
+>
+  <!-- Interactive Gradient Border Glow -->
+  <div
+    class={`absolute inset-0 bg-gradient-to-br rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none feature-glow-border ${color}`}
+  >
+  </div>
+
+  <!-- Main Card Content Area -->
+  <div
+    class="relative h-full bg-[#050505]/90 backdrop-blur-xl rounded-[23px] p-6 lg:p-8 flex flex-col items-start overflow-hidden z-10 transition-transform duration-300 ease-out will-change-transform feature-card-inner"
+  >
+    <!-- Spotlight effect tracking cursor -->
+    <div
+      class={`absolute rounded-full pointer-events-none feature-spotlight opacity-0 group-hover:opacity-40 transition-opacity duration-300 ${color}`}
+    >
+    </div>
+
+    <!-- Icon -->
+    <div
+      class={`w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 shadow-inner ${iconColor} group-hover:scale-110 transition-transform duration-500 ease-out relative z-10`}
+    >
+      <span class={`${icon} text-2xl lg:text-3xl`}></span>
+    </div>
+
+    <!-- Title -->
+    <h3
+      class="text-xl lg:text-2xl font-bold font-display mb-4 text-white group-hover:text-brand-accent transition-colors duration-300 relative z-10"
+    >
+      {title}
+    </h3>
+
+    <!-- Bullet Points -->
+    <ul class="space-y-3 relative z-10 mt-2 flex-grow">
+      {
+        items.map((item) => (
+          <li class="flex items-start gap-3 text-sm lg:text-base text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
+            <span class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0 bg-brand-accent/50 group-hover:bg-brand-accent transition-colors duration-300 shadow-[0_0_8px_rgba(168,85,247,0.4)]" />
+            <span>{item}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>
+
+<style>
+  .feature-card {
+    perspective: 1500px;
+    transform-style: preserve-3d;
+  }
+
+  /* The actual spotlight blob */
+  .feature-spotlight {
+    width: 400px;
+    height: 400px;
+    top: -200px; /* offset by half height */
+    left: -200px; /* offset by half width */
+    transform: translate(var(--mouse-x, 0), var(--mouse-y, 0));
+    filter: blur(80px);
+    will-change: transform;
+    transition:
+      opacity 0.4s ease,
+      transform 0.1s linear; /* Smooth but fast tracking */
+  }
+
+  /* 3D tilt target */
+  .feature-card-inner {
+    transform: rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg));
+    transform-style: preserve-3d;
+  }
+</style>
+
+<script>
+  function initFeatureCards() {
+    const cards = document.querySelectorAll(".feature-card");
+
+    cards.forEach((card) => {
+      const inner = card.querySelector(
+        ".feature-card-inner",
+      ) as HTMLElement | null;
+      if (!inner) return;
+
+      const handleMouseMove = (e: MouseEvent) => {
+        const rect = card.getBoundingClientRect();
+
+        // Calculate mouse position relative to card (0 to 1)
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Calculate percentage from center (-0.5 to 0.5)
+        const centerX = x / rect.width - 0.5;
+        const centerY = y / rect.height - 0.5;
+
+        // Update spotlight position
+        inner.style.setProperty("--mouse-x", `${x}px`);
+        inner.style.setProperty("--mouse-y", `${y}px`);
+
+        // Update 3D tilt (max 8 degrees flip)
+        // Note: rotating X based on Y axis requires inversion
+        const rotateX = centerY * -8;
+        const rotateY = centerX * 8;
+        inner.style.setProperty("--rotate-x", `${rotateX}deg`);
+        inner.style.setProperty("--rotate-y", `${rotateY}deg`);
+      };
+
+      const handleMouseLeave = () => {
+        // Reset tilt
+        inner.style.setProperty("--rotate-x", "0deg");
+        inner.style.setProperty("--rotate-y", "0deg");
+      };
+
+      card.addEventListener("mousemove", handleMouseMove as EventListener);
+      card.addEventListener("mouseleave", handleMouseLeave);
+    });
+  }
+
+  // Initialize on Astro view transitions
+  document.addEventListener("astro:page-load", initFeatureCards);
+</script>
