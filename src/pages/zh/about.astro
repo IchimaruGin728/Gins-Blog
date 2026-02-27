@@ -6,7 +6,6 @@ import CloudflareImage from "../../components/CloudflareImage.astro";
 import { getLangFromUrl, useTranslations } from "../../i18n/utils";
 
 const cfAvatarId = import.meta.env.PUBLIC_CF_AVATAR_ID;
-console.log("DEBUG ZH: PUBLIC_CF_AVATAR_ID =", cfAvatarId);
 
 const lang = getLangFromUrl(Astro.url);
 // biome-ignore lint/correctness/noUnusedVariables: Used in template
