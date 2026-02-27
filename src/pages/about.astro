@@ -3,92 +3,35 @@ export const prerender = true;
 import SocialLinks from "../components/SocialLinks.tsx";
 import Layout from "../layouts/Layout.astro";
 import CloudflareImage from "../components/CloudflareImage.astro";
-
-const gravatarHash = "60eb98ab51a815a519feeca028e08573"; // IchimaruGin728
-const cfAvatarId = import.meta.env.PUBLIC_CF_AVATAR_ID;
-const cfCheemsId = "29d8d5a1-1d20-47db-9eaf-6347606fee00";
-
 import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const cfAvatarId = import.meta.env.PUBLIC_CF_AVATAR_ID;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-let socialLinks: {
-  label: string;
-  url: string;
-  icon: string;
-  color?: string;
-}[] = [];
-
-try {
-  const res = await fetch(`https://en.gravatar.com/${gravatarHash}.json`, {
-    headers: { "User-Agent": "Mozilla/5.0 (compatible; GinBlog/1.0)" },
-  });
-
-  if (res.ok) {
-    const data = (await res.json()) as any;
-    const entry = data.entry[0];
-
-    const getServiceIcon = (service: string) => {
-      const map: Record<string, string> = {
-        github: "i-simple-icons-github",
-        twitter: "i-simple-icons-x",
-        facebook: "i-simple-icons-facebook",
-        instagram: "i-simple-icons-instagram",
-        linkedin: "i-simple-icons-linkedin",
-        discord: "i-simple-icons-discord",
-        youtube: "i-simple-icons-youtube",
-        reddit: "i-simple-icons-reddit",
-        medium: "i-simple-icons-medium",
-        stackoverflow: "i-simple-icons-stackoverflow",
-        twitch: "i-simple-icons-twitch",
-        steam: "i-simple-icons-steam",
-        telegram: "i-simple-icons-telegram",
-      };
-      return map[service] || "i-heroicons-link";
-    };
-
-    if (entry.accounts) {
-      entry.accounts.forEach((acc: any) => {
-        socialLinks.push({
-          label: acc.display || acc.username || acc.shortname,
-          url: acc.url,
-          icon: getServiceIcon(acc.shortname),
-          color: "hover:text-white",
-        });
-      });
-    }
-
-    if (entry.urls) {
-      entry.urls.forEach((link: any) => {
-        let icon = "i-heroicons-globe-alt";
-        const label = link.title;
-        const url = link.value;
-
-        if (url.includes("github.com")) icon = "i-simple-icons-github";
-        else if (url.includes("twitter.com") || url.includes("x.com"))
-          icon = "i-simple-icons-x";
-        else if (url.includes("linkedin.com")) icon = "i-simple-icons-linkedin";
-
-        socialLinks.push({ label, url, icon });
-      });
-    }
-  }
-} catch (e) {
-  console.error("Failed to fetch Gravatar profile", e);
-  socialLinks = [
-    {
-      label: "GitHub",
-      url: "https://github.com/IchimaruGin728",
-      icon: "i-simple-icons-github",
-    },
-    {
-      label: "X (Twitter)",
-      url: "https://x.com/IchimaruGin728",
-      icon: "i-simple-icons-x",
-    },
-  ];
-}
+const socialLinks = [
+  {
+    label: "Threads",
+    url: "https://www.threads.net/@ichimarugin728",
+    icon: "i-simple-icons-threads",
+  },
+  {
+    label: "Twitter",
+    url: "https://twitter.com/IchimaruGin728",
+    icon: "i-simple-icons-x",
+  },
+  {
+    label: "Tiktok",
+    url: "https://www.tiktok.com/@ichimarugin728",
+    icon: "i-simple-icons-tiktok",
+  },
+  {
+    label: "GitHub",
+    url: "https://github.com/IchimaruGin728",
+    icon: "i-simple-icons-github",
+  },
+];
 ---
 
 <Layout title={`${t("nav.about")} - ${t("hero.title")}`}>
@@ -106,33 +49,20 @@ try {
           <div
             class="w-32 h-32 rounded-full p-1 bg-gradient-to-br from-brand-accent to-brand-primary avatar-protected overflow-hidden"
           >
-            <img
-              src="https://secure.gravatar.com/avatar/0?d=mp&f=y"
-              class="hidden"
-              alt="force-load"
-            />
             {
               cfAvatarId ? (
-                <div class="relative w-full h-full group/avatar">
-                  <CloudflareImage
-                    imageId={cfAvatarId}
-                    variant="avatar"
-                    alt="Ichimaru Gin"
-                    class="w-full h-full rounded-full object-cover transition-all duration-700 absolute top-0 left-0 z-10 group-hover/avatar:opacity-0"
-                  />
-                  <CloudflareImage
-                    imageId={cfCheemsId}
-                    variant="avatar"
-                    alt="Cheems mode"
-                    class="w-full h-full rounded-full object-cover opacity-0 group-hover/avatar:opacity-100 transition-all duration-700 absolute top-0 left-0"
-                  />
-                </div>
-              ) : (
-                <img
-                  src={`https://secure.gravatar.com/avatar/${gravatarHash}?s=512&d=https%3A%2F%2Fgithub.com%2FIchimaruGin728.png`}
+                <CloudflareImage
+                  imageId={cfAvatarId}
+                  variant="avatar"
                   alt="Ichimaru Gin"
                   class="w-full h-full rounded-full object-cover shadow-2xl shadow-brand-primary/50"
                 />
+              ) : (
+                <div class="w-full h-full rounded-full bg-brand-primary/20 flex items-center justify-center">
+                  <span class="text-brand-accent font-bold text-xl uppercase">
+                    Gin
+                  </span>
+                </div>
               )
             }
           </div>
@@ -160,31 +90,7 @@ try {
             {t("about.description")}
           </p>
 
-          <SocialLinks
-            client:idle
-            initialLinks={[
-              {
-                label: "Threads",
-                url: "https://www.threads.net/@ichimarugin728",
-                icon: "i-simple-icons-threads",
-              },
-              {
-                label: "Twitter",
-                url: "https://twitter.com/IchimaruGin728",
-                icon: "i-simple-icons-x",
-              },
-              {
-                label: "Tiktok",
-                url: "https://www.tiktok.com/@ichimarugin728",
-                icon: "i-simple-icons-tiktok",
-              },
-              {
-                label: "Github",
-                url: "https://github.com/IchimaruGin728",
-                icon: "i-simple-icons-github",
-              },
-            ]}
-          />
+          <SocialLinks client:idle initialLinks={socialLinks} />
         </div>
       </div>
     </div>
