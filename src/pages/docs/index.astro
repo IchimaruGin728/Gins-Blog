@@ -4,66 +4,66 @@ import DocsFeatureCard from "../../components/DocsFeatureCard.astro";
 
 const features = [
   {
-    title: "Edge-Native SSR",
+    title: "Edge-Native Rendering",
     items: [
-      "Zero cold starts latency",
-      "Globally distributed rendering",
-      "Powered by Cloudflare Workers",
+      "Eliminates traditional server cold start latency",
+      "Renders pages on edge nodes closest to the user",
+      "Built natively on the Cloudflare Workers ecosystem",
     ],
     icon: "i-heroicons-globe-alt",
     color: "from-blue-500/20 to-cyan-500/20",
     iconColor: "text-cyan-400",
   },
   {
-    title: "Liquid Glass UI",
+    title: "Dynamic Visuals",
     items: [
-      "Hardware-accelerated glassmorphism",
-      "Dynamic cursor-tracking glows",
-      "Cinematic view transitions",
+      "Hardware-accelerated glassmorphism components",
+      "Interactive 3D hover effects with cursor tracking",
+      "Smooth route transitions powered by modern APIs",
     ],
     icon: "i-heroicons-sparkles",
     color: "from-purple-500/20 to-pink-500/20",
     iconColor: "text-pink-400",
   },
   {
-    title: "Zero Trust Security",
+    title: "Zero Trust Ready",
     items: [
-      "Integrated authentication logic",
-      "WebAuthn and Hardware Keys ready",
-      "Built-in WebSocket rate limiting",
+      "Integrates with Cloudflare Access enterprise gateways",
+      "Native support for WebAuthn and Passkey logins",
+      "Implements granular rate limiting at the edge layer",
     ],
     icon: "i-heroicons-shield-check",
     color: "from-emerald-500/20 to-green-500/20",
     iconColor: "text-emerald-400",
   },
   {
-    title: "Serverless D1 Engine",
+    title: "Serverless Database",
     items: [
-      "Ultra-fast SQLite at the edge",
-      "Zero connection pooling limits",
-      "Seamless schema typing with Drizzle ORM",
+      "Bypasses traditional TCP connection pool limits",
+      "Powered by Cloudflare D1 distributed SQLite",
+      "Ensures end-to-end type safety via Drizzle ORM",
     ],
     icon: "i-heroicons-circle-stack",
     color: "from-orange-500/20 to-amber-500/20",
     iconColor: "text-orange-400",
   },
   {
-    title: "AI-Native Search",
+    title: "Native AI Integration",
     items: [
-      "Vectorized semantic indexing",
-      "LLM-powered textual endpoints",
-      "MCP protocol API tools integrated",
+      "Low-latency semantic text search via edge vectors",
+      "LLM connectivity for dynamic knowledge retrieval",
+      "Includes MCP Agentic endpoints for advanced AI tooling",
     ],
     icon: "i-heroicons-cpu-chip",
     color: "from-indigo-500/20 to-violet-500/20",
     iconColor: "text-indigo-400",
   },
   {
-    title: "Sub-millisecond API",
+    title: "Lightweight Edge API",
     items: [
-      "Hono-powered lightweight backend",
-      "Strict data validation using Zod",
-      "End-to-end RPC unified types",
+      "Driven by the low-footprint Hono web framework",
+      "Strict incoming data validation powered by Zod",
+      "Provides a unified, type-safe RPC calling experience",
     ],
     icon: "i-heroicons-bolt",
     color: "from-yellow-500/20 to-lime-500/20",
@@ -85,8 +85,8 @@ const features = [
       Gins-Blog Architecture
     </h1>
     <p class="text-xl text-gray-400 max-w-2xl leading-relaxed">
-      Explore the technical architecture, deployment strategies, and system
-      internals of the Gin's Blog ecosystem.
+      Beyond the source code, explore the architectural patterns, deployment
+      workflows, and engineering practices that power the Gins-Blog ecosystem.
     </p>
   </div>
 
@@ -113,16 +113,17 @@ const features = [
     class="mt-16 pt-12 border-t border-white/10 flex flex-col md:flex-row gap-6 items-center justify-between"
   >
     <div>
-      <h3 class="text-2xl font-bold font-display mb-2">Getting Started</h3>
+      <h3 class="text-2xl font-bold font-display mb-2">Ready to deploy?</h3>
       <p class="text-gray-400 text-sm">
-        Follow the technical deployment guide to configure the environment.
+        Use my automated setup scripts to quickly provision a complete
+        edge-native infrastructure within your Cloudflare account.
       </p>
     </div>
     <a
       href="/docs/deployment"
       class="px-8 py-4 rounded-xl bg-white text-black font-bold flex items-center gap-2 hover:bg-gray-200 transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
     >
-      Start Deployment <span class="i-heroicons-arrow-right"></span>
+      View Setup Guide <span class="i-heroicons-arrow-right"></span>
     </a>
   </div>
 </DocsLayout>

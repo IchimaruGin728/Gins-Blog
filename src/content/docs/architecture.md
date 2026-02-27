@@ -10,7 +10,7 @@ Gins-Blog isn't merely hosted; it exists simultaneously across hundreds of data 
 
 ## The Astro/Hono Symbiosis
 
-We utilize a unique hybrid approach:
+I utilize a unique hybrid approach:
 - **Astro** handles the core of Server-Side Rendering (SSR). It compiles components to extremely lightweight HTML/CSS, perfectly suited for V8 Isolates.
 - **Hono** is mounted within Astro's server execution context to handle raw API routes, RPC (Remote Procedure Calls), and strict data validation using Zod.
 

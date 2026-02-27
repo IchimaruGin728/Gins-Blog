@@ -4,66 +4,66 @@ import DocsFeatureCard from "../../../components/DocsFeatureCard.astro";
 
 const features = [
   {
-    title: "边缘原生 SSR",
+    title: "边缘原生渲染",
     items: [
-      "告别令人烦躁的服务器冷启动",
-      "完全依托 Cloudflare Workers",
-      "近乎无限的全球边缘渲染节点",
+      "告别传统服务器的冷启动延迟",
+      "在离用户最近的边缘节点完成页面渲染",
+      "基于 Cloudflare Workers 构建的分布式架构",
     ],
     icon: "i-heroicons-globe-alt",
     color: "from-blue-500/20 to-cyan-500/20",
     iconColor: "text-cyan-400",
   },
   {
-    title: "Liquid Glass 视觉表现",
+    title: "动态拟态视觉",
     items: [
-      "GPU 强制硬件加速的玻璃拟态",
-      "鼠标指针捕捉的 3D 泛光效果",
-      "无缝衔接的电影级路由过渡转场",
+      "利用 GPU 硬件加速的玻璃拟态组件",
+      "跟随鼠标轨迹的 3D 悬浮交互反馈",
+      "结合原生 API 实现的平滑路由过渡",
     ],
     icon: "i-heroicons-sparkles",
     color: "from-purple-500/20 to-pink-500/20",
     iconColor: "text-pink-400",
   },
   {
-    title: "零信任安全",
+    title: "内置零信任保护",
     items: [
-      "深度集成 Cloudflare 身份验证中心",
-      "原生支持企业级 WebAuthn 硬件密匙",
-      "底层防护与细粒度 WebSocket 频次限制",
+      "基于 Cloudflare Access 构建身份验证网关",
+      "原生无缝支持 WebAuthn 与 Passkey 登录",
+      "在边缘层自动替你拦截恶意扫描与异常请求",
     ],
     icon: "i-heroicons-shield-check",
     color: "from-emerald-500/20 to-green-500/20",
     iconColor: "text-emerald-400",
   },
   {
-    title: "无服务器 D1 引擎",
+    title: "Serverless 数据库",
     items: [
-      "毫无传统 TCP 连接池耗尽的焦虑",
-      "部署极快的边缘分布 SQLite 引擎",
-      "基于 Drizzle ORM 的端到端全链路类型推断",
+      "摆脱传统 TCP 数据库连接池的并发限制",
+      "基于 Cloudflare D1 分布式 SQLite 引擎",
+      "搭配 Drizzle ORM 构建端到端的类型安全",
     ],
     icon: "i-heroicons-circle-stack",
     color: "from-orange-500/20 to-amber-500/20",
     iconColor: "text-orange-400",
   },
   {
-    title: "原生 AI 处理中枢",
+    title: "原生 AI 集成",
     items: [
-      "毫秒级响应的纯边端向量化语义检索",
-      "与大语言模型直连的 Textual 知识问答",
-      "完美兼容前沿的 MCP Agentic 工具调用",
+      "依托边缘算力实现低延迟的语义向量检索",
+      "无缝连接大语言模型，构建知识问答体系",
+      "预留 MCP 协议接口以支持 Agent 智能体",
     ],
     icon: "i-heroicons-cpu-chip",
     color: "from-indigo-500/20 to-violet-500/20",
     iconColor: "text-indigo-400",
   },
   {
-    title: "亚毫秒极速 API",
+    title: "轻量化边缘 API",
     items: [
-      "使用极其轻量化的 Hono 中间件作为宿主",
-      "由 Zod 在边缘把关的苛刻数据验证拦截",
-      "抹平前后端差异的 RPC (Remote Procedure Call)",
+      "采用 Hono 框架打造低内存占用的驱动核心",
+      "通过 Zod 在请求入口处完成严格的数据校验",
+      "提供统一类型定义的 RPC 前后端调用接口",
     ],
     icon: "i-heroicons-bolt",
     color: "from-yellow-500/20 to-lime-500/20",
@@ -85,8 +85,8 @@ const features = [
       Gins-Blog 内核架构
     </h1>
     <p class="text-xl text-gray-400 max-w-2xl leading-relaxed">
-      深入探索 Gins-Blog
-      生态系统的底层技术架构、全流程部署策略以及系统工程剖析。
+      除了阅读代码，您也可以在这里了解 Gins-Blog
+      背后的边缘计算架构、部署规范，以及我在开发过程中的实践经验。
     </p>
   </div>
 
@@ -113,16 +113,17 @@ const features = [
     class="mt-16 pt-12 border-t border-white/10 flex flex-col md:flex-row gap-6 items-center justify-between"
   >
     <div>
-      <h3 class="text-2xl font-bold font-display mb-2">快速开始</h3>
+      <h3 class="text-2xl font-bold font-display mb-2">准备好部署了吗？</h3>
       <p class="text-gray-400 text-sm">
-        跟随技术部署指南，全自动配置您的线上架构环境。
+        通过我提供的自动化脚本，您可以轻松在自己的 Cloudflare
+        账户中拉起一套完整的基础设施。
       </p>
     </div>
     <a
       href="/zh/docs/deployment"
       class="px-8 py-4 rounded-xl bg-white text-black font-bold flex items-center gap-2 hover:bg-gray-200 transition-all hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
     >
-      开始部署配置 <span class="i-heroicons-arrow-right"></span>
+      使用引导脚本 <span class="i-heroicons-arrow-right"></span>
     </a>
   </div>
 </DocsLayout>

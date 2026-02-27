@@ -17,8 +17,8 @@ Designed to move beyond monolithic CMS architectures and visually evolve traditi
 
 Traditional blogging engines parse massive bundles on cold servers. Gins-Blog shifts the entire paradigm to the Edge via Cloudflare Workers. 
 
-1. **Liquid Glass Aesthetic:** We employ hardware-accelerated CSS over heavy WebGL, ensuring a dynamic, cinematic UI that runs at 120fps even on mobile devices.
-2. **Serverless D1 Engine:** Eliminates connection pooling limitations. We utilize SQLite perfectly distributed at the edge, typed seamlessly by Drizzle ORM.
+1. **Liquid Glass Aesthetic:** I employ hardware-accelerated CSS over heavy WebGL, ensuring a dynamic, cinematic UI that runs at 120fps even on mobile devices.
+2. **Serverless D1 Engine:** Eliminates connection pooling limitations. I utilize SQLite perfectly distributed at the edge, typed seamlessly by Drizzle ORM.
 3. **Zero Trust Integration:** Security isn't an afterthought; it's the foundation. WebAuthn, hardware tokens, and Cloudflare Zero Trust are first-class citizens.
 
 ## System Schematic
