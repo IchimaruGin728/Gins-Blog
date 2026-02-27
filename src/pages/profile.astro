@@ -575,7 +575,23 @@ const socialLinks = userProfile?.socialLinks
               </div>
               <div>
                 <div class="font-medium text-white">
-                  ${session.browser} on ${session.os}
+                  ${(() => {
+                    let os = session.os;
+                    if (session.isCurrent) {
+                      const ua = navigator.userAgent;
+                      const isTouch =
+                        (ua &&
+                          (ua.includes("iPhone") ||
+                            ua.includes("iPad") ||
+                            ua.includes("iPod"))) ||
+                        (os.toLowerCase().includes("mac") &&
+                          navigator.maxTouchPoints > 0);
+                      if (isTouch && !os.toLowerCase().includes("ios")) {
+                        os = "iOS (detected)";
+                      }
+                    }
+                    return `${session.browser} on ${os}`;
+                  })()}
                   ${session.isCurrent ? `<span class="ml-2 text-xs px-2 py-0.5 bg-brand-accent/20 text-brand-accent rounded-full">${tSessionsCurrent}</span>` : ""}
                 </div>
                 <div class="text-xs text-gray-400">
@@ -633,6 +649,39 @@ const socialLinks = userProfile?.socialLinks
     }
   };
 
+  // --- Device Intelligence Collection ---
+  async function reportDeviceInfo() {
+    if (sessionStorage.getItem("gins_device_reported_profile")) return;
+
+    const ua = navigator.userAgent;
+    let verifiedOs = null;
+    if (ua.includes("Mac") && navigator.maxTouchPoints > 0) {
+      verifiedOs = "iOS";
+    }
+
+    const info = {
+      screenResolution: `${window.screen.width}x${window.screen.height}`,
+      // @ts-ignore
+      deviceMemory: navigator.deviceMemory,
+      cpuCores: navigator.hardwareConcurrency,
+      // @ts-ignore
+      connectionType: navigator.connection?.effectiveType,
+      os: verifiedOs,
+    };
+
+    try {
+      await fetch("/api/session/device-info", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(info),
+      });
+      sessionStorage.setItem("gins_device_reported_profile", "true");
+    } catch (e) {
+      console.error("Device info report failed", e);
+    }
+  }
+
   // Load sessions when page loads
   loadSessions();
+  reportDeviceInfo();
 </script>

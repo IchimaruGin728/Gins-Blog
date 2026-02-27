@@ -32,8 +32,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			deviceMemory?: string;
 			cpuCores?: string;
 			connectionType?: string;
+			os?: string;
 		};
-		const { screenResolution, deviceMemory, cpuCores, connectionType } = body;
+		const { screenResolution, deviceMemory, cpuCores, connectionType, os } = body;
 
 		// 3. Update Session in DB
 		await db
@@ -43,6 +44,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 				deviceMemory: deviceMemory ? parseInt(deviceMemory, 10) : null,
 				cpuCores: cpuCores ? parseInt(cpuCores, 10) : null,
 				connectionType: connectionType || null,
+				osVerified: os || null,
 			})
 			.where(eq(sessions.id, validation.session.id));
 
@@ -54,6 +56,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			deviceMemory: deviceMemory ? parseInt(deviceMemory, 10) : null,
 			cpuCores: cpuCores ? parseInt(cpuCores, 10) : null,
 			connectionType: connectionType || null,
+			osVerified: os || null,
 		};
 
 		await env.GIN_KV.put(

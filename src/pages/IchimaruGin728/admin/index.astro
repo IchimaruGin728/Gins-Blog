@@ -2240,6 +2240,12 @@ const COLO_LOCATIONS: Record<
       // Don't report if already done this session (optional, but good for performance)
       if (sessionStorage.getItem("gins_device_reported")) return;
 
+      const ua = navigator.userAgent;
+      let verifiedOs = null;
+      if (ua.includes("Mac") && navigator.maxTouchPoints > 0) {
+        verifiedOs = "iOS";
+      }
+
       const info = {
         screenResolution: `${window.screen.width}x${window.screen.height}`,
         // @ts-ignore
@@ -2247,6 +2253,7 @@ const COLO_LOCATIONS: Record<
         cpuCores: navigator.hardwareConcurrency,
         // @ts-ignore
         connectionType: navigator.connection?.effectiveType,
+        os: verifiedOs,
       };
 
       try {

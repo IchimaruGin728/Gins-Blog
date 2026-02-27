@@ -67,6 +67,7 @@ export const sessions = sqliteTable("sessions", {
 	deviceMemory: integer("device_memory"), // GB
 	cpuCores: integer("cpu_cores"), // logical cores
 	connectionType: text("connection_type"), // e.g., "4g", "wifi", "slow-2g"
+	osVerified: text("os_verified"),
 });
 
 export type User = typeof users.$inferSelect;
