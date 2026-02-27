@@ -18,9 +18,14 @@ const lang = getLangFromUrl(Astro.url);
 interface Props {
   title: string;
   description?: string;
+  hideRightSidebar?: boolean;
 }
 
-const { title, description = "Gin's Blog Documentation" } = Astro.props;
+const {
+  title,
+  description = "Gin's Blog Documentation",
+  hideRightSidebar = false,
+} = Astro.props;
 const fullTitle = `${title} | Gin's Docs`;
 ---
 
@@ -58,10 +63,10 @@ const fullTitle = `${title} | Gin's Docs`;
     <Header />
 
     <main
-      class="relative z-10 pt-24 px-4 md:px-6 max-w-[1400px] mx-auto w-full flex-grow pb-24 md:pb-0 flex gap-8"
+      class="relative z-10 pt-32 px-4 md:px-6 max-w-7xl mx-auto w-full flex-grow pb-24 md:pb-0 flex gap-8"
     >
       <aside
-        class="hidden md:block w-64 shrink-0 overflow-y-auto custom-scrollbar sticky top-24 max-h-[calc(100vh-8rem)]"
+        class="hidden md:block w-64 shrink-0 overflow-y-auto custom-scrollbar sticky top-32 max-h-[calc(100vh-10rem)]"
       >
         <DocsSidebar />
       </aside>
@@ -72,29 +77,35 @@ const fullTitle = `${title} | Gin's Docs`;
         </div>
       </article>
 
-      <aside class="hidden xl:block w-48 shrink-0 relative">
-        <div class="sticky top-24">
-          <h3
-            class="font-bold text-sm text-gray-400 uppercase tracking-wider mb-4"
-          >
-            Quick Links
-          </h3>
-          <ul class="space-y-3 text-sm text-gray-400">
-            <li>
-              <a
-                href="/"
-                class="hover:text-brand-accent transition-colors flex items-center gap-2"
-                ><span class="i-heroicons-arrow-left"></span> Back to Main</a
-              >
-            </li>
-            <li>
-              <a href="/blog" class="hover:text-brand-accent transition-colors"
-                >Blog Postings</a
-              >
-            </li>
-          </ul>
-        </div>
-      </aside>
+      {
+        !hideRightSidebar && (
+          <aside class="hidden xl:block w-48 shrink-0 relative">
+            <div class="sticky top-32">
+              <h3 class="font-bold text-sm text-gray-400 uppercase tracking-wider mb-4">
+                Quick Links
+              </h3>
+              <ul class="space-y-3 text-sm text-gray-400">
+                <li>
+                  <a
+                    href="/"
+                    class="hover:text-brand-accent transition-colors flex items-center gap-2"
+                  >
+                    <span class="i-heroicons-arrow-left" /> Back to Main
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/blog"
+                    class="hover:text-brand-accent transition-colors"
+                  >
+                    Blog Postings
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </aside>
+        )
+      }
     </main>
 
     <MobileNav />

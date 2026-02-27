@@ -1,0 +1,41 @@
+---
+interface Props {
+  imageId: string;
+  variant?: string; // 'public', 'avatar', 'hero', etc. defaults to 'public'
+  alt: string;
+  width?: number;
+  height?: number;
+  class?: string;
+  loading?: "lazy" | "eager";
+  fetchpriority?: "high" | "low" | "auto";
+}
+
+const {
+  imageId,
+  variant = "public",
+  alt,
+  width,
+  height,
+  class: className,
+  loading = "lazy",
+  fetchpriority = "auto",
+} = Astro.props;
+
+// Read the Cloudflare Account Hash from environment variables at runtime/buildtime
+const { env } = Astro.locals.runtime || { env: process.env };
+const accountHash = env.CLOUDFLARE_ACCOUNT_HASH || "MISSING_HASH";
+
+// Construct the imagedelivery.net URL
+// Format: https://imagedelivery.net/<ACCOUNT_HASH>/<IMAGE_ID>/<VARIANT>
+const src = `https://imagedelivery.net/${accountHash}/${imageId}/${variant}`;
+---
+
+<img
+  src={src}
+  alt={alt}
+  width={width}
+  height={height}
+  class={className}
+  loading={loading}
+  fetchpriority={fetchpriority}
+/>

@@ -72,33 +72,46 @@ body {
 	}
 }
 
-/* Custom Page Transition Keyframes */
-@keyframes fade-enter {
+/* Liquid Crossfade Page Transition (120Hz Optimized) */
+@keyframes liquid-fade-exit {
 	0% {
-		opacity: 0;
+		opacity: 1;
+		filter: blur(0px);
+		transform: translateY(0) scale(1) translateZ(0); /* Force GPU acceleration */
 	}
 	100% {
-		opacity: 1;
+		opacity: 0;
+		filter: blur(8px);
+		transform: translateY(-8px) scale(0.985) translateZ(0);
 	}
 }
-@keyframes fade-exit {
+@keyframes liquid-fade-enter {
 	0% {
-		opacity: 1;
+		opacity: 0;
+		filter: blur(8px);
+		transform: translateY(12px) scale(0.985) translateZ(0);
 	}
 	100% {
-		opacity: 0;
+		opacity: 1;
+		filter: blur(0px);
+		transform: translateY(0) scale(1) translateZ(0);
 	}
 }
 
-/* Page Transition: Slide Up */
 .main-content {
 	view-transition-name: main-content;
+	/* Disable native scroll anchoring jitter during transition */
+	overflow-anchor: none; 
 }
 
+/* 
+  Custom Spring Physics Curve for 120Hz: 
+  Extremely fast start (0.22), slight overshoot (1.05), very long smooth damping tail (0.36) 
+*/
 ::view-transition-old(main-content) {
-	animation: 0.1s ease-in both fade-exit;
+	animation: 0.35s cubic-bezier(0.4, 0, 1, 1) both liquid-fade-exit;
 }
 
 ::view-transition-new(main-content) {
-	animation: 0.2s ease-out both fade-enter;
+	animation: 0.55s cubic-bezier(0.22, 1.05, 0.36, 1) both liquid-fade-enter;
 }

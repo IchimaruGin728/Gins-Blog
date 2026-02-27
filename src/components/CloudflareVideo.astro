@@ -1,0 +1,49 @@
+---
+interface Props {
+  videoId: string;
+  title?: string;
+  poster?: string;
+  controls?: boolean;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  class?: string;
+}
+
+const {
+  videoId,
+  title = "Video player",
+  poster,
+  controls = true,
+  autoplay = false,
+  loop = false,
+  muted = false,
+  class: className = "w-full aspect-video rounded-xl overflow-hidden",
+} = Astro.props;
+
+const { env } = Astro.locals.runtime || { env: process.env };
+const customerId =
+  env.CLOUDFLARE_STREAM_CUSTOMER_ID ||
+  env.CLOUDFLARE_ACCOUNT_HASH ||
+  "MISSING_ID";
+
+// Cloudflare Stream unified iframe URL
+// Format: https://customer-<ID>.cloudflarestream.com/<VIDEO_ID>/iframe
+const src = new URL(
+  `https://customer-${customerId}.cloudflarestream.com/${videoId}/iframe`,
+);
+if (poster) src.searchParams.set("poster", encodeURIComponent(poster));
+if (controls) src.searchParams.set("controls", "true");
+if (autoplay) src.searchParams.set("autoplay", "true");
+if (loop) src.searchParams.set("loop", "true");
+if (muted || autoplay) src.searchParams.set("muted", "true"); // Autoplay usually requires muted on modern browsers
+---
+
+<div class={className}>
+  <iframe
+    src={src.toString()}
+    title={title}
+    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+    allowfullscreen="true"
+    class="w-full h-full border-none"></iframe>
+</div>

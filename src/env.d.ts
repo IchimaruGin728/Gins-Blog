@@ -32,4 +32,10 @@ interface Env {
 	DISCORD_CLIENT_SECRET: string;
 	DISCORD_REDIRECT_URI: string;
 	CF_API_TOKEN: string;
+
+	// Media Storage
+	CLOUDFLARE_ACCOUNT_ID: string;
+	CLOUDFLARE_ACCOUNT_HASH: string;
+	CLOUDFLARE_API_TOKEN: string;
+	CLOUDFLARE_STREAM_CUSTOMER_ID?: string;
 }

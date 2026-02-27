@@ -78,6 +78,10 @@
 - **PWA Support** - Installable as a native app on mobile and desktop
 - **Smart Routing** - Cloudflare Smart Placement for optimal latency
 
+### 🎥 **Edge-Native Media Integration (Optional)**
+- **Cloudflare Images** - Zero-latency, auto-optimized WebP/AVIF delivery via the `<CloudflareImage />` component.
+- **Cloudflare Stream** - Adaptive bitrate (HLS) streaming player for videos via the `<CloudflareVideo />` component.
+- **Integrated Admin Editor** - Securely upload Edge-Native media directly within your Markdown editor workspace without bloating your database or repo.
 ### 🤖 **AI-Powered Search**
 - **Semantic Search** - Cloudflare Vectorize + Workers AI for intelligent content discovery
 - **Multi-Language Support** - Search across both English and Chinese content
@@ -236,8 +240,8 @@ npm install
 ### **Step 2: Automated Cloudflare Setup**
 Select the method that best suits your workflow:
 
-#### **Method A: Interactive Mode (Recommended)**
-For humans. The script will guide you through all configurations.
+#### **Method A: Interactive Setup Script (✨ Highly Recommended)**
+The fastest way to get started. Just run the command below and the interactive wizard will guide you through connecting your Cloudflare DB, Storage, and explicitly prompt you for optional Edge Media configurations (Images/Stream) step-by-step.
 ```bash
 npm run setup
 ```

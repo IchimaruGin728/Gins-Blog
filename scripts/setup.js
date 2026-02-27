@@ -153,9 +153,18 @@ async function main() {
 			},
 			{
 				type: "input",
+				name: "cfAccountId",
+				message:
+					"Enter your Cloudflare Account ID (found on the right sidebar of CF Dashboard):",
+				when: (answers) => answers.setupMedia,
+				validate: (input) =>
+					input ? true : "Account ID is required for Media uploads.",
+			},
+			{
+				type: "input",
 				name: "cfAccountHash",
 				message:
-					"Enter your Cloudflare Account Hash (found in Images dashboard):",
+					"Enter your Cloudflare Account Hash (found in Images dashboard Delivery URL):",
 				when: (answers) => answers.setupMedia,
 				validate: (input) =>
 					input ? true : "Account Hash is required for Images.",
@@ -406,25 +415,23 @@ async function main() {
 				envContent = fs.readFileSync(envPath, "utf8");
 			}
 
-			if (!envContent.includes("CF_API_TOKEN")) {
-				envContent += `\nCF_API_TOKEN=${answers.cfApiToken}`;
+			if (!envContent.includes("CLOUDFLARE_ACCOUNT_ID")) {
+				envContent += `\nCLOUDFLARE_ACCOUNT_ID=${answers.cfAccountId}`;
 			}
-			if (!envContent.includes("PUBLIC_CF_ACCOUNT_HASH")) {
-				envContent += `\nPUBLIC_CF_ACCOUNT_HASH=${answers.cfAccountHash}`;
+			if (!envContent.includes("CLOUDFLARE_API_TOKEN")) {
+				envContent += `\nCLOUDFLARE_API_TOKEN=${answers.cfApiToken}`;
+			}
+			if (!envContent.includes("CLOUDFLARE_ACCOUNT_HASH")) {
+				envContent += `\nCLOUDFLARE_ACCOUNT_HASH=${answers.cfAccountHash}`;
 			}
 
 			fs.writeFileSync(envPath, envContent);
-			console.log("✅ Secrets saved to .dev.vars (local)");
+			console.log("✅ Credentials saved to .dev.vars (local)");
 
-			// Try to put secrets if logged in
-			// This might prompt interactively or fail if not set up, so we just log the manual command
 			console.log("ℹ️  To enable in production, run:");
-			console.log(`   npx wrangler secret put CF_API_TOKEN`);
-			console.log(
-				`   npx wrangler secret put PUBLIC_CF_ACCOUNT_HASH`, // Actually this can be a var in wrangler.toml or just public env, but secret is safe
-			);
-			// Wait, PUBLIC vars should be in wrangler.toml usually, but secrets work too.
-			// Actually better to put PUBLIC_CF_ACCOUNT_HASH in wrangler.jsonc vars if we can, but simpler to just use secrets for now or .env
+			console.log(`   npx wrangler secret put CLOUDFLARE_ACCOUNT_ID`);
+			console.log(`   npx wrangler secret put CLOUDFLARE_API_TOKEN`);
+			console.log(`   npx wrangler secret put CLOUDFLARE_ACCOUNT_HASH`);
 		} catch (e) {
 			console.warn("⚠️  Could not save secrets automatically.");
 		}
@@ -439,13 +446,13 @@ async function main() {
 	if (answers.setupMedia) {
 		console.log("3. (Media Enabled) Run these commands for production:");
 		console.log(
-			`   npx wrangler secret put CF_API_TOKEN (Value: ${answers.cfApiToken.substring(0, 5)}...)`,
+			`   npx wrangler secret put CLOUDFLARE_ACCOUNT_ID (Value: ${answers.cfAccountId})`,
 		);
-		// Since Env vars need redeploy, we might suggest adding the public hash to wrangler.jsonc vars manually or just setting it as secret ok?
-		// Astro client-side envs (PUBLIC_) must be build-time or runtime env.
-		// For runtime (Cloudflare), we can set it in dashboard variables.
 		console.log(
-			`   npx wrangler secret put PUBLIC_CF_ACCOUNT_HASH (Value: ${answers.cfAccountHash})`,
+			`   npx wrangler secret put CLOUDFLARE_API_TOKEN (Value: ${answers.cfApiToken.substring(0, 5)}...)`,
+		);
+		console.log(
+			`   npx wrangler secret put CLOUDFLARE_ACCOUNT_HASH (Value: ${answers.cfAccountHash})`,
 		);
 	}
 	console.log('4. Run "npm run deploy"');

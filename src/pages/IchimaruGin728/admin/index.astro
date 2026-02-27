@@ -792,15 +792,47 @@ const COLO_LOCATIONS: Record<
           type="button"
           id="upload-btn"
           class="flex items-center gap-2 px-3 py-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors text-sm"
+          title="Upload to R2 (Standard)"
+        >
+          <span class="i-heroicons-document-arrow-up"></span>
+          File
+        </button>
+        <button
+          type="button"
+          id="upload-cf-image-btn"
+          class="flex items-center gap-2 px-3 py-1.5 hover:bg-white/10 rounded-lg text-brand-accent hover:text-brand-accent/80 transition-colors text-sm"
+          title="Upload to Cloudflare Images"
         >
           <span class="i-heroicons-photo"></span>
-          Upload Media
+          CF Image
         </button>
+        <button
+          type="button"
+          id="upload-cf-video-btn"
+          class="flex items-center gap-2 px-3 py-1.5 hover:bg-white/10 rounded-lg text-brand-primary hover:text-brand-primary/80 transition-colors text-sm"
+          title="Upload to Cloudflare Stream"
+        >
+          <span class="i-heroicons-video-camera"></span>
+          CF Video
+        </button>
+
         <input
           type="file"
           id="file-input"
           class="hidden"
           accept="image/*, .gif, .ppt, .pptx, .doc, .docx, .xls, .xlsx, .csv"
+        />
+        <input
+          type="file"
+          id="cf-image-input"
+          class="hidden"
+          accept="image/*"
+        />
+        <input
+          type="file"
+          id="cf-video-input"
+          class="hidden"
+          accept="video/mp4,video/quicktime,video/webm"
         />
       </div>
       <textarea
@@ -1900,13 +1932,23 @@ const COLO_LOCATIONS: Record<
       "content-area",
     ) as HTMLTextAreaElement;
 
-    // File Upload Handler
+    const cfImageInput = document.getElementById(
+      "cf-image-input",
+    ) as HTMLInputElement;
+    const cfVideoInput = document.getElementById(
+      "cf-video-input",
+    ) as HTMLInputElement;
+    const uploadCfImageBtn = document.getElementById("upload-cf-image-btn");
+    const uploadCfVideoBtn = document.getElementById("upload-cf-video-btn");
+
+    // Standard R2 Upload Handler
     uploadBtn?.addEventListener("click", () => fileInput.click());
 
     fileInput.addEventListener("change", async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
 
+      const originalHtml = uploadBtn!.innerHTML;
       uploadBtn!.innerText = "Uploading...";
 
       try {
@@ -1933,13 +1975,126 @@ const COLO_LOCATIONS: Record<
           uploadBtn!.innerHTML =
             '<span class="i-heroicons-check"></span> Uploaded';
           setTimeout(() => {
-            uploadBtn!.innerHTML =
-              '<span class="i-heroicons-photo"></span> Upload Media';
+            uploadBtn!.innerHTML = originalHtml;
           }, 2000);
         }
       } catch (err) {
         console.error(err);
         uploadBtn!.innerText = "Failed";
+      } finally {
+        fileInput.value = "";
+      }
+    });
+
+    // Cloudflare Image Handler
+    uploadCfImageBtn?.addEventListener("click", () => cfImageInput.click());
+
+    cfImageInput.addEventListener("change", async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const originalHtml = uploadCfImageBtn!.innerHTML;
+      uploadCfImageBtn!.innerHTML =
+        '<span class="i-heroicons-arrow-path animate-spin"></span> Uploading...';
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch("/api/media/upload-image", {
+          method: "POST",
+          body: formData,
+        });
+        interface CloudflareImageUploadResponse {
+          success: boolean;
+          imageId?: string;
+          error?: string;
+          details?: any;
+        }
+
+        const data = (await res.json()) as CloudflareImageUploadResponse;
+
+        if (res.ok) {
+          const cursorPosition = textarea.selectionStart;
+          const textBefore = textarea.value.substring(0, cursorPosition);
+          const textAfter = textarea.value.substring(
+            cursorPosition,
+            textarea.value.length,
+          );
+          const componentCode = `\n<CloudflareImage imageId="${data.imageId}" alt="${file.name}" />\n`;
+
+          textarea.value = textBefore + componentCode + textAfter;
+
+          uploadCfImageBtn!.innerHTML =
+            '<span class="i-heroicons-check"></span> Done';
+        } else {
+          alert("CF Image Upload Failed: " + (data.error || "Unknown error"));
+          uploadCfImageBtn!.innerHTML = "Failed";
+        }
+      } catch (err: any) {
+        alert("CF Image Upload Error: " + err.message);
+        uploadCfImageBtn!.innerHTML = "Error";
+      } finally {
+        setTimeout(() => {
+          uploadCfImageBtn!.innerHTML = originalHtml;
+        }, 2000);
+        cfImageInput.value = "";
+      }
+    });
+
+    // Cloudflare Video Handler
+    uploadCfVideoBtn?.addEventListener("click", () => cfVideoInput.click());
+
+    cfVideoInput.addEventListener("change", async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const originalHtml = uploadCfVideoBtn!.innerHTML;
+      uploadCfVideoBtn!.innerHTML =
+        '<span class="i-heroicons-arrow-path animate-spin"></span> Uploading...';
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch("/api/media/upload-video", {
+          method: "POST",
+          body: formData,
+        });
+        interface CloudflareVideoUploadResponse {
+          success: boolean;
+          videoId?: string;
+          error?: string;
+          details?: any;
+        }
+
+        const data = (await res.json()) as CloudflareVideoUploadResponse;
+
+        if (res.ok) {
+          const cursorPosition = textarea.selectionStart;
+          const textBefore = textarea.value.substring(0, cursorPosition);
+          const textAfter = textarea.value.substring(
+            cursorPosition,
+            textarea.value.length,
+          );
+          const componentCode = `\n<CloudflareVideo videoId="${data.videoId}" controls={true} autoplay={false} />\n`;
+
+          textarea.value = textBefore + componentCode + textAfter;
+
+          uploadCfVideoBtn!.innerHTML =
+            '<span class="i-heroicons-check"></span> Done';
+        } else {
+          alert("CF Video Upload Failed: " + (data.error || "Unknown error"));
+          uploadCfVideoBtn!.innerHTML = "Failed";
+        }
+      } catch (err: any) {
+        alert("CF Video Upload Error: " + err.message);
+        uploadCfVideoBtn!.innerHTML = "Error";
+      } finally {
+        setTimeout(() => {
+          uploadCfVideoBtn!.innerHTML = originalHtml;
+        }, 2000);
+        cfVideoInput.value = "";
       }
     });
 

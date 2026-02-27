@@ -1,20 +1,23 @@
 ---
-import { getEntry } from "astro:content";
+import { getCollection, render } from "astro:content";
 import DocsLayout from "../../layouts/DocsLayout.astro";
 
-const { slug } = Astro.params;
+export const prerender = true;
 
-if (!slug) {
-  return Astro.redirect("/docs");
+export async function getStaticPaths() {
+  const docs = await getCollection("docs");
+  return docs.map((entry) => {
+    // Astro 5 glob loader includes the extension in the ID
+    const slug = entry.id.replace(/\.[^/.]+$/, "");
+    return {
+      params: { slug: slug === "index" ? undefined : slug },
+      props: { entry },
+    };
+  });
 }
 
-const entry = await getEntry("docs", slug);
-
-if (!entry) {
-  return Astro.redirect("/404");
-}
-
-const { Content } = await entry.render();
+const { entry } = Astro.props;
+const { Content } = await render(entry);
 ---
 
 <DocsLayout title={entry.data.title} description={entry.data.description}>

@@ -25,7 +25,8 @@ const currentPath = Astro.url.pathname;
   <nav class="space-y-1">
     {
       sortedDocs.map((doc) => {
-        const href = `/docs/${doc.id === "index" ? "" : doc.id}`;
+        const routeSlug = doc.id.replace(/\.[^/.]+$/, "");
+        const href = `/docs/${routeSlug === "index" ? "" : routeSlug}`;
         const isActive =
           currentPath.replace(/\/$/, "") === href.replace(/\/$/, "");
 
