@@ -604,7 +604,7 @@ try {
                         (os.toLowerCase().includes("mac") &&
                           navigator.maxTouchPoints > 2);
                       if (isTouch && !os.toLowerCase().includes("ios")) {
-                        os = "iOS (detected)";
+                        os = "iOS";
                       }
                     }
                     return `${session.browser} on ${os}`;
