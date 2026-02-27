@@ -1,4 +1,4 @@
-<div id="top"></div>
+<a name="top"></a>
 
 # Gin's Blog ✨
 
