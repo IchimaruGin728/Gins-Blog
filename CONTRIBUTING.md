@@ -76,6 +76,18 @@ We use a strict branching workflow to ensure stability:
    - **DO NOT** target `main` directly.
    - Describe your changes and link to any relevant issues.
 
+## Contributing to Documentation
+
+We maintain an interactive Documentation Hub.
+
+- **Location**:
+  - English: `src/pages/docs/`
+  - Chinese: `src/pages/zh/docs/`
+- **Format**: Documentation uses `.mdx` files, allowing you to embed interactive Astro components natively.
+- **Components**: Pre-built docs layout components (like `DocsSidebar`, `DocsCard`) are located in `src/components/`.
+
+When adding new features, please ensure the corresponding documentation is updated in both languages.
+
 ## Tech Stack & Code Style
 
 - **Framework**: Astro + Preact

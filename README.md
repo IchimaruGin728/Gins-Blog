@@ -19,7 +19,7 @@
 
 **A high-performance, edge-first blog platform built with modern web technologies**
 
-[🌐 Live Demo](https://blog.ichimarugin728.com) • [📖 中文文档](./README.zh.md)
+[🌐 Live Demo](https://blog.ichimarugin728.com) • [📖 中文文档](./README.zh.md) • [📚 Documentation](/docs)
 [🦞 OpenClaw Users](./AGENT_GUIDE.md): Just tell your agent: "Read AGENT_GUIDE.md and deploy this for me."
 
 ![Gins Blog Home Preview](media/home.png)
@@ -46,6 +46,11 @@
 - **Glassmorphism UI** - Frosted glass effects with backdrop blur
 - **Fluid Animations** - Smooth transitions and micro-interactions
 - **Safari-Style Mobile Nav** - Shrinking navigation bar with holographic text effects
+
+### 📚 **Interactive Documentation Hub**
+- **MDX Powered** - Write documentation with embedded interactive components
+- **Bilingual Structure** - Dedicated `/docs` and `/zh/docs` routing identical to the main app
+- **Animated Architecture** - View Transition API support for seamless navigation between guides
 
 ### 🌐 **Internationalization (i18n)**
 - **Multi-Language Support** - Seamless English and Chinese (Simplified) experience

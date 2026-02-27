@@ -54,3 +54,4 @@ This project is **MCP Ready**. It exposes an MCP server for agents to manage con
 
 -   **Documentation**: Refer to `MCP_GUIDE.md` for connection details.
 -   **Capabilities**: Search posts, draft content, and check analytics via the `/api/mcp` endpoint.
+-   **Architecture & Logic**: Agents modifying this project should refer to the interactive documentation located in `src/pages/docs` (English) or `src/pages/zh/docs` (Chinese) for deeper architectural guidelines.

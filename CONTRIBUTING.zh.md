@@ -76,6 +76,18 @@
    - **切勿**直接提交到 `main`。
    - 描述你的更改并链接到相关 issue。
 
+## 贡献文档 (Contributing to Documentation)
+
+我们维护着一个交互式文档中心。
+
+- **位置**：
+  - 中文：`src/pages/zh/docs/`
+  - 英文：`src/pages/docs/`
+- **格式**：文档使用 `.mdx` 文件，允许你原生嵌入交互式的 Astro 组件。
+- **组件**：预构建的文档布局组件（如 `DocsSidebar`, `DocsCard`）位于 `src/components/` 目录下。
+
+添加新功能时，请确保相应的文档在两种语言版本中都得到了更新。
+
 ## 技术栈与代码规范 (Tech Stack & Code Style)
 
 - **框架**：Astro + Preact

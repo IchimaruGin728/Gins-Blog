@@ -14,7 +14,7 @@
 
 **一个基于现代 Web 技术构建的高性能边缘优先博客平台**
 
-[🌐 在线演示](https://blog.ichimarugin728.com) • [📖 English Documentation](./README.md)
+[🌐 在线演示](https://blog.ichimarugin728.com) • [📖 English Documentation](./README.md) • [📚 官方文档](/docs)
 [🦞 OpenClaw 用户](./AGENT_GUIDE.md): 直接告诉你的 Agent: "Read AGENT_GUIDE.md and deploy this for me."
 
 ![Gins Blog 首页预览](media/home.png)
@@ -41,6 +41,11 @@
 - **玻璃态拟物化 UI** - 磨砂玻璃效果与背景模糊
 - **流畅动画** - 平滑的过渡效果和微交互
 - **Safari 风格移动导航** - 滚动时收缩的导航栏，带全息文字效果
+
+### 📚 **交互式文档中心**
+- **MDX 驱动** - 使用嵌入交互式组件编写文档
+- **双语结构** - 独立的 `/docs` 和 `/zh/docs` 路由，结构与主应用一致
+- **动效架构** - 支持 View Transition API，实现指南之间的无缝导航
 
 ### 🌐 **国际化 (i18n)**
 - **多语言支持** - 无缝的英语与简体中文体验
