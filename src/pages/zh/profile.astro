@@ -602,7 +602,7 @@ try {
                             ua.includes("iPad") ||
                             ua.includes("iPod"))) ||
                         (os.toLowerCase().includes("mac") &&
-                          navigator.maxTouchPoints > 0);
+                          navigator.maxTouchPoints > 2);
                       if (isTouch && !os.toLowerCase().includes("ios")) {
                         os = "iOS (detected)";
                       }
@@ -672,7 +672,7 @@ try {
 
     const ua = navigator.userAgent;
     let verifiedOs = null;
-    if (ua.includes("Mac") && navigator.maxTouchPoints > 0) {
+    if (ua.includes("Mac") && navigator.maxTouchPoints > 2) {
       verifiedOs = "iOS";
     }
 

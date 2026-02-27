@@ -1631,7 +1631,7 @@ const COLO_LOCATIONS: Record<
                   (ua.includes("iPhone") ||
                     ua.includes("iPad") ||
                     ua.includes("iPod"))) ||
-                (osNameLower.includes("mac") && navigator.maxTouchPoints > 0);
+                (osNameLower.includes("mac") && navigator.maxTouchPoints > 2);
 
               if (isTouch && !osNameLower.includes("ios")) {
                 osName = "iOS (detected)";
@@ -2242,7 +2242,7 @@ const COLO_LOCATIONS: Record<
 
       const ua = navigator.userAgent;
       let verifiedOs = null;
-      if (ua.includes("Mac") && navigator.maxTouchPoints > 0) {
+      if (ua.includes("Mac") && navigator.maxTouchPoints > 2) {
         verifiedOs = "iOS";
       }
 
