@@ -314,7 +314,7 @@ npm run deploy
 编辑 `src/pages/about.astro` 和 `src/pages/zh-SG/about.astro` 以更新：
 - 简介和时间轴
 - 社交链接
-- Gravatar 哈希
+- Cloudflare 图片 ID 与账户哈希 (Account Hash)
 
 ### **更改站点配置**
 

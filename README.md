@@ -360,7 +360,7 @@ git push origin main
 Edit `src/pages/about.astro` and `src/pages/zh-SG/about.astro` to update:
 - Bio and timeline
 - Social links
-- Gravatar hash
+- Cloudflare Image ID & Account Hash
 
 ### **Change Site Configuration**
 

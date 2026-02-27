@@ -171,6 +171,15 @@ async function main() {
 			},
 			{
 				type: "input",
+				name: "cfAvatarId",
+				message:
+					"Enter your primary Cloudflare Image ID (Gin avatar):",
+				when: (answers) => answers.setupMedia,
+				validate: (input) =>
+					input ? true : "Avatar ID is required.",
+			},
+			{
+				type: "input",
 				name: "cfApiToken",
 				message:
 					"Enter a Cloudflare API Token (Permissions: Account.Images:Edit, Account.Stream:Edit):",
@@ -424,6 +433,9 @@ async function main() {
 			if (!envContent.includes("CLOUDFLARE_ACCOUNT_HASH")) {
 				envContent += `\nCLOUDFLARE_ACCOUNT_HASH=${answers.cfAccountHash}`;
 			}
+			if (!envContent.includes("PUBLIC_CF_AVATAR_ID")) {
+				envContent += `\nPUBLIC_CF_AVATAR_ID=${answers.cfAvatarId}`;
+			}
 
 			fs.writeFileSync(envPath, envContent);
 			console.log("✅ Credentials saved to .dev.vars (local)");
@@ -432,6 +444,7 @@ async function main() {
 			console.log(`   npx wrangler secret put CLOUDFLARE_ACCOUNT_ID`);
 			console.log(`   npx wrangler secret put CLOUDFLARE_API_TOKEN`);
 			console.log(`   npx wrangler secret put CLOUDFLARE_ACCOUNT_HASH`);
+			console.log(`   npx wrangler secret put PUBLIC_CF_AVATAR_ID`);
 		} catch (e) {
 			console.warn("⚠️  Could not save secrets automatically.");
 		}
