@@ -28,7 +28,8 @@
 	"vars": {
 		"GITHUB_REDIRECT_URI": "https://blog.ichimarugin728.com/login/github/callback",
 		"GOOGLE_REDIRECT_URI": "https://blog.ichimarugin728.com/login/google/callback",
-		"DISCORD_REDIRECT_URI": "https://blog.ichimarugin728.com/login/discord/callback"
+		"DISCORD_REDIRECT_URI": "https://blog.ichimarugin728.com/login/discord/callback",
+		"PUBLIC_CF_AVATAR_ID": ""
 	},
 	"assets": {
 		"directory": "./dist",
