@@ -141,7 +141,12 @@ Built with an Edge-First MCP Server, you can connect **Claude Desktop**, **OpenC
 | :---: | :---: |
 | ![Blog Page](media/blog.png) | ![About Page](media/about.png) |
 
-### 👤 User System
+### � Documentation Hub
+| Docs Landing | Content Layout |
+| :---: | :---: |
+| ![Docs Landing](media/docs_landing.png) | ![Docs Content](media/docs_content.png) |
+
+### �👤 User System
 | Profile Customization | Identity Switching |
 | :---: | :---: |
 | ![Profile Page](media/profile.png) | ![Profile Switching](media/switch-profile.png) |
