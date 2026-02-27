@@ -27,7 +27,7 @@ const t = useTranslations(lang);
         <!-- Avatar -->
         <div class="relative">
           <div
-            class="w-32 h-32 rounded-full p-1 bg-gradient-to-br from-brand-accent to-brand-primary"
+            class="w-32 h-32 rounded-full p-1 bg-gradient-to-br from-brand-accent to-brand-primary avatar-protected"
           >
             {
               cfAvatarId ? (
@@ -247,3 +247,26 @@ const t = useTranslations(lang);
     </div>
   </div>
 </Layout>
+
+<style>
+  .avatar-protected {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    pointer-events: auto;
+  }
+  .avatar-protected img {
+    -webkit-user-drag: none;
+    user-drag: none;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  function protectAvatar() {
+    document.querySelectorAll(".avatar-protected").forEach((el) => {
+      el.addEventListener("contextmenu", (e) => e.preventDefault());
+    });
+  }
+  document.addEventListener("astro:page-load", protectAvatar);
+</script>
