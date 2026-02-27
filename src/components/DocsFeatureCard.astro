@@ -109,10 +109,10 @@ const { title, items, icon, color, iconColor } = Astro.props;
         inner.style.setProperty("--mouse-x", `${x}px`);
         inner.style.setProperty("--mouse-y", `${y}px`);
 
-        // Update 3D tilt (max 8 degrees flip)
+        // Update 3D tilt (max 20 degrees flip)
         // Note: rotating X based on Y axis requires inversion
-        const rotateX = centerY * -8;
-        const rotateY = centerX * 8;
+        const rotateX = centerY * -20;
+        const rotateY = centerX * 20;
         inner.style.setProperty("--rotate-x", `${rotateX}deg`);
         inner.style.setProperty("--rotate-y", `${rotateY}deg`);
       };
