@@ -23,10 +23,10 @@ export const GET: APIRoute = async ({ params, locals }) => {
 	// Load Fonts (Inter Bold and Regular)
 	// Caching these would be good in production
 	const fontData = await fetch(
-		"https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-700-normal.woff",
+		"https://cdn.jsdelivr.net/npm/@fontsource/inter@latest/files/inter-latin-700-normal.woff",
 	).then((res) => res.arrayBuffer());
 	const fontDataRegular = await fetch(
-		"https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-400-normal.woff",
+		"https://cdn.jsdelivr.net/npm/@fontsource/inter@latest/files/inter-latin-400-normal.woff",
 	).then((res) => res.arrayBuffer());
 
 	// Calculate Reading Time

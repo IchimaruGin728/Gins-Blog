@@ -26,7 +26,7 @@ export default defineConfig({
 		mdx(),
 	],
 	prefetch: {
-		defaultStrategy: "hover",
+		defaultStrategy: "viewport",
 	},
 	i18n: {
 		defaultLocale: "en-SG",

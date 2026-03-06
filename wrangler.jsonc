@@ -3,7 +3,7 @@
 	"name": "gins-blog",
 	"account_id": "cd4ce461acea5097153abf9e2deb26ec",
 	"main": "./dist/_worker.js/index.js",
-	"compatibility_date": "2026-01-20",
+	"compatibility_date": "2026-03-06",
 	"compatibility_flags": ["nodejs_compat"],
 	"routes": [
 		{
