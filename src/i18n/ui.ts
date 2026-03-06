@@ -27,8 +27,8 @@ export const ui = {
 		"blog.back": "Back to Overview",
 		"blog.prev": "Previous Post",
 		"blog.next": "Next Post",
-		"chronicle.deno_jsr": "Deno & JSR Ecosystem Migration",
-		"chronicle.deno_jsr_desc": "Fully migrated backend and local environment from Node/npm to Deno workspaces with JSR support for radically faster build and types resolution.",
+		"chronicle.deno_jsr": "Migration to pnpm & JSR",
+		"chronicle.deno_jsr_desc": "Fully migrated backend and local environment to pnpm workspaces with JSR support for radically faster build and types resolution.",
 		"chronicle.mcp_agent": "Agentic AI & MCP Integration",
 		"chronicle.mcp_agent_desc":
 			"Added llms.txt, OpenClaw deployment support, and a full Model Context Protocol (MCP) Server for autonomous content management.",
@@ -117,8 +117,8 @@ export const ui = {
 		"blog.back": "返回列表",
 		"blog.prev": "上一篇",
 		"blog.next": "下一篇",
-		"chronicle.deno_jsr": "迁移至 Deno 与 JSR 生态",
-		"chronicle.deno_jsr_desc": "将本地环境、依赖项解析及打包系统从传统 Node/npm 彻底迁移至由于 Rust 驱动的 Deno Workspaces 和高性能 JSR 平台。",
+		"chronicle.deno_jsr": "全量迁移至 pnpm 与 JSR 生态",
+		"chronicle.deno_jsr_desc": "将本地环境、依赖项解析及打包系统切换为 pnpm Workspaces，并接入高性能 JSR 包管理平台。",
 		"chronicle.mcp_agent": "Agentic AI & MCP 集成",
 		"chronicle.mcp_agent_desc":
 			"新增 llms.txt 支持、OpenClaw 部署管理，并实现了完整的 MCP (Model Context Protocol) Server 以支持自主内容管理。",
