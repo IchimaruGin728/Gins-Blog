@@ -28,7 +28,7 @@ export const ui = {
 		"blog.prev": "Previous Post",
 		"blog.next": "Next Post",
 		"chronicle.deno_jsr": "Migration to pnpm & JSR",
-		"chronicle.deno_jsr_desc": "Fully migrated backend and local environment to pnpm workspaces with JSR support for radically faster build and types resolution.",
+		"chronicle.deno_jsr_desc": "Fully unified local development by migrating package management to pnpm and integrated JSR for high-performance dependency resolution.",
 		"chronicle.mcp_agent": "Agentic AI & MCP Integration",
 		"chronicle.mcp_agent_desc":
 			"Added llms.txt, OpenClaw deployment support, and a full Model Context Protocol (MCP) Server for autonomous content management.",
@@ -118,7 +118,7 @@ export const ui = {
 		"blog.prev": "上一篇",
 		"blog.next": "下一篇",
 		"chronicle.deno_jsr": "全量迁移至 pnpm 与 JSR 生态",
-		"chronicle.deno_jsr_desc": "将本地环境、依赖项解析及打包系统切换为 pnpm Workspaces，并接入高性能 JSR 包管理平台。",
+		"chronicle.deno_jsr_desc": "统一本地开发环境，将包管理器彻底迁移至更高效的 pnpm，并接入高性能的 JSR 包管理平台以优化依赖解析。",
 		"chronicle.mcp_agent": "Agentic AI & MCP 集成",
 		"chronicle.mcp_agent_desc":
 			"新增 llms.txt 支持、OpenClaw 部署管理，并实现了完整的 MCP (Model Context Protocol) Server 以支持自主内容管理。",
