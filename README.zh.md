@@ -10,6 +10,7 @@
 ![Astro](https://img.shields.io/badge/Astro-5.0%2B-orange.svg)
 ![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020.svg)
 ![Deno](https://img.shields.io/badge/Deno-000000?style=flat&logo=deno&logoColor=white)
+![JSR](https://img.shields.io/badge/JSR-F7DF1E?style=flat&logo=jsr&logoColor=black)
 ![OpenClaw](https://img.shields.io/badge/%F0%9F%A6%9E_OpenClaw-Compatible-00CDAC)
 ![MCP](https://img.shields.io/badge/MCP-Ready-7D56F4)
 
