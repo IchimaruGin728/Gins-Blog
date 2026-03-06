@@ -9,6 +9,7 @@
 ![Astro](https://img.shields.io/badge/Astro-BC52EE?style=flat&logo=astro&logoColor=white)
 ![Preact](https://img.shields.io/badge/Preact-673AB8?style=flat&logo=preact&logoColor=white)
 ![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=flat&logo=cloudflare&logoColor=white)
+![Deno](https://img.shields.io/badge/Deno-000000?style=flat&logo=deno&logoColor=white)
 ![Hono](https://img.shields.io/badge/Hono-E36002?style=flat&logo=hono&logoColor=white)
 ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=flat&logo=drizzle&logoColor=black)
 ![UnoCSS](https://img.shields.io/badge/UnoCSS-333333?style=flat&logo=unocss&logoColor=white)
@@ -184,6 +185,8 @@ Built with an Edge-First MCP Server, you can connect **Claude Desktop**, **OpenC
 ### **Backend & Edge**
 | Technology | Version | Purpose |
 |------------|---------|---------|
+| [Deno](https://deno.com) | `v2.x` | High-performance secure runtime (Replaces Node.js) |
+| [JSR](https://jsr.io) | Latest | Modern open-source package registry |
 | [Cloudflare Workers](https://workers.cloudflare.com) | - | Serverless edge compute platform |
 | [GitHub Actions](https://github.com/features/actions) | - | Automated CI/CD deployment pipeline |
 | [Hono](https://hono.dev) | Latest | Ultrafast web framework for robust API Routes (`/api/*`) |
@@ -226,13 +229,12 @@ Built with an Edge-First MCP Server, you can connect **Claude Desktop**, **OpenC
 
 Before you begin, ensure you have the following installed:
 
-- **Node.js** `24+` ([Download](https://nodejs.org))
-- **npm** or **pnpm** (comes with Node.js)
+- **Deno** `2.x+` ([Download](https://deno.com))
 - **Cloudflare Account** ([Sign up for free](https://dash.cloudflare.com/sign-up))
 - **Wrangler CLI** (Cloudflare's command-line tool)
 
 ```bash
-npm install -g wrangler
+deno install -g wrangler
 ```
 
 ---
@@ -242,7 +244,7 @@ npm install -g wrangler
 ```bash
 git clone https://github.com/your-username/gins-blog.git
 cd gins-blog
-npm install
+deno install
 ```
 
 ---
@@ -253,7 +255,7 @@ Select the method that best suits your workflow:
 #### **Method A: Interactive Setup Script (✨ Highly Recommended)**
 The fastest way to get started. Just run the command below and the interactive wizard will guide you through connecting your Cloudflare DB, Storage, and explicitly prompt you for optional Edge Media configurations (Images/Stream) step-by-step.
 ```bash
-npm run setup
+deno task setup
 ```
 
 #### **Method B: AI / CI Agent Mode**
@@ -327,7 +329,7 @@ mv src/pages/IchimaruGin728 src/pages/my-secret-admin-panel
 ### **Step 5: Run Locally**
 
 ```bash
-npm run dev
+deno task dev
 ```
 
 Visit `http://localhost:4321` 🎉

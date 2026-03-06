@@ -9,6 +9,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-blue.svg)
 ![Astro](https://img.shields.io/badge/Astro-5.0%2B-orange.svg)
 ![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020.svg)
+![Deno](https://img.shields.io/badge/Deno-000000?style=flat&logo=deno&logoColor=white)
 ![OpenClaw](https://img.shields.io/badge/%F0%9F%A6%9E_OpenClaw-Compatible-00CDAC)
 ![MCP](https://img.shields.io/badge/MCP-Ready-7D56F4)
 
@@ -169,9 +170,11 @@
 | [Arctic](https://arctic.js.org) | OAuth 2.0 客户端库 | Latest |
 | [Oslo](https://oslo.js.org) | 认证工具（会话、PKCE 等）| Latest |
 
-### **工具**
+### **工具与运行时**
 | 技术 | 用途 | 版本 |
 |------|------|------|
+| [Deno](https://deno.com) | 高性能安全运行时 (替代 Node.js) | `v2.x` |
+| [JSR](https://jsr.io) | 现代开源包注册中心 | Latest |
 | [Marked](https://marked.js.org) | 内容的 Markdown 解析器 | ^17.0.3 |
 | [Zod](https://zod.dev) | TypeScript 优先的模式验证 | ^4.3.6 |
 | [TypeScript](https://www.typescriptlang.org) | 类型安全的 JavaScript | ^5.9.3 |
@@ -184,13 +187,12 @@
 
 开始之前，请确保已安装以下内容：
 
-- **Node.js** `24+` ([下载](https://nodejs.org))
-- **npm** 或 **pnpm**（Node.js 自带）
+- **Deno** `2.x+` ([下载](https://deno.com))
 - **Cloudflare 账户** ([免费注册](https://dash.cloudflare.com/sign-up))
 - **Wrangler CLI**（Cloudflare 的命令行工具）
 
 ```bash
-npm install -g wrangler
+deno install -g wrangler
 ```
 
 ---
@@ -200,7 +202,7 @@ npm install -g wrangler
 ```bash
 git clone https://github.com/your-username/gins-blog.git
 cd gins-blog
-npm install
+deno install
 ```
 
 ---
@@ -211,7 +213,7 @@ npm install
 #### **方式 A：交互式引导安装脚本 (✨ 强烈推荐)**
 最快、最简单的零门槛部署方式。只需运行该引导脚本，高度人性化的向导环境将帮您自动配置好 Cloudflare 的数据库、存储、并在部署末尾以交互方式提问是否启动**边缘图片/视频高级托管**。
 ```bash
-npm run setup
+deno task setup
 ```
 
 #### **方式 B：AI / CI Agent 模式**
