@@ -10,12 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@master
       
       - name: Setup Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
+        uses: denoland/setup-deno@main
 
       - name: Install Dependencies
         run: deno install
