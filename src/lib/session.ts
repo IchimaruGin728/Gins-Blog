@@ -1,9 +1,10 @@
+import type { CfProperties } from "@cloudflare/workers-types";
 import { sha256 } from "@oslojs/crypto/sha2";
 import {
 	encodeBase32LowerCaseNoPadding,
 	encodeHexLowerCase,
 } from "@oslojs/encoding";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { Session, User } from "../../db/schema";
 import { sessions, users } from "../../db/schema";
 import type { getDb } from "./db";
@@ -33,11 +34,14 @@ export async function createSession(
 	// Extract comprehensive metadata
 	const userAgent = request.headers.get("User-Agent") || undefined;
 	const ipAddress = request.headers.get("CF-Connecting-IP") || undefined;
-	const cf = request.cf as any; // Cloudflare metadata object
+	const cf = (request as Request & { cf?: CfProperties }).cf;
+	const getCfString = (value: unknown): string | null =>
+		typeof value === "string" ? value : null;
+	const getCfNumber = (value: unknown): number | null =>
+		typeof value === "number" ? value : null;
 
 	// Deduplication: Remove existing sessions from same device (same userAgent + ipAddress)
 	if (userAgent && ipAddress) {
-		const { and } = await import("drizzle-orm");
 		const duplicateSessions = await db
 			.select()
 			.from(sessions)
@@ -65,38 +69,39 @@ export async function createSession(
 		ipAddress: ipAddress || null,
 
 		// Basic Geo
-		country: cf?.country || null,
-		city: cf?.city || null,
+		country: getCfString(cf?.country),
+		city: getCfString(cf?.city),
 
 		// Network & ISP
-		asn: cf?.asn || null,
-		asOrganization: cf?.asOrganization || null,
-		colo: cf?.colo || null,
-		continent: cf?.continent || null,
-		timezone: cf?.timezone || null,
+		asn: getCfNumber(cf?.asn),
+		asOrganization: getCfString(cf?.asOrganization),
+		colo: getCfString(cf?.colo),
+		continent: getCfString(cf?.continent),
+		timezone: getCfString(cf?.timezone),
 
 		// Enhanced Geolocation
-		latitude: cf?.latitude || null,
-		longitude: cf?.longitude || null,
-		postalCode: cf?.postalCode || null,
-		region: cf?.region || null,
-		regionCode: cf?.regionCode || null,
+		latitude: getCfString(cf?.latitude),
+		longitude: getCfString(cf?.longitude),
+		postalCode: getCfString(cf?.postalCode),
+		region: getCfString(cf?.region),
+		regionCode: getCfString(cf?.regionCode),
 
 		// Connection Details
-		httpProtocol: cf?.httpProtocol || null,
-		tlsVersion: cf?.tlsVersion || null,
-		tlsCipher: cf?.tlsCipher || null,
-		clientTcpRtt: cf?.clientTcpRtt || null,
+		httpProtocol: getCfString(cf?.httpProtocol),
+		tlsVersion: getCfString(cf?.tlsVersion),
+		tlsCipher: getCfString(cf?.tlsCipher),
+		clientTcpRtt: getCfNumber(cf?.clientTcpRtt),
 
 		// Security & Trust
-		clientTrustScore: cf?.clientTrustScore || null,
-		isEUCountry: cf?.isEUCountry ? 1 : 0,
+		clientTrustScore: null,
+		isEUCountry: cf?.isEUCountry === true ? 1 : 0,
 
 		// Device Information (client-collected)
 		screenResolution: deviceInfo?.screenResolution || null,
 		deviceMemory: deviceInfo?.deviceMemory || null,
 		cpuCores: deviceInfo?.cpuCores || null,
 		connectionType: deviceInfo?.connectionType || null,
+		osVerified: null,
 
 		createdAt: now,
 		lastActive: now,

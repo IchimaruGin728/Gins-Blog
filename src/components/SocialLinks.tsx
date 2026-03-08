@@ -11,6 +11,27 @@ interface Props {
 	initialLinks: SocialLink[];
 }
 
+interface GravatarAccount {
+	display?: string;
+	username?: string;
+	shortname?: string;
+	url: string;
+}
+
+interface GravatarUrl {
+	title: string;
+	value: string;
+}
+
+interface GravatarEntry {
+	accounts?: GravatarAccount[];
+	urls?: GravatarUrl[];
+}
+
+interface GravatarProfile {
+	entry?: GravatarEntry[];
+}
+
 const gravatarHash = "60eb98ab51a815a519feeca028e08573";
 
 export default function SocialLinks({ initialLinks }: Props) {
@@ -28,8 +49,9 @@ export default function SocialLinks({ initialLinks }: Props) {
 				);
 
 				if (res.ok) {
-					const data = (await res.json()) as any;
-					const entry = data.entry[0];
+					const data = (await res.json()) as GravatarProfile;
+					const entry = data.entry?.[0];
+					if (!entry) return;
 					const newLinks: SocialLink[] = [];
 
 					// Helper to map service to icon
@@ -54,11 +76,11 @@ export default function SocialLinks({ initialLinks }: Props) {
 
 					// 1. Verified Accounts
 					if (entry.accounts) {
-						entry.accounts.forEach((acc: any) => {
+						entry.accounts.forEach((acc) => {
 							newLinks.push({
-								label: acc.display || acc.username || acc.shortname,
+								label: acc.display || acc.username || acc.shortname || acc.url,
 								url: acc.url,
-								icon: getServiceIcon(acc.shortname),
+								icon: getServiceIcon(acc.shortname || ""),
 								color: "hover:text-white",
 							});
 						});
@@ -66,7 +88,7 @@ export default function SocialLinks({ initialLinks }: Props) {
 
 					// 2. Custom URLs
 					if (entry.urls) {
-						entry.urls.forEach((link: any) => {
+						entry.urls.forEach((link) => {
 							let icon = "i-heroicons-globe-alt";
 							const label = link.title;
 							const url = link.value;

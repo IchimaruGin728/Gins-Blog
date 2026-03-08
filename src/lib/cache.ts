@@ -12,7 +12,7 @@ export class Cache {
 		return value as T | null;
 	}
 
-	async set(key: string, value: any, ttlSeconds: number = 300): Promise<void> {
+	async set<T>(key: string, value: T, ttlSeconds: number = 300): Promise<void> {
 		await this.kv.put(key, JSON.stringify(value), {
 			expirationTtl: ttlSeconds,
 		});

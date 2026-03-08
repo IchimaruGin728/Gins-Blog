@@ -4,24 +4,32 @@ import { validateSessionToken } from "./lib/session";
 import { getZeroTrustUser } from "./lib/zerotrust";
 
 export const onRequest = defineMiddleware(async (context, next) => {
-	const token = context.cookies.get("session")?.value ?? null;
-
 	// Initialize locals
 	context.locals.user = null;
 	context.locals.session = null;
 
+	const pathname = context.url.pathname;
+	const isPrerenderedDocsRoute =
+		pathname.startsWith("/docs") || pathname.startsWith("/zh/docs");
+
+	if (isPrerenderedDocsRoute) {
+		return next();
+	}
+
+	const token = context.cookies.get("session")?.value ?? null;
+
 	// Access env from locals.runtime (populated by Adapter)
 	// Safety check for dev mode without wrangler or weird states
 	const runtime = context.locals.runtime;
-	const env = runtime?.env || ({} as any);
+	const env: Env | null = runtime?.env ?? null;
 
 	// NUCLEAR BYPASS: Privacy pages (static) should strictly skip all middleware logic to prevent 500s
-	if (context.url.pathname.includes("/privacy")) {
+	if (pathname.includes("/privacy")) {
 		return next();
 	}
 
 	// If no DB binding, we can't do much session work, but we should try to survive public routes
-	const db = env.DB ? getDb(env) : null;
+	const db = env?.DB ? getDb(env) : null;
 
 	// HTML Caching for Public GET Routes
 	// Skip if logged in (token present), or if admin/api/login
@@ -36,7 +44,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		// Cache Key: Full URL
 		const cacheKey = context.url.href;
 		// Safely check if KV is available (might be missing in some dev environments)
-		if (env.GIN_KV) {
+		if (env?.GIN_KV) {
 			try {
 				const cachedHtml = await env.GIN_KV.get(cacheKey);
 

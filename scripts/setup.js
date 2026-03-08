@@ -36,7 +36,7 @@ async function main() {
 	// 1. Check for wrangler
 	try {
 		run("wrangler --version");
-	} catch (e) {
+	} catch (_error) {
 		console.error("❌ Wrangler not found. Please run: npm install -g wrangler");
 		process.exit(1);
 	}
@@ -56,7 +56,7 @@ async function main() {
 				console.log(`✅ Logged in as: \x1b[32m${emailMatch[0]}\x1b[0m`);
 			}
 		}
-	} catch (e) {
+	} catch (_error) {
 		// Proceed if cannot determine
 	}
 
@@ -138,14 +138,6 @@ async function main() {
 				validate: validateName,
 			},
 			{
-				type: "input",
-				name: "vectorIndex",
-				message: "Vectorize Index Name:",
-				default: (answers) => `gins-vector-${answers.suffix}`,
-				when: (answers) => answers.setupAi,
-				validate: validateName,
-			},
-			{
 				type: "confirm",
 				name: "setupMedia",
 				message: "Do you have the Cloudflare Starter Bundle (Images + Stream)?",
@@ -172,11 +164,9 @@ async function main() {
 			{
 				type: "input",
 				name: "cfAvatarId",
-				message:
-					"Enter your primary Cloudflare Image ID (Gin avatar):",
+				message: "Enter your primary Cloudflare Image ID (Gin avatar):",
 				when: (answers) => answers.setupMedia,
-				validate: (input) =>
-					input ? true : "Avatar ID is required.",
+				validate: (input) => (input ? true : "Avatar ID is required."),
 			},
 			{
 				type: "input",
@@ -198,7 +188,7 @@ async function main() {
 		console.log(`KV (General): \x1b[32m${answers.kvGeneral}\x1b[0m`);
 		console.log(`R2 Bucket:    \x1b[32m${answers.r2Bucket}\x1b[0m`);
 		console.log(
-			`AI Search:    \x1b[32m${answers.setupAi ? "Enabled (" + answers.vectorIndex + ")" : "Disabled"}\x1b[0m`,
+			`AI Search:    \x1b[32m${answers.setupAi ? `Enabled (${answers.vectorIndex})` : "Disabled"}\x1b[0m`,
 		);
 		console.log(
 			`Media Optimized:\x1b[32m${answers.setupMedia ? "Enabled (Pro Bundle)" : "Disabled"}\x1b[0m`,
@@ -232,8 +222,8 @@ async function main() {
 		const output = run(`wrangler d1 create ${answers.dbName}`);
 		const match = output.match(/database_id\s*=\s*"([^"]+)"/);
 		if (match) dbId = match[1];
-	} catch (e) {
-		if (e.stderr && e.stderr.includes("already exists")) {
+	} catch (error) {
+		if (error.stderr?.includes("already exists")) {
 			console.log(
 				`⚠️  Database ${answers.dbName} already exists. Attempting to fetch ID...`,
 			);
@@ -261,7 +251,7 @@ async function main() {
 			);
 			const match = output.match(/id\s*=\s*"([^"]+)"/);
 			if (match) kvIds[binding] = match[1];
-		} catch (e) {
+		} catch (_error) {
 			console.error(`❌ Failed to create KV: ${binding}`);
 		}
 	}
@@ -271,7 +261,7 @@ async function main() {
 	try {
 		run(`wrangler r2 bucket create ${answers.r2Bucket}`);
 		console.log(`✅ R2 Bucket Created`);
-	} catch (e) {
+	} catch (_error) {
 		console.warn("⚠️  Failed to create R2 bucket (it might already exist).");
 	}
 
@@ -283,7 +273,7 @@ async function main() {
 				`wrangler vectorize create ${answers.vectorIndex} --dimensions=768 --metric=cosine`,
 			);
 			console.log(`✅ Vectorize Index Created`);
-		} catch (e) {
+		} catch (_error) {
 			console.warn("⚠️  Failed to create Vectorize Index.");
 		}
 	}
@@ -408,7 +398,7 @@ async function main() {
 		try {
 			execSync("npm run db:push", { stdio: "inherit" });
 			console.log("✅ Database initialized!");
-		} catch (e) {
+		} catch (_error) {
 			console.error("❌ Failed to push schema.");
 		}
 	}
@@ -445,7 +435,7 @@ async function main() {
 			console.log(`   npx wrangler secret put CLOUDFLARE_API_TOKEN`);
 			console.log(`   npx wrangler secret put CLOUDFLARE_ACCOUNT_HASH`);
 			console.log(`   npx wrangler secret put PUBLIC_CF_AVATAR_ID`);
-		} catch (e) {
+		} catch (_error) {
 			console.warn("⚠️  Could not save secrets automatically.");
 		}
 	}

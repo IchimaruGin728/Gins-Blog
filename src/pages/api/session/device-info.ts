@@ -34,7 +34,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			connectionType?: string;
 			os?: string;
 		};
-		const { screenResolution, deviceMemory, cpuCores, connectionType, os } = body;
+		const { screenResolution, deviceMemory, cpuCores, connectionType, os } =
+			body;
 
 		// 3. Update Session in DB
 		await db

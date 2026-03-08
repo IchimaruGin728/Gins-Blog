@@ -42,7 +42,7 @@ export default function Comments({ postId, currentUser }: CommentsProps) {
 		}
 	}
 
-	async function handleSubmit(e: any) {
+	async function handleSubmit(e: Event) {
 		e.preventDefault();
 		if (!newComment.trim()) return;
 		setSubmitting(true);
@@ -108,6 +108,7 @@ export default function Comments({ postId, currentUser }: CommentsProps) {
 								currentUser.avatar ||
 								`https://ui-avatars.com/api/?name=${currentUser.username}`
 							}
+							alt={`${currentUser.username} avatar`}
 							class="w-10 h-10 rounded-full border border-white/10"
 						/>
 						<div class="flex-1">
@@ -156,12 +157,13 @@ export default function Comments({ postId, currentUser }: CommentsProps) {
 					{comments.map((comment) => (
 						<div key={comment.id} class="group animate-fade-in">
 							<div class="flex gap-4">
-								<div class="flex-shrink-0">
+								<div class="shrink-0">
 									<img
 										src={
 											comment.user.avatar ||
 											`https://ui-avatars.com/api/?name=${comment.user.username}`
 										}
+										alt={`${comment.user.username} avatar`}
 										class="w-10 h-10 rounded-full border border-white/10"
 									/>
 								</div>
@@ -179,6 +181,7 @@ export default function Comments({ postId, currentUser }: CommentsProps) {
 									</div>
 									<div class="flex items-center gap-4">
 										<button
+											type="button"
 											onClick={() =>
 												handleLike(comment.id, comment.likedByUser)
 											}
@@ -193,7 +196,10 @@ export default function Comments({ postId, currentUser }: CommentsProps) {
 											></span>
 											{comment.likes}
 										</button>
-										<button class="text-xs text-gray-500 hover:text-white transition-colors">
+										<button
+											type="button"
+											class="text-xs text-gray-500 hover:text-white transition-colors"
+										>
 											Reply
 										</button>
 									</div>

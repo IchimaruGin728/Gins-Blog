@@ -54,7 +54,7 @@ export const GET: APIRoute = async ({ locals, request, cookies }) => {
 		else if (ua.includes("Android")) os = "Android";
 		else if (ua.includes("iOS") || ua.includes("iPhone") || ua.includes("iPad"))
 			os = "iOS";
-		
+
 		if (session.osVerified) {
 			os = session.osVerified;
 		}

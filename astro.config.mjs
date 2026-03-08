@@ -2,8 +2,8 @@ import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
 import preact from "@astrojs/preact";
 import sitemap from "@astrojs/sitemap";
-import { defineConfig } from "astro/config";
 import unocss from "@unocss/astro";
+import { defineConfig } from "astro/config";
 
 // https://astro.build/config
 export default defineConfig({
@@ -19,9 +19,7 @@ export default defineConfig({
 		preact({
 			compat: true,
 		}),
-		unocss({
-			injectReset: true,
-		}),
+		unocss(),
 		sitemap(),
 		mdx(),
 	],

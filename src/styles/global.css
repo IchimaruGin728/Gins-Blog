@@ -1,3 +1,5 @@
+@import "@unocss/reset/tailwind.css";
+
 html {
 	scroll-behavior: smooth;
 	background-color: #050505;
@@ -100,7 +102,7 @@ body {
 
 .main-content {
 	view-transition-name: main-content;
-	overflow-anchor: none; 
+	overflow-anchor: none;
 }
 
 ::view-transition-old(main-content) {

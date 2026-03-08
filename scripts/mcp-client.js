@@ -57,7 +57,7 @@ async function main() {
 						}),
 					);
 				}
-			} catch (parseError) {
+			} catch (_parseError) {
 				// Ignore invalid JSON lines
 			}
 		}
