@@ -116,6 +116,7 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 				discordId: discordUser.id,
 				username: discordUser.username,
 				avatar: `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`,
+				createdAt: Date.now(),
 				discordUsername: discordUser.username,
 				discordAvatar: `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`,
 			});

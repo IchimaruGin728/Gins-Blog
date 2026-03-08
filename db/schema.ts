@@ -13,6 +13,7 @@ export const users = sqliteTable("users", {
 	discordId: text("discord_id").unique(),
 	username: text("username").notNull(),
 	avatar: text("avatar"), // URL to R2 or external
+	createdAt: integer("created_at"),
 	bio: text("bio"),
 	socialLinks: text("social_links", { mode: "json" }), // JSON string for { twitter, github, etc }
 

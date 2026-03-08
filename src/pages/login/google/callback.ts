@@ -116,6 +116,7 @@ export const GET: APIRoute = async ({ request, cookies, locals }) => {
 				googleId: googleUser.sub,
 				username: googleUser.name,
 				avatar: googleUser.picture,
+				createdAt: Date.now(),
 				googleUsername: googleUser.name,
 				googleAvatar: googleUser.picture,
 			});

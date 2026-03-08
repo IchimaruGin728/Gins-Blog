@@ -125,6 +125,7 @@ export const GET: APIRoute = async ({ request, cookies, locals }) => {
 				id: userId,
 				githubId: githubUser.id,
 				username: githubUser.login,
+				createdAt: Date.now(),
 				githubUsername: githubUser.login,
 				githubAvatar: githubUser.avatar_url,
 			});
