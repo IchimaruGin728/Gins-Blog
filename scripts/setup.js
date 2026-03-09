@@ -164,9 +164,17 @@ async function main() {
 			{
 				type: "input",
 				name: "cfAvatarId",
-				message: "Enter your primary Cloudflare Image ID (Gin avatar):",
+				message:
+					"Enter your primary Avatar ID (can be an Image ID or R2 path like 'Avatars/me.jpg'):",
 				when: (answers) => answers.setupMedia,
-				validate: (input) => (input ? true : "Avatar ID is required."),
+				validate: (input) => (input ? true : "Avatar ID/Path is required."),
+			},
+			{
+				type: "input",
+				name: "assetsDomain",
+				message:
+					"Enter your R2 Assets Custom Domain (optional, e.g., assets.yourdomain.com):",
+				when: (answers) => answers.setupMedia,
 			},
 			{
 				type: "input",
@@ -426,6 +434,9 @@ async function main() {
 			if (!envContent.includes("PUBLIC_CF_AVATAR_ID")) {
 				envContent += `\nPUBLIC_CF_AVATAR_ID=${answers.cfAvatarId}`;
 			}
+			if (answers.assetsDomain && !envContent.includes("PUBLIC_ASSETS_DOMAIN")) {
+				envContent += `\nPUBLIC_ASSETS_DOMAIN=${answers.assetsDomain}`;
+			}
 
 			fs.writeFileSync(envPath, envContent);
 			console.log("✅ Credentials saved to .dev.vars (local)");
@@ -435,6 +446,9 @@ async function main() {
 			console.log(`   npx wrangler secret put CLOUDFLARE_API_TOKEN`);
 			console.log(`   npx wrangler secret put CLOUDFLARE_ACCOUNT_HASH`);
 			console.log(`   npx wrangler secret put PUBLIC_CF_AVATAR_ID`);
+			if (answers.assetsDomain) {
+				console.log(`   npx wrangler secret put PUBLIC_ASSETS_DOMAIN`);
+			}
 		} catch (_error) {
 			console.warn("⚠️  Could not save secrets automatically.");
 		}

@@ -21,16 +21,35 @@ const {
   fetchpriority = "auto",
 } = Astro.props;
 
-// Read the Cloudflare Account Hash from environment variables
+// Read configuration from environment variables
 const accountHash =
   import.meta.env.CLOUDFLARE_ACCOUNT_HASH ||
   Astro.locals.runtime?.env?.CLOUDFLARE_ACCOUNT_HASH ||
   process.env.CLOUDFLARE_ACCOUNT_HASH ||
   "MISSING_HASH";
 
-// Construct the imagedelivery.net URL
-// Format: https://imagedelivery.net/<ACCOUNT_HASH>/<IMAGE_ID>/<VARIANT>
-const src = `https://imagedelivery.net/${accountHash}/${imageId}/${variant}`;
+const assetsDomain =
+  import.meta.env.PUBLIC_ASSETS_DOMAIN ||
+  Astro.locals.runtime?.env?.PUBLIC_ASSETS_DOMAIN ||
+  process.env.PUBLIC_ASSETS_DOMAIN;
+
+// Construct the URL
+let src;
+if (assetsDomain && imageId.includes("/")) {
+  // R2 Optimized Path (No delivery fees)
+  // Format: https://<CUSTOM_DOMAIN>/cdn-cgi/image/<PARAMS>/<PATH>
+  const params = [];
+  if (width) params.push(`width=${width}`);
+  if (height) params.push(`height=${height}`);
+  if (variant === "avatar") params.push("fit=crop");
+  params.push("format=auto");
+
+  src = `https://${assetsDomain}/cdn-cgi/image/${params.join(",")}/${imageId}`;
+} else {
+  // Standard Cloudflare Images Path (Metered delivery)
+  // Format: https://imagedelivery.net/<ACCOUNT_HASH>/<IMAGE_ID>/<VARIANT>
+  src = `https://imagedelivery.net/${accountHash}/${imageId}/${variant}`;
+}
 ---
 
 <img
