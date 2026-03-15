@@ -91,7 +91,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
 	try {
 		const body = (await request.json()) as any;
 		const { postId, content } = body;
-		// postId might be slug
+
+		if (!postId || typeof content !== "string" || content.trim().length === 0) {
+			return new Response(
+				JSON.stringify({ error: "postId and non-empty content are required" }),
+				{ status: 400 },
+			);
+		}
 
 		const db = getDb(locals.runtime.env);
 

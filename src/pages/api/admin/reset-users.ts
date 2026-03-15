@@ -3,15 +3,7 @@ import { sessions, users } from "../../../../db/schema";
 import { getDb } from "../../../lib/db";
 
 export const POST: APIRoute = async ({ locals }) => {
-	// Admin only
-	const user = locals.user;
-	if (!user || user.id !== "e948c115-a7cf-4571-9d2c-5ed43b96bb93") {
-		return new Response(JSON.stringify({ error: "Unauthorized" }), {
-			status: 403,
-			headers: { "Content-Type": "application/json" },
-		});
-	}
-
+	// Protected by Zero Trust middleware at /api/admin level (see src/middleware.ts)
 	const db = getDb(locals.runtime.env);
 
 	try {

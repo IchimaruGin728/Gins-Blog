@@ -47,14 +47,14 @@ app.post(
 			? new Date(updatedAt).getTime()
 			: Date.now();
 
-		await db
+		const [savedPost] = await db
 			.insert(posts)
 			.values({
 				id,
 				title,
 				slug,
 				content,
-				createdAt: Date.now(), // Only valid for insert, but ignored on update if we don't set it
+				createdAt: Date.now(),
 				updatedAt: updateTimestamp,
 				publishedAt: timestamp,
 			})
@@ -67,20 +67,12 @@ app.post(
 					updatedAt: updateTimestamp,
 					publishedAt: timestamp,
 				},
-			});
+			})
+			.returning();
 
 		try {
 			const CACHE_KEY = `post:${slug}`;
-			const postData = {
-				id,
-				title,
-				slug,
-				content,
-				createdAt: Date.now(),
-				updatedAt: updateTimestamp,
-				publishedAt: timestamp,
-			};
-			await env.GINS_CACHE.put(CACHE_KEY, JSON.stringify(postData), {
+			await env.GINS_CACHE.put(CACHE_KEY, JSON.stringify(savedPost), {
 				expirationTtl: 60 * 60 * 24 * 7, // 7 Days Cache
 			});
 		} catch (e) {
@@ -114,7 +106,7 @@ app.get("/posts", async (c) => {
 	const db = getDb(c.env as Env);
 	const limitParam = c.req.query("limit");
 
-	let query = db
+	const baseQuery = db
 		.select({
 			id: posts.id,
 			title: posts.title,
@@ -125,11 +117,11 @@ app.get("/posts", async (c) => {
 		.from(posts)
 		.orderBy(desc(posts.publishedAt));
 
-	if (limitParam !== "all") {
-		query = (query as any).limit(limitParam ? parseInt(limitParam, 10) : 20);
-	}
+	const allPosts =
+		limitParam === "all"
+			? await baseQuery.all()
+			: await baseQuery.limit(Math.max(1, parseInt(limitParam ?? "20", 10) || 20)).all();
 
-	const allPosts = await query.all();
 	return c.json(allPosts);
 });
 
@@ -176,6 +168,9 @@ app.patch(
 		}),
 	),
 	async (c) => {
+		const userId = c.req.header("X-User-Id");
+		if (!userId) return c.json({ error: "Unauthorized" }, 401);
+
 		const db = getDb(c.env as Env);
 		const slug = c.req.param("slug");
 		const { action } = c.req.valid("json");
@@ -197,6 +192,9 @@ app.patch(
 );
 
 app.delete("/posts/:slug", async (c) => {
+	const userId = c.req.header("X-User-Id");
+	if (!userId) return c.json({ error: "Unauthorized" }, 401);
+
 	const db = getDb(c.env as Env);
 	const slug = c.req.param("slug");
 	const env = c.env as Env;

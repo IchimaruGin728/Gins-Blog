@@ -14,6 +14,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		const body = (await request.json()) as any;
 		const { commentId, value } = body; // value: 1 = like, 0 = remove
 
+		if (!commentId || (value !== 0 && value !== 1)) {
+			return new Response(
+				JSON.stringify({ error: "commentId and value (0 or 1) are required" }),
+				{ status: 400 },
+			);
+		}
+
 		const db = getDb(locals.runtime.env);
 
 		if (value === 0) {

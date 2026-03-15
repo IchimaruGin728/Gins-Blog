@@ -17,7 +17,6 @@ interface Env {
 	GIN_KV: import("@cloudflare/workers-types").KVNamespace;
 	GINS_CACHE: import("@cloudflare/workers-types").KVNamespace;
 	BUCKET: import("@cloudflare/workers-types").R2Bucket;
-	MY_QUEUE: import("@cloudflare/workers-types").Queue;
 	VECTOR_INDEX: import("@cloudflare/workers-types").VectorizeIndex;
 	AI: import("@cloudflare/workers-types").Ai;
 
@@ -40,5 +39,4 @@ interface Env {
 	PUBLIC_CF_AVATAR_ID: string;
 	PUBLIC_ASSETS_DOMAIN?: string;
 	PUBLIC_AVATAR_URL?: string;
-	CLOUDFLARE_STREAM_CUSTOMER_ID?: string;
 }

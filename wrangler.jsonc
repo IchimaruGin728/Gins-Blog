@@ -28,7 +28,9 @@
 	"vars": {
 		"GITHUB_REDIRECT_URI": "https://blog.ichimarugin728.com/login/github/callback",
 		"GOOGLE_REDIRECT_URI": "https://blog.ichimarugin728.com/login/google/callback",
-		"DISCORD_REDIRECT_URI": "https://blog.ichimarugin728.com/login/discord/callback"
+		"DISCORD_REDIRECT_URI": "https://blog.ichimarugin728.com/login/discord/callback",
+		"PUBLIC_CF_AVATAR_ID": "Avatars/Gin.JPG",
+		"PUBLIC_ASSETS_DOMAIN": "assets.ichimarugin728.com"
 	},
 	"assets": {
 		"directory": "./dist",
@@ -36,18 +38,15 @@
 	},
 	"kv_namespaces": [
 		{
+			// Sessions + general KV storage (session:*, oauth:* keys)
 			"binding": "GIN_KV",
 			"id": "d749e0c6642747248d4db6d3393573db",
 			"preview_id": "171ef5dabf7e4c83ad560b8cd85cacb9"
 		},
 		{
-			"binding": "SESSION",
-			"id": "d749e0c6642747248d4db6d3393573db", // Reusing ID for now as placeholder, user likely needs to create new one
-			"preview_id": "171ef5dabf7e4c83ad560b8cd85cacb9"
-		},
-		{
+			// Page & post cache (post:*, <url> keys)
 			"binding": "GINS_CACHE",
-			"id": "d749e0c6642747248d4db6d3393573db", // Using same placeholder, user will update if needed
+			"id": "2f7f0068e7a347f8809e3c91f94acb40",
 			"preview_id": "171ef5dabf7e4c83ad560b8cd85cacb9"
 		}
 	],
@@ -55,7 +54,7 @@
 		{
 			"binding": "DB",
 			"database_name": "gins-blog-db",
-			"database_id": "1a05c007-b063-416f-b589-e8f9c5c079e8"
+			"database_id": "f67d5dd7-1256-4b87-9ac9-36075b71f31d"
 		}
 	],
 	"r2_buckets": [
@@ -64,21 +63,13 @@
 			"bucket_name": "gins-media"
 		}
 	],
-	"queues": {
-		"producers": [
-			{
-				"binding": "MY_QUEUE",
-				"queue": "gins-queue"
-			}
-		]
+	"vectorize": [
+		{
+			"binding": "VECTOR_INDEX",
+			"index_name": "gins-vector"
+		}
+	],
+	"ai": {
+		"binding": "AI"
 	}
-	// "vectorize": [
-	// 	{
-	// 		"binding": "VECTOR_INDEX",
-	// 		"index_name": "gins-vector"
-	// 	}
-	// ],
-	// "ai": {
-	// 	"binding": "AI"
-	// }
 }

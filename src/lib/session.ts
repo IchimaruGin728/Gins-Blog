@@ -119,6 +119,64 @@ export async function createSession(
 	return session;
 }
 
+// Backfill missing userAgent/ipAddress from legacy sessions, returns false if session should be invalidated
+async function hydrateLegacySession(
+	session: Session,
+	sessionId: string,
+	request: Request,
+	db: ReturnType<typeof getDb>,
+	env: Env,
+): Promise<boolean> {
+	const userAgent = request.headers.get("user-agent");
+	const ipAddress = request.headers.get("cf-connecting-ip");
+
+	if (!userAgent || !ipAddress) return false;
+
+	session.userAgent = userAgent;
+	session.ipAddress = ipAddress;
+	session.lastActive = Date.now();
+
+	await db
+		.update(sessions)
+		.set({ userAgent, ipAddress, lastActive: session.lastActive })
+		.where(eq(sessions.id, session.id));
+	await env.GIN_KV.put(`session:${sessionId}`, JSON.stringify(session), {
+		expiration: Math.floor(session.expiresAt / 1000),
+	});
+	return true;
+}
+
+// Slide session expiration or bump lastActive, then sync to KV + DB
+async function refreshSession(
+	session: Session,
+	sessionId: string,
+	db: ReturnType<typeof getDb>,
+	env: Env,
+): Promise<void> {
+	const now = Date.now();
+
+	if (now >= session.expiresAt - 1000 * 60 * 60 * 24 * 15) {
+		session.expiresAt = now + 1000 * 60 * 60 * 24 * 30;
+		session.lastActive = now;
+		await env.GIN_KV.put(`session:${sessionId}`, JSON.stringify(session), {
+			expiration: Math.floor(session.expiresAt / 1000),
+		});
+		await db
+			.update(sessions)
+			.set({ expiresAt: session.expiresAt, lastActive: session.lastActive })
+			.where(eq(sessions.id, session.id));
+	} else if (now - (session.lastActive || 0) > 60000) {
+		session.lastActive = now;
+		await env.GIN_KV.put(`session:${sessionId}`, JSON.stringify(session), {
+			expiration: Math.floor(session.expiresAt / 1000),
+		});
+		await db
+			.update(sessions)
+			.set({ lastActive: session.lastActive })
+			.where(eq(sessions.id, session.id));
+	}
+}
+
 export async function validateSessionToken(
 	token: string,
 	db: ReturnType<typeof getDb>,
@@ -127,89 +185,28 @@ export async function validateSessionToken(
 ): Promise<SessionValidationResult> {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 
-	// 1. Check KV Cache (Fast Path)
+	// 1. Check KV Cache (Fast Path) — KV check Session -> D1 check User
 	const cachedSessionStr = await env.GIN_KV.get(`session:${sessionId}`);
 	if (cachedSessionStr) {
 		const session = JSON.parse(cachedSessionStr) as Session;
 
-		// Even if we hit cache, we might need to check freshness or user details if we want full strictness,
-		// but for speed we trust KV until expiration.
-		// However, we need the User object too.
-		// We can cache the User with the Session or fetch User separately.
-		// Let's modify the cache structure to include User ID or fetch User from KV too?
-		// For simplicity and speed: Cache the *Validation Result* or just fetch User from D1?
-		// Fetching User from D1 is fast enough if Session is valid? No, we want NO D1 hits if possible.
-		// Let's stick to: KV check Session -> D1 check User (Primary Key lookup is fast).
-
-		// Check Expiration
 		if (Date.now() >= session.expiresAt) {
 			await env.GIN_KV.delete(`session:${sessionId}`);
 			await db.delete(sessions).where(eq(sessions.id, session.id));
 			return { session: null, user: null };
 		}
 
-		// Legacy session check: if missing userAgent or ipAddress, try to update or invalidate
 		if ((!session.userAgent || !session.ipAddress) && request) {
-			const userAgent = request.headers.get("user-agent");
-			const ipAddress = request.headers.get("cf-connecting-ip");
-
-			if (userAgent && ipAddress) {
-				// Update legacy session with current device info
-				session.userAgent = userAgent;
-				session.ipAddress = ipAddress;
-				session.lastActive = Date.now();
-
-				await db
-					.update(sessions)
-					.set({
-						userAgent: session.userAgent,
-						ipAddress: session.ipAddress,
-						lastActive: session.lastActive,
-					})
-					.where(eq(sessions.id, session.id));
-
-				await env.GIN_KV.put(`session:${sessionId}`, JSON.stringify(session), {
-					expiration: Math.floor(session.expiresAt / 1000),
-				});
-			} else {
-				// Cannot update, invalidate this legacy session
+			const ok = await hydrateLegacySession(session, sessionId, request, db, env);
+			if (!ok) {
 				await env.GIN_KV.delete(`session:${sessionId}`);
 				await db.delete(sessions).where(eq(sessions.id, session.id));
 				return { session: null, user: null };
 			}
 		}
 
-		// Refresh Logic (Slide Expiration) - Update KV and DB if needed
-		if (Date.now() >= session.expiresAt - 1000 * 60 * 60 * 24 * 15) {
-			session.expiresAt = Date.now() + 1000 * 60 * 60 * 24 * 30;
-			session.lastActive = Date.now();
-			// Update KV
-			await env.GIN_KV.put(`session:${sessionId}`, JSON.stringify(session), {
-				expiration: Math.floor(session.expiresAt / 1000),
-			});
-			// Async Update DB (Fire and forget? or await)
-			await db
-				.update(sessions)
-				.set({ expiresAt: session.expiresAt, lastActive: session.lastActive })
-				.where(eq(sessions.id, session.id));
-		} else {
-			// Just update lastActive without sliding expiration
-			const now = Date.now();
-			const lastActive = session.lastActive || 0;
-			if (now - lastActive > 60000) {
-				// Update if > 1 minute since last update
-				session.lastActive = now;
-				await env.GIN_KV.put(`session:${sessionId}`, JSON.stringify(session), {
-					expiration: Math.floor(session.expiresAt / 1000),
-				});
-				await db
-					.update(sessions)
-					.set({ lastActive: session.lastActive })
-					.where(eq(sessions.id, session.id));
-			}
-		}
+		await refreshSession(session, sessionId, db, env);
 
-		// Fetch User (Fast PK lookup)
 		const user = await db
 			.select()
 			.from(users)
@@ -228,63 +225,26 @@ export async function validateSessionToken(
 		.where(eq(sessions.id, sessionId))
 		.get();
 
-	if (!result) {
-		return { session: null, user: null };
-	}
+	if (!result) return { session: null, user: null };
+
 	const { user, session } = result;
+
 	if (Date.now() >= session.expiresAt) {
 		await db.delete(sessions).where(eq(sessions.id, session.id));
 		return { session: null, user: null };
 	}
 
-	// Legacy session check for DB path too
 	if ((!session.userAgent || !session.ipAddress) && request) {
-		const userAgent = request.headers.get("user-agent");
-		const ipAddress = request.headers.get("cf-connecting-ip");
-
-		if (userAgent && ipAddress) {
-			session.userAgent = userAgent;
-			session.ipAddress = ipAddress;
-			session.lastActive = Date.now();
-
-			await db
-				.update(sessions)
-				.set({
-					userAgent: session.userAgent,
-					ipAddress: session.ipAddress,
-					lastActive: session.lastActive,
-				})
-				.where(eq(sessions.id, session.id));
-		} else {
-			// Cannot update, invalidate this legacy session
+		const ok = await hydrateLegacySession(session, sessionId, request, db, env);
+		if (!ok) {
 			await db.delete(sessions).where(eq(sessions.id, session.id));
 			return { session: null, user: null };
 		}
 	}
 
-	if (Date.now() >= session.expiresAt - 1000 * 60 * 60 * 24 * 15) {
-		session.expiresAt = Date.now() + 1000 * 60 * 60 * 24 * 30;
-		session.lastActive = Date.now();
-		await db
-			.update(sessions)
-			.set({
-				expiresAt: session.expiresAt,
-				lastActive: session.lastActive,
-			})
-			.where(eq(sessions.id, session.id));
-	} else {
-		const now = Date.now();
-		const lastActive = session.lastActive || 0;
-		if (now - lastActive > 60000) {
-			session.lastActive = now;
-			await db
-				.update(sessions)
-				.set({ lastActive: session.lastActive })
-				.where(eq(sessions.id, session.id));
-		}
-	}
+	await refreshSession(session, sessionId, db, env);
 
-	// Hydrate KV Cache
+	// Hydrate KV Cache on DB hit
 	await env.GIN_KV.put(`session:${sessionId}`, JSON.stringify(session), {
 		expiration: Math.floor(session.expiresAt / 1000),
 	});
