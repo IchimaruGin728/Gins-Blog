@@ -96,11 +96,62 @@ const TOOLS = [
 	},
 ];
 
+type JsonRpcId = string | number | null;
+
+interface JsonRpcRequest {
+	method?: string;
+	params?: {
+		name?: string;
+		arguments?: Record<string, unknown>;
+	};
+	id?: JsonRpcId;
+}
+
+type JsonRpcTextContent = {
+	type: "text";
+	text: string;
+};
+
+interface CloudflareMcpUploadResponse {
+	success: boolean;
+	errors: { message?: string }[];
+	result: {
+		id?: string;
+		variants?: string[];
+		uid?: string;
+		thumbnail?: string;
+	};
+}
+
+function getErrorString(error: unknown) {
+	return error instanceof Error ? error.message : String(error);
+}
+
+function getStringArg(value: unknown, fieldName: string) {
+	if (typeof value !== "string" || value.trim() === "") {
+		throw new Error(`Invalid or missing "${fieldName}" argument.`);
+	}
+
+	return value;
+}
+
+function getOptionalStringArg(value: unknown) {
+	if (typeof value !== "string" || value.trim() === "") {
+		return undefined;
+	}
+
+	return value;
+}
+
+function getNumberArg(value: unknown, fallback: number) {
+	return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
 export const POST: APIRoute = async ({ request, locals }) => {
 	const env = locals.runtime.env;
 
 	try {
-		const body = (await request.json()) as any;
+		const body = (await request.json()) as JsonRpcRequest;
 
 		// JSON-RPC 2.0 Request Handling
 		const { method, params, id } = body;
@@ -121,15 +172,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 		// 2. Execute Tool
 		if (method === "tools/call") {
-			const toolName = params.name;
-			const args = params.arguments || {};
+			const toolName = params?.name;
+			const args = params?.arguments || {};
 			const db = getDb(env);
-			let resultContent = [];
+			let resultContent: JsonRpcTextContent[] = [];
 
 			switch (toolName) {
 				case "search_posts": {
-					const query = args.query;
-					const limit = args.limit || 5;
+					const searchQuery = getStringArg(args.query, "query");
+					const resultLimit = getNumberArg(args.limit, 5);
 					const results = await db
 						.select({
 							title: posts.title,
@@ -138,8 +189,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 							publishedAt: posts.publishedAt,
 						})
 						.from(posts)
-						.where(like(posts.title, `%${query}%`))
-						.limit(limit);
+						.where(like(posts.title, `%${searchQuery}%`))
+						.limit(resultLimit);
 
 					resultContent = [
 						{ type: "text", text: JSON.stringify(results, null, 2) },
@@ -148,10 +199,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
 				}
 
 				case "draft_post": {
-					const { title, content } = args;
-					const slug =
-						args.slug ||
-						title
+					const draftTitle = getStringArg(args.title, "title");
+					const draftContent = getStringArg(args.content, "content");
+					const draftSlug =
+						getOptionalStringArg(args.slug) ||
+						draftTitle
 							.toLowerCase()
 							.replace(/[^a-z0-9]+/g, "-")
 							.replace(/^-|-$/g, "") +
@@ -164,9 +216,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 					await db.insert(posts).values({
 						id: newId,
-						title,
-						slug,
-						content,
+						title: draftTitle,
+						slug: draftSlug,
+						content: draftContent,
 						createdAt: now,
 						updatedAt: now,
 						publishedAt: null, // Draft
@@ -176,14 +228,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
 					resultContent = [
 						{
 							type: "text",
-							text: `Draft created successfully! ID: ${newId}, Slug: ${slug}`,
+							text: `Draft created successfully! ID: ${newId}, Slug: ${draftSlug}`,
 						},
 					];
 					break;
 				}
 
 				case "analyze_comments": {
-					const limit = args.limit || 10;
+					const resultLimit = getNumberArg(args.limit, 10);
 					const recentComments = await db
 						.select({
 							content: comments.content,
@@ -192,7 +244,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 						})
 						.from(comments)
 						.orderBy(desc(comments.createdAt))
-						.limit(limit);
+						.limit(resultLimit);
 
 					resultContent = [
 						{ type: "text", text: JSON.stringify(recentComments, null, 2) },
@@ -229,7 +281,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 				}
 
 				case "upload_image": {
-					const { url, requireSignedURLs } = args;
+					const imageUrl = getStringArg(args.url, "url");
 					const accountId =
 						env.CLOUDFLARE_ACCOUNT_ID || "cd4ce461acea5097153abf9e2deb26ec";
 					const apiToken =
@@ -244,8 +296,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 					}
 
 					const formData = new FormData();
-					formData.append("url", url);
-					if (requireSignedURLs) {
+					formData.append("url", imageUrl);
+					if (args.requireSignedURLs === true) {
 						formData.append("requireSignedURLs", "true");
 					}
 
@@ -260,7 +312,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 						},
 					);
 
-					const data = (await response.json()) as any;
+					const data = (await response.json()) as CloudflareMcpUploadResponse;
 
 					if (!data.success) {
 						throw new Error(
@@ -270,7 +322,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 					// Return a markdown snippet for the user/agent
 					const imageId = data.result.id;
-					const variants = data.result.variants;
+					const variants = data.result.variants ?? [];
 					const publicUrl = variants.find((v: string) => v.endsWith("/public"));
 
 					resultContent = [
@@ -283,7 +335,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 				}
 
 				case "upload_video": {
-					const { url, title } = args;
+					const videoUrl = getStringArg(args.url, "url");
+					const videoTitle = getOptionalStringArg(args.title);
 					const accountId =
 						env.CLOUDFLARE_ACCOUNT_ID || "cd4ce461acea5097153abf9e2deb26ec";
 					const apiToken =
@@ -297,10 +350,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
 						);
 					}
 
-					const body: any = {
-						url: url,
+					const body: {
+						url: string;
+						meta?: { name: string };
+					} = {
+						url: videoUrl,
 					};
-					if (title) body.meta = { name: title };
+					if (videoTitle) body.meta = { name: videoTitle };
 
 					const response = await fetch(
 						`https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/copy`,
@@ -314,7 +370,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 						},
 					);
 
-					const data = (await response.json()) as any;
+					const data = (await response.json()) as CloudflareMcpUploadResponse;
 
 					if (!data.success) {
 						throw new Error(
@@ -328,7 +384,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 					resultContent = [
 						{
 							type: "text",
-							text: `Video upload started! (Async)\n\nID: ${videoId}\n\nMarkdown Snippet:\n\`\`\`astro\n<StreamPlayer videoId="${videoId}" title="${title || "Video"}" />\n\`\`\`\n\nThumbnail: ${thumbnail}`,
+							text: `Video upload started! (Async)\n\nID: ${videoId}\n\nMarkdown Snippet:\n\`\`\`astro\n<StreamPlayer videoId="${videoId}" title="${videoTitle || "Video"}" />\n\`\`\`\n\nThumbnail: ${thumbnail}`,
 						},
 					];
 					break;
@@ -365,7 +421,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			}),
 			{ status: 400 },
 		);
-	} catch (error: any) {
+	} catch (error: unknown) {
 		return new Response(
 			JSON.stringify({
 				jsonrpc: "2.0",
@@ -373,7 +429,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 				error: {
 					code: -32603,
 					message: "Internal error",
-					data: error.toString(),
+					data: getErrorString(error),
 				},
 			}),
 			{ status: 500 },

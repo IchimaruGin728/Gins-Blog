@@ -1,5 +1,18 @@
 import type { APIRoute } from "astro";
 
+interface CloudflareImageUploadResponse {
+	success: boolean;
+	errors: { message?: string }[];
+	result: {
+		id: string;
+		variants: string[];
+	};
+}
+
+function getErrorMessage(error: unknown) {
+	return error instanceof Error ? error.message : "Unknown error";
+}
+
 export const POST: APIRoute = async ({ request, locals }) => {
 	// Admin Authorization check
 	if (!locals.user) {
@@ -51,7 +64,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			},
 		);
 
-		const cfData = (await cfResponse.json()) as any;
+		const cfData = (await cfResponse.json()) as CloudflareImageUploadResponse;
 
 		if (!cfData.success) {
 			return new Response(
@@ -77,12 +90,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
 				headers: { "Content-Type": "application/json" },
 			},
 		);
-	} catch (error: any) {
+	} catch (error: unknown) {
 		console.error("Image upload error:", error);
 		return new Response(
 			JSON.stringify({
 				error: "Internal Server Error",
-				message: error.message,
+				message: getErrorMessage(error),
 			}),
 			{
 				status: 500,

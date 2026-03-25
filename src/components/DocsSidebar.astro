@@ -1,9 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 
-const docs = await getCollection("docs");
-
-const sortedDocs = docs.sort((a, b) => {
+const docs = (await getCollection("docs")).sort((a, b) => {
     const orderA = a.data.order ?? 999;
     const orderB = b.data.order ?? 999;
     if (orderA !== orderB) {
@@ -11,9 +9,7 @@ const sortedDocs = docs.sort((a, b) => {
     }
     return a.data.title.localeCompare(b.data.title);
 });
-
-const currentPath = Astro.url.pathname;
-const getRouteSlug = (docId: string) => docId.replace(/^docs\//, "");
+void docs;
 ---
 
 <div class="pr-6">
@@ -25,11 +21,12 @@ const getRouteSlug = (docId: string) => docId.replace(/^docs\//, "");
 
     <nav class="space-y-1">
         {
-            sortedDocs.map((doc) => {
-                const routeSlug = getRouteSlug(doc.id);
+            docs.map((doc) => {
+                const routeSlug = doc.id.replace(/^docs\//, "");
                 const href = `/docs/${routeSlug === "index" ? "" : routeSlug}`;
                 const isActive =
-                    currentPath.replace(/\/$/, "") === href.replace(/\/$/, "");
+                    Astro.url.pathname.replace(/\/$/, "") ===
+                    href.replace(/\/$/, "");
 
                 return (
                     <a
