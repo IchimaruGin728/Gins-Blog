@@ -120,7 +120,9 @@ app.get("/posts", async (c) => {
 	const allPosts =
 		limitParam === "all"
 			? await baseQuery.all()
-			: await baseQuery.limit(Math.max(1, parseInt(limitParam ?? "20", 10) || 20)).all();
+			: await baseQuery
+					.limit(Math.max(1, parseInt(limitParam ?? "20", 10) || 20))
+					.all();
 
 	return c.json(allPosts);
 });

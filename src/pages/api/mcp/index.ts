@@ -230,11 +230,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 				case "upload_image": {
 					const { url, requireSignedURLs } = args;
-					const accountId = "cd4ce461acea5097153abf9e2deb26ec"; // Gins-Blog Account ID
-					const apiToken = env.CF_API_TOKEN;
+					const accountId =
+						env.CLOUDFLARE_ACCOUNT_ID || "cd4ce461acea5097153abf9e2deb26ec";
+					const apiToken =
+						env.CLOUDFLARE_MEDIA_API_TOKEN ||
+						env.CF_API_TOKEN ||
+						env.CLOUDFLARE_API_TOKEN;
 
 					if (!apiToken) {
-						throw new Error("CF_API_TOKEN environment variable is not set.");
+						throw new Error(
+							"CLOUDFLARE_MEDIA_API_TOKEN environment variable is not set.",
+						);
 					}
 
 					const formData = new FormData();
@@ -278,11 +284,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 				case "upload_video": {
 					const { url, title } = args;
-					const accountId = "cd4ce461acea5097153abf9e2deb26ec"; // Gins-Blog Account ID
-					const apiToken = env.CF_API_TOKEN;
+					const accountId =
+						env.CLOUDFLARE_ACCOUNT_ID || "cd4ce461acea5097153abf9e2deb26ec";
+					const apiToken =
+						env.CLOUDFLARE_MEDIA_API_TOKEN ||
+						env.CF_API_TOKEN ||
+						env.CLOUDFLARE_API_TOKEN;
 
 					if (!apiToken) {
-						throw new Error("CF_API_TOKEN environment variable is not set.");
+						throw new Error(
+							"CLOUDFLARE_MEDIA_API_TOKEN environment variable is not set.",
+						);
 					}
 
 					const body: any = {

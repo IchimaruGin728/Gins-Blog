@@ -11,12 +11,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 	const { env } = locals.runtime;
 	const accountId = env.CLOUDFLARE_ACCOUNT_ID;
-	const apiToken = env.CLOUDFLARE_API_TOKEN;
+	const apiToken = env.CLOUDFLARE_MEDIA_API_TOKEN || env.CLOUDFLARE_API_TOKEN;
 
 	if (!accountId || !apiToken) {
 		return new Response(
 			JSON.stringify({
-				error: "Missing Cloudflare Credentials in environment.",
+				error: "Missing Cloudflare media credentials in environment.",
 			}),
 			{
 				status: 500,

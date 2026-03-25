@@ -51,6 +51,12 @@ wrangler d1 execute gins-db --file=./db/migrations/0000_schema.sql --remote
 
 Once the database is primed and the bindings are set, you can deploy the application globally.
 
+Keep the two Cloudflare tokens separate:
+- `CLOUDFLARE_API_TOKEN` for CI or manual deploys with Workers permissions
+- `CLOUDFLARE_MEDIA_API_TOKEN` for runtime Images/Stream uploads inside the blog Worker
+
+The media token is optional. Only configure it if you separately purchased Cloudflare Images and Stream for this blog.
+
 ```bash
 npm run deploy
 ```

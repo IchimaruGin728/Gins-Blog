@@ -86,8 +86,8 @@
 - **Smart Routing** - Cloudflare Smart Placement for optimal latency
 
 ### 🎥 **Edge-Native Media Integration (Optional)**
-- **Cloudflare Images** - Zero-latency, auto-optimized WebP/AVIF delivery via the `<CloudflareImage />` component.
-- **Cloudflare Stream** - Adaptive bitrate (HLS) streaming player for videos via the `<CloudflareVideo />` component.
+- **Cloudflare Images** - Zero-latency, auto-optimized WebP/AVIF delivery via the `<CloudflareImage />` component. Optional, requires a separate Cloudflare purchase.
+- **Cloudflare Stream** - Adaptive bitrate (HLS) streaming player for videos via the `<CloudflareVideo />` component. Optional, requires a separate Cloudflare purchase.
 - **Integrated Admin Editor** - Securely upload Edge-Native media directly within your Markdown editor workspace without bloating your database or repo.
 ### 🤖 **AI-Powered Search**
 - **Semantic Search** - Cloudflare Vectorize + Workers AI for intelligent content discovery
@@ -255,7 +255,7 @@ pnpm install
 Select the method that best suits your workflow:
 
 #### **Method A: Interactive Setup Script (✨ Highly Recommended)**
-The fastest way to get started. Just run the command below and the interactive wizard will guide you through connecting your Cloudflare DB, Storage, and explicitly prompt you for optional Edge Media configurations (Images/Stream) step-by-step.
+The fastest way to get started. Just run the command below and the interactive wizard will guide you through connecting your Cloudflare DB and Storage. If you separately purchased Cloudflare Images + Stream, it will also offer an optional media step using a dedicated media token that stays separate from your deploy token.
 ```bash
 pnpm run setup
 ```
@@ -305,6 +305,13 @@ GOOGLE_REDIRECT_URI=http://localhost:4321/login/google/callback
 DISCORD_CLIENT_ID=your_discord_client_id
 DISCORD_CLIENT_SECRET=your_discord_client_secret
 DISCORD_REDIRECT_URI=http://localhost:4321/login/discord/callback
+
+# Optional only if you purchased Cloudflare Images + Stream
+CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
+CLOUDFLARE_ACCOUNT_HASH=your_cloudflare_account_hash
+CLOUDFLARE_MEDIA_API_TOKEN=your_media_api_token
+PUBLIC_CF_AVATAR_ID=your_avatar_image_id_or_r2_path
+PUBLIC_ASSETS_DOMAIN=assets.yourdomain.com
 ```
 
 > **⚠️ IMPORTANT:** Add `.dev.vars` to your `.gitignore` to prevent committing secrets!
@@ -350,7 +357,12 @@ Go to your GitHub Repository → Settings → Secrets and variables → Actions.
 
 2. **Configure Environment Variables:**
 
-Environment variables should be configured via `wrangler.jsonc` for production or set in the Cloudflare Dashboard for the Worker.
+Set production runtime values on the Worker itself:
+- Secret: `CLOUDFLARE_MEDIA_API_TOKEN` for Images/Stream uploads
+- Variables: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ACCOUNT_HASH`, `PUBLIC_CF_AVATAR_ID`
+- Variable: `PUBLIC_ASSETS_DOMAIN` if you use an R2 custom domain
+
+Keep the deploy token and media token separate. `CLOUDFLARE_API_TOKEN` is for GitHub Actions deployment, while `CLOUDFLARE_MEDIA_API_TOKEN` is only for runtime media uploads.
 
 3. **Automatic Deployment:**
 

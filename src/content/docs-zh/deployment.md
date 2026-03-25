@@ -32,7 +32,7 @@ npm run setup
 1. **自动调配基础云资源池**：配置 D1 (数据库持久化存储), KV (键值对高频缓存), 以及选择性启用的 Vectorize (AI 语义向量库)。
 2. **连接绑定**：它会自动扫描生成的系统 ID，并一键写入您的 `wrangler.jsonc` 配置文件。
 3. **架构同步**：全自动执行 `npm run db:push` 初始化并将您的表单结构同步至刚创建好的 D1 数据库中。
-4. **媒体高级托管向导**：最后，如果您购买了 Cloudflare Media Bundle（可选，非强制），脚本会引导您配置对应的 API Token（需要 `Images: Edit` 以及 `Stream: Edit` 权限），从而开启流畅的多媒体体验。
+4. **媒体高级托管向导**：最后，只有在您额外购买了 Cloudflare Images/Stream 时，脚本才需要引导您配置单独的媒体 Token（需要 `Images: Edit` 以及 `Stream: Edit` 权限），并与部署 Token 分离。
 
 
 ## 原生部署引擎与手工覆盖
@@ -49,6 +49,12 @@ wrangler d1 execute gins-db --file=./db/migrations/0000_schema.sql --remote
 ### 点火升空 (Ignition)
 
 一旦以上设置都通过 `npm run setup` 顺利敲定，直接执行部署指令，即可将这串庞大的渲染引擎分发到全球各地的节点：
+
+请将两个 Cloudflare Token 分开保存：
+- `CLOUDFLARE_API_TOKEN`：仅用于 CI 或手动部署
+- `CLOUDFLARE_MEDIA_API_TOKEN`：仅用于博客运行时的 Images/Stream 上传
+
+媒体 Token 是可选项。若您没有额外购买 Cloudflare Images/Stream，可以完全跳过这一部分。
 
 ```bash
 npm run deploy

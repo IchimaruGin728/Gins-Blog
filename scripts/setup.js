@@ -27,6 +27,22 @@ const validateName = (input) => {
 	return "Name must only contain lowercase letters, numbers, and hyphens.";
 };
 
+function upsertEnvVar(content, key, value) {
+	const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+	const line = `${key}=${value}`;
+	const regex = new RegExp(`^${escapedKey}=.*$`, "m");
+
+	if (regex.test(content)) {
+		return content.replace(regex, line);
+	}
+
+	if (!content.endsWith("\n") && content.length > 0) {
+		content += "\n";
+	}
+
+	return `${content}${line}\n`;
+}
+
 async function main() {
 	console.log("\x1b[36m%s\x1b[0m", "🚀 Starting Gins Blog Setup...");
 
@@ -77,6 +93,13 @@ async function main() {
 			r2Bucket: args["r2-bucket"] || `gins-media-${suffix}`,
 			setupAi: args["setup-ai"] === true || args["setup-ai"] === "true",
 			vectorIndex: args["vector-index"] || `gins-vector-${suffix}`,
+			setupMedia:
+				args["setup-media"] === true || args["setup-media"] === "true",
+			cfAccountId: args["cf-account-id"] || "",
+			cfAccountHash: args["cf-account-hash"] || "",
+			cfAvatarId: args["cf-avatar-id"] || "",
+			assetsDomain: args["assets-domain"] || "",
+			cfMediaApiToken: args["cf-media-api-token"] || "",
 		};
 	} else {
 		answers = await inquirer.prompt([
@@ -140,7 +163,8 @@ async function main() {
 			{
 				type: "confirm",
 				name: "setupMedia",
-				message: "Do you have the Cloudflare Starter Bundle (Images + Stream)?",
+				message:
+					"Did you purchase the optional Cloudflare Images + Stream add-on? (Skip if not purchased)",
 				default: false,
 			},
 			{
@@ -177,13 +201,14 @@ async function main() {
 				when: (answers) => answers.setupMedia,
 			},
 			{
-				type: "input",
-				name: "cfApiToken",
+				type: "password",
+				name: "cfMediaApiToken",
 				message:
-					"Enter a Cloudflare API Token (Permissions: Account.Images:Edit, Account.Stream:Edit):",
+					"Enter your Media API Token (Account.Images:Edit + Account.Stream:Edit, separate from deploy token):",
 				when: (answers) => answers.setupMedia,
 				validate: (input) =>
-					input ? true : "API Token is required for uploads.",
+					input ? true : "Media API Token is required for uploads.",
+				mask: "*",
 			},
 		]);
 
@@ -221,6 +246,22 @@ async function main() {
 	console.log("\n⚙️  Applying configuration...");
 	if (!isInteractive) {
 		console.log(JSON.stringify(answers, null, 2));
+	}
+
+	if (answers.setupMedia) {
+		const requiredMediaFields = [
+			["cfAccountId", "Cloudflare Account ID"],
+			["cfAccountHash", "Cloudflare Account Hash"],
+			["cfAvatarId", "Primary Avatar ID"],
+			["cfMediaApiToken", "Cloudflare Media API Token"],
+		];
+
+		for (const [field, label] of requiredMediaFields) {
+			if (!answers[field]) {
+				console.error(`❌ Missing required media setup field: ${label}`);
+				process.exit(1);
+			}
+		}
 	}
 
 	// 4. Create D1 Database
@@ -413,7 +454,7 @@ async function main() {
 
 	// 10. Handle Secrets & Config
 	if (answers.setupMedia) {
-		console.log("🔐 Designing secrets for Media Bundle...");
+		console.log("🔐 Designing secrets for the optional media add-on...");
 		// We append/update .dev.vars for local dev
 		try {
 			let envContent = "";
@@ -422,32 +463,46 @@ async function main() {
 				envContent = fs.readFileSync(envPath, "utf8");
 			}
 
-			if (!envContent.includes("CLOUDFLARE_ACCOUNT_ID")) {
-				envContent += `\nCLOUDFLARE_ACCOUNT_ID=${answers.cfAccountId}`;
-			}
-			if (!envContent.includes("CLOUDFLARE_API_TOKEN")) {
-				envContent += `\nCLOUDFLARE_API_TOKEN=${answers.cfApiToken}`;
-			}
-			if (!envContent.includes("CLOUDFLARE_ACCOUNT_HASH")) {
-				envContent += `\nCLOUDFLARE_ACCOUNT_HASH=${answers.cfAccountHash}`;
-			}
-			if (!envContent.includes("PUBLIC_CF_AVATAR_ID")) {
-				envContent += `\nPUBLIC_CF_AVATAR_ID=${answers.cfAvatarId}`;
-			}
-			if (answers.assetsDomain && !envContent.includes("PUBLIC_ASSETS_DOMAIN")) {
-				envContent += `\nPUBLIC_ASSETS_DOMAIN=${answers.assetsDomain}`;
+			envContent = upsertEnvVar(
+				envContent,
+				"CLOUDFLARE_ACCOUNT_ID",
+				answers.cfAccountId,
+			);
+			envContent = upsertEnvVar(
+				envContent,
+				"CLOUDFLARE_MEDIA_API_TOKEN",
+				answers.cfMediaApiToken,
+			);
+			envContent = upsertEnvVar(
+				envContent,
+				"CLOUDFLARE_ACCOUNT_HASH",
+				answers.cfAccountHash,
+			);
+			envContent = upsertEnvVar(
+				envContent,
+				"PUBLIC_CF_AVATAR_ID",
+				answers.cfAvatarId,
+			);
+			if (answers.assetsDomain) {
+				envContent = upsertEnvVar(
+					envContent,
+					"PUBLIC_ASSETS_DOMAIN",
+					answers.assetsDomain,
+				);
 			}
 
 			fs.writeFileSync(envPath, envContent);
-			console.log("✅ Credentials saved to .dev.vars (local)");
+			console.log("✅ Media credentials saved to .dev.vars (local)");
 
-			console.log("ℹ️  To enable in production, run:");
-			console.log(`   npx wrangler secret put CLOUDFLARE_ACCOUNT_ID`);
-			console.log(`   npx wrangler secret put CLOUDFLARE_API_TOKEN`);
-			console.log(`   npx wrangler secret put CLOUDFLARE_ACCOUNT_HASH`);
-			console.log(`   npx wrangler secret put PUBLIC_CF_AVATAR_ID`);
+			console.log("ℹ️  Production placement:");
+			console.log(
+				"   Worker secret: CLOUDFLARE_MEDIA_API_TOKEN (secret, keep separate from deploy token)",
+			);
+			console.log(
+				"   Worker vars: CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_ACCOUNT_HASH, PUBLIC_CF_AVATAR_ID",
+			);
 			if (answers.assetsDomain) {
-				console.log(`   npx wrangler secret put PUBLIC_ASSETS_DOMAIN`);
+				console.log("   Worker var: PUBLIC_ASSETS_DOMAIN");
 			}
 		} catch (_error) {
 			console.warn("⚠️  Could not save secrets automatically.");
@@ -461,16 +516,18 @@ async function main() {
 		console.log("2. (AI Enabled) Ensure your account has Workers AI enabled.");
 	}
 	if (answers.setupMedia) {
-		console.log("3. (Media Enabled) Run these commands for production:");
+		console.log("3. (Media Enabled) Configure these in production:");
 		console.log(
-			`   npx wrangler secret put CLOUDFLARE_ACCOUNT_ID (Value: ${answers.cfAccountId})`,
+			`   Worker secret: CLOUDFLARE_MEDIA_API_TOKEN (Value: ${answers.cfMediaApiToken.substring(0, 5)}...)`,
 		);
 		console.log(
-			`   npx wrangler secret put CLOUDFLARE_API_TOKEN (Value: ${answers.cfApiToken.substring(0, 5)}...)`,
+			`   Worker vars: CLOUDFLARE_ACCOUNT_ID=${answers.cfAccountId}, CLOUDFLARE_ACCOUNT_HASH=${answers.cfAccountHash}, PUBLIC_CF_AVATAR_ID=${answers.cfAvatarId}`,
 		);
-		console.log(
-			`   npx wrangler secret put CLOUDFLARE_ACCOUNT_HASH (Value: ${answers.cfAccountHash})`,
-		);
+		if (answers.assetsDomain) {
+			console.log(
+				`   Worker var: PUBLIC_ASSETS_DOMAIN=${answers.assetsDomain}`,
+			);
+		}
 	}
 	console.log('4. Run "npm run deploy"');
 }

@@ -197,7 +197,13 @@ export async function validateSessionToken(
 		}
 
 		if ((!session.userAgent || !session.ipAddress) && request) {
-			const ok = await hydrateLegacySession(session, sessionId, request, db, env);
+			const ok = await hydrateLegacySession(
+				session,
+				sessionId,
+				request,
+				db,
+				env,
+			);
 			if (!ok) {
 				await env.GIN_KV.delete(`session:${sessionId}`);
 				await db.delete(sessions).where(eq(sessions.id, session.id));

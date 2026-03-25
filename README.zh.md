@@ -79,8 +79,8 @@
 - **智能路由** - Cloudflare Smart Placement 优化延迟
 
 ### 🎥 **边缘原生多媒体集成 (可选)**
-- **Cloudflare Images** - 零延迟、自动优化的 WebP/AVIF 图像分发（通过 `<CloudflareImage />` 组件）。
-- **Cloudflare Stream** - 自适应码率 (HLS) 视频流媒体播放器（通过 `<CloudflareVideo />` 组件）。
+- **Cloudflare Images** - 零延迟、自动优化的 WebP/AVIF 图像分发（通过 `<CloudflareImage />` 组件）。可选功能，需要单独购买。
+- **Cloudflare Stream** - 自适应码率 (HLS) 视频流媒体播放器（通过 `<CloudflareVideo />` 组件）。可选功能，需要单独购买。
 - **编辑器原生直传** - 在 Markdown 编辑器中极其安全地直传图片和视频并挂载至边缘节点，不占用数据库与代码仓库空间。
 
 ### 🤖 **AI 驱动搜索**
@@ -233,6 +233,7 @@ node scripts/setup.js --suffix=prod --setup-ai=false
 2. **创建资源** - 自动创建 D1 数据库、KV 命名空间和 R2 存储桶。
 3. **配置项目** - 自动更新 `wrangler.jsonc`。
 4. **初始化数据库** - 推送最新的数据库架构。
+5. **媒体配置** - 仅当您额外购买了 Images/Stream 时才需要启用；脚本会单独写入 `CLOUDFLARE_MEDIA_API_TOKEN`，不再与部署 token 混用。
 
 ### **步骤 2.1：(可选) 配置 AI 搜索**
 
@@ -262,6 +263,13 @@ GOOGLE_REDIRECT_URI=http://localhost:4321/login/google/callback
 DISCORD_CLIENT_ID=your_discord_client_id
 DISCORD_CLIENT_SECRET=your_discord_client_secret
 DISCORD_REDIRECT_URI=http://localhost:4321/login/discord/callback
+
+# 仅在您额外购买了 Cloudflare Images + Stream 时才需要
+CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
+CLOUDFLARE_ACCOUNT_HASH=your_cloudflare_account_hash
+CLOUDFLARE_MEDIA_API_TOKEN=your_media_api_token
+PUBLIC_CF_AVATAR_ID=your_avatar_image_id_or_r2_path
+PUBLIC_ASSETS_DOMAIN=assets.yourdomain.com
 ```
 
 > **⚠️ 重要提示：** 将 `.dev.vars` 添加到您的 `.gitignore` 以防止提交机密信息！
@@ -297,15 +305,23 @@ npm run dev
 
 ## 📦 部署
 
-### **部署到 Cloudflare Pages**
+### **部署到 Cloudflare Workers**
 
-1. **设置生产环境变量：**
+1. **设置 GitHub Actions Secrets：**
 
-前往您的 [Cloudflare Pages 仪表板](https://dash.cloudflare.com) → 选择您的项目 → 设置 → 环境变量
+- `CLOUDFLARE_API_TOKEN`：仅用于部署的 token
+- `CLOUDFLARE_ACCOUNT_ID`：Cloudflare Account ID
 
-添加 `.dev.vars` 中的所有变量（使用生产值作为重定向 URI）。
+2. **设置 Worker 运行时变量：**
 
-2. **部署：**
+前往 Cloudflare Worker 设置页面：
+- Secret：`CLOUDFLARE_MEDIA_API_TOKEN`
+- Variables：`CLOUDFLARE_ACCOUNT_ID`、`CLOUDFLARE_ACCOUNT_HASH`、`PUBLIC_CF_AVATAR_ID`
+- Variable：`PUBLIC_ASSETS_DOMAIN`（如果您用了 R2 自定义域名）
+
+部署 token 和媒体 token 需要分开保存，不要复用。
+
+3. **部署：**
 
 ```bash
 npm run deploy
