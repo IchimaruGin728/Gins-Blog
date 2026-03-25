@@ -9,7 +9,7 @@ const getSourcePath = (docId: string) => docId.replace(/^docs\//, "");
 export async function getStaticPaths() {
     const docs = await getCollection("docs");
     return docs.map((entry) => {
-        const slug = getRouteSlug(entry.id);
+        const slug = entry.id.replace(/^docs\//, "");
         return {
             params: { slug: slug === "index" ? undefined : slug },
             props: { entry },
