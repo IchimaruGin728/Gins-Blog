@@ -60,7 +60,7 @@
 	"r2_buckets": [
 		{
 			"binding": "BUCKET",
-			"bucket_name": "gins-media"
+			"bucket_name": "my-assets"
 		}
 	],
 	"vectorize": [
