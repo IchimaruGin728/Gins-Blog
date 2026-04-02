@@ -47,7 +47,7 @@ async function main() {
 	console.log("\x1b[36m%s\x1b[0m", "🚀 Starting Gins Blog Setup...");
 
 	const args = minimist(process.argv.slice(2));
-	const isInteractive = Object.keys(args).length === 1 && args._.length === 0;
+	const isInteractive = args._.length === 0 && Object.keys(args).filter((k) => k !== "_").length === 0;
 
 	// 1. Check for wrangler
 	try {
@@ -295,9 +295,7 @@ async function main() {
 	for (const [binding, name] of Object.entries(kvConfig)) {
 		console.log(`📦 Creating KV Namespace for ${binding}: ${name}...`);
 		try {
-			const output = run(
-				`wrangler kv namespace create ${binding} --title=${name}`,
-			);
+			const output = run(`wrangler kv namespace create ${name}`);
 			const match = output.match(/id\s*=\s*"([^"]+)"/);
 			if (match) kvIds[binding] = match[1];
 		} catch (_error) {
@@ -390,21 +388,13 @@ async function main() {
 
 				if (insideVectorize) {
 					if (trimmed.startsWith("//")) {
-						// Uncomment lines inside
-						line.replace("//", "");
-						// Check if we need to fix indentation (replace often leaves a space if strictly '// ')
-						// But simple replace works if we trust consistency.
-						// Let's use a regex to replace the first comment marker and optional space
-						line = line.replace(/\s*\/\/\s?/, (match) =>
-							match.replace(/\/\/\s?/, ""),
-						);
+						// Uncomment lines inside by stripping leading '// '
+						line = line.replace(/^(\s*)\/\/\s?/, "$1");
 
 						// Update index_name specifically
 						if (line.includes('"index_name":')) {
 							const indent = line.substring(0, line.indexOf('"'));
 							line = `${indent}"index_name": "${answers.vectorIndex}"`;
-							// Add comma if it was there? No, usually jsonc last item doesn't need it but standard json might.
-							// The original file: "index_name": "gins-vector" (no comma if last in obj)
 						}
 					}
 
