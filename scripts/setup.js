@@ -53,7 +53,7 @@ async function main() {
 	try {
 		run("wrangler --version");
 	} catch (_error) {
-		console.error("❌ Wrangler not found. Please run: npm install -g wrangler");
+		console.error("❌ Wrangler not found. Please run: pnpm add -g wrangler");
 		process.exit(1);
 	}
 
@@ -296,7 +296,8 @@ async function main() {
 		console.log(`📦 Creating KV Namespace for ${binding}: ${name}...`);
 		try {
 			const output = run(`wrangler kv namespace create ${name}`);
-			const match = output.match(/id\s*=\s*"([^"]+)"/);
+			// wrangler v4 outputs JSON: "id": "abc123"
+			const match = output.match(/"id":\s*"([^"]+)"/);
 			if (match) kvIds[binding] = match[1];
 		} catch (_error) {
 			console.error(`❌ Failed to create KV: ${binding}`);
@@ -435,7 +436,7 @@ async function main() {
 	if (dbId) {
 		console.log("🔄 Initializing Database Schema...");
 		try {
-			execSync("npm run db:push", { stdio: "inherit" });
+			execSync("pnpm run db:push", { stdio: "inherit" });
 			console.log("✅ Database initialized!");
 		} catch (_error) {
 			console.error("❌ Failed to push schema.");
@@ -519,7 +520,7 @@ async function main() {
 			);
 		}
 	}
-	console.log('4. Run "npm run deploy"');
+	console.log('4. Run "pnpm run deploy"');
 }
 
 main();

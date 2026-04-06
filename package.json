@@ -8,7 +8,7 @@
 	"scripts": {
 		"dev": "astro dev",
 		"setup": "node scripts/setup.js",
-		"deploy:agent": "npm run setup",
+		"deploy:agent": "node scripts/setup.js",
 		"start": "astro dev",
 		"build": "astro build",
 		"deploy": "astro build && wrangler deploy",
