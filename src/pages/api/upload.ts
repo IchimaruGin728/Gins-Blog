@@ -1,13 +1,14 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { sanitizeFilename, validateGenericUpload } from "../../lib/uploads";
 import { getZeroTrustUser } from "../../lib/zerotrust";
 
-export const PUT: APIRoute = async ({ request, locals }) => {
+export const PUT: APIRoute = async ({ request }) => {
 	if (!getZeroTrustUser(request)) {
 		return new Response("Forbidden", { status: 403 });
 	}
 
-	const env = locals.runtime.env;
+	const env = workerEnv as Env;
 	const url = new URL(request.url);
 	const filename = url.searchParams.get("filename");
 

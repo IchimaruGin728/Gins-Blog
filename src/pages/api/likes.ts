@@ -1,9 +1,11 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { and, eq } from "drizzle-orm";
 import { likes } from "../../../db/schema";
 import { getDb } from "../../lib/db";
 
 export const POST: APIRoute = async ({ request, locals }) => {
+	const env = workerEnv as Env;
 	const user = locals.user;
 	if (!user)
 		return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -21,7 +23,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			);
 		}
 
-		const db = getDb(locals.runtime.env);
+		const db = getDb(env);
 
 		if (value === 0) {
 			// Remove like

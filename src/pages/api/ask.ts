@@ -1,14 +1,14 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 
-export const GET: APIRoute = async ({ request, locals }) => {
+export const GET: APIRoute = async ({ request }) => {
+	const env = workerEnv as Env;
 	const url = new URL(request.url);
 	const q = url.searchParams.get("q");
 
 	if (!q) {
 		return new Response("Query required", { status: 400 });
 	}
-
-	const env = locals.runtime.env;
 
 	try {
 		// 1. Generate Embedding

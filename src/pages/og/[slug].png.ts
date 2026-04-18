@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import { Resvg } from "@resvg/resvg-wasm";
 import type { APIRoute } from "astro";
 import { eq } from "drizzle-orm";
@@ -11,11 +12,11 @@ import { getDb } from "../../lib/db";
 // However, @resvg/resvg-wasm might need manual init if mostly used in Node.
 // Let's try standard import first.
 
-export const GET: APIRoute = async ({ params, locals }) => {
+export const GET: APIRoute = async ({ params }) => {
 	const { slug } = params;
 	if (!slug) return new Response("Not found", { status: 404 });
 
-	const db = getDb(locals.runtime.env);
+	const db = getDb(workerEnv as Env);
 	const post = await db.select().from(posts).where(eq(posts.slug, slug)).get();
 
 	if (!post) return new Response("Not found", { status: 404 });

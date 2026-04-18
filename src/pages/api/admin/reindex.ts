@@ -1,10 +1,11 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { posts } from "../../../../db/schema";
 import { getDb } from "../../../lib/db";
 // import { eq } from 'drizzle-orm';
 
 export const POST: APIRoute = async ({ locals }) => {
-	const env = locals.runtime.env;
+	const env = workerEnv as Env;
 	const db = getDb(env);
 
 	// 1. Fetch all posts

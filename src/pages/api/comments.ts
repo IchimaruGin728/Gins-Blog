@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { and, desc, eq, lte, sql } from "drizzle-orm";
 import { comments, likes, posts, users } from "../../../db/schema";
@@ -6,6 +7,7 @@ import { getDb } from "../../lib/db";
 const MAX_COMMENT_LENGTH = 2000;
 
 export const GET: APIRoute = async ({ request, locals }) => {
+	const env = workerEnv as Env;
 	const url = new URL(request.url);
 	const postId = url.searchParams.get("postId");
 
@@ -15,7 +17,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
 	if (!postId) return new Response(JSON.stringify([]), { status: 200 });
 
-	const db = getDb(locals.runtime.env);
+	const db = getDb(env);
 	const currentUser = locals.user;
 
 	// We need to get the internal UUID for the post if postId is a slug
@@ -86,6 +88,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
 };
 
 export const POST: APIRoute = async ({ request, locals }) => {
+	const env = workerEnv as Env;
 	const user = locals.user;
 	if (!user)
 		return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -111,7 +114,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			);
 		}
 
-		const db = getDb(locals.runtime.env);
+		const db = getDb(env);
 
 		let targetPostId = postId;
 		const isUuid =

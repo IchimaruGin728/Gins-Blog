@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { validateImageFile } from "../../../lib/uploads";
 import { getZeroTrustUser } from "../../../lib/zerotrust";
@@ -15,7 +16,7 @@ function getErrorMessage(error: unknown) {
 	return error instanceof Error ? error.message : "Unknown error";
 }
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
 	if (!getZeroTrustUser(request)) {
 		return new Response(JSON.stringify({ error: "Forbidden" }), {
 			status: 403,
@@ -23,7 +24,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		});
 	}
 
-	const { env } = locals.runtime;
+	const env = workerEnv as Env;
 	const accountId = env.CLOUDFLARE_ACCOUNT_ID;
 	const apiToken = env.CLOUDFLARE_MEDIA_API_TOKEN || env.CLOUDFLARE_API_TOKEN;
 

@@ -1,13 +1,15 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { getDb } from "../lib/db";
 import { invalidateSession } from "../lib/session";
 
-export const POST: APIRoute = async ({ cookies, locals }) => {
+export const POST: APIRoute = async ({ cookies }) => {
 	const sessionToken = cookies.get("session")?.value;
 
 	if (sessionToken) {
-		const db = getDb(locals.runtime.env);
-		await invalidateSession(sessionToken, db, locals.runtime.env);
+		const env = workerEnv as Env;
+		const db = getDb(env);
+		await invalidateSession(sessionToken, db, env);
 	}
 
 	cookies.delete("session", { path: "/" });

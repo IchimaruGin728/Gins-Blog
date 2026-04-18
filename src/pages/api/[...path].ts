@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import { zValidator } from "@hono/zod-validator";
 import type { APIRoute } from "astro";
 import { and, desc, eq, isNotNull, like, lte, or } from "drizzle-orm";
@@ -300,7 +301,7 @@ export type AppType = typeof app;
 import { getZeroTrustUser } from "../../lib/zerotrust";
 
 export const ALL: APIRoute = async (context) => {
-	const env = context.locals.runtime.env;
+	const env = workerEnv as Env;
 	const request = new Request(context.request);
 	const ztUser = getZeroTrustUser(context.request);
 

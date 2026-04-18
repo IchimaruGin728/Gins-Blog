@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { desc, like, sql } from "drizzle-orm";
 import { comments, posts } from "../../../../db/schema";
@@ -147,8 +148,8 @@ function getNumberArg(value: unknown, fallback: number) {
 	return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
 
-export const POST: APIRoute = async ({ request, locals }) => {
-	const env = locals.runtime.env;
+export const POST: APIRoute = async ({ request }) => {
+	const env = workerEnv as Env;
 
 	try {
 		const body = (await request.json()) as JsonRpcRequest;

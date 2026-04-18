@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import { sha256 } from "@oslojs/crypto/sha2";
 import { encodeHexLowerCase } from "@oslojs/encoding";
 import type { APIRoute } from "astro";
@@ -6,6 +7,7 @@ import { type Session, sessions } from "../../../db/schema";
 import { getDb } from "../../lib/db";
 
 export const GET: APIRoute = async ({ locals, request, cookies }) => {
+	const env = workerEnv as Env;
 	const { user } = locals;
 	if (!user) {
 		return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -14,7 +16,7 @@ export const GET: APIRoute = async ({ locals, request, cookies }) => {
 		});
 	}
 
-	const db = getDb(locals.runtime.env);
+	const db = getDb(env);
 
 	// Get all sessions for this user
 	const userSessions = await db
@@ -78,6 +80,7 @@ export const GET: APIRoute = async ({ locals, request, cookies }) => {
 };
 
 export const DELETE: APIRoute = async ({ locals, request, cookies }) => {
+	const env = workerEnv as Env;
 	const { user } = locals;
 	if (!user) {
 		return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -96,7 +99,7 @@ export const DELETE: APIRoute = async ({ locals, request, cookies }) => {
 		});
 	}
 
-	const db = getDb(locals.runtime.env);
+	const db = getDb(env);
 
 	// Verify this session belongs to the user
 	const session = await db
@@ -132,7 +135,7 @@ export const DELETE: APIRoute = async ({ locals, request, cookies }) => {
 
 	// Delete session from DB and KV
 	await db.delete(sessions).where(eq(sessions.id, sessionId));
-	await locals.runtime.env.GIN_KV.delete(`session:${sessionId}`);
+	await env.GIN_KV.delete(`session:${sessionId}`);
 
 	return new Response(JSON.stringify({ success: true }), {
 		headers: { "Content-Type": "application/json" },

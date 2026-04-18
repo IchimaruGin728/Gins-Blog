@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { sessions } from "../../../../db/schema";
 import { getDb } from "../../../lib/db";
@@ -8,7 +9,7 @@ export const prerender = false;
 
 export const DELETE: APIRoute = async ({ locals }) => {
 	// No need to verify ZT here - middleware already enforces it for /api/admin/*
-	const env = locals.runtime.env;
+	const env = workerEnv as Env;
 	const db = getDb(env);
 
 	try {

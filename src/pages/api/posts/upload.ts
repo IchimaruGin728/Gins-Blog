@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { posts } from "../../../../db/schema";
 import { getDb } from "../../../lib/db";
@@ -50,6 +51,7 @@ function parseRTF(content: string) {
 }
 
 export const POST: APIRoute = async ({ request, locals }) => {
+	const env = workerEnv as Env;
 	if (!locals.user) {
 		return new Response(JSON.stringify({ error: "Unauthorized" }), {
 			status: 401,
@@ -90,7 +92,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		// For a robust system, we'd query DB. SQLite UNIQUE constraint will throw if dup.
 		// Let's rely on try/catch for duplicate slug.
 
-		const { env } = locals.runtime;
 		const db = getDb(env);
 
 		const postData = {

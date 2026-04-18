@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { and, inArray, isNotNull } from "drizzle-orm";
 import { posts } from "../../../db/schema";
@@ -5,6 +6,7 @@ import { getDb } from "../../lib/db";
 import { querySimilarPosts } from "../../lib/vectorize";
 
 export const GET: APIRoute = async ({ request, locals }) => {
+	const env = workerEnv as Env;
 	const url = new URL(request.url);
 	const q = url.searchParams.get("q");
 
@@ -13,8 +15,6 @@ export const GET: APIRoute = async ({ request, locals }) => {
 			headers: { "Content-Type": "application/json" },
 		});
 	}
-
-	const env = locals.runtime.env;
 
 	try {
 		// 1. Semantic Search via Vectorize (using shared helper)
