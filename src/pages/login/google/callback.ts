@@ -49,6 +49,12 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 					},
 				},
 			);
+			if (!googleUserResponse.ok) {
+				const errorText = await googleUserResponse.text();
+				throw new Error(
+					`Google API returned ${googleUserResponse.status}: ${errorText.slice(0, 200)}`,
+				);
+			}
 			googleUser = await googleUserResponse.json();
 			console.log("Google User fetched:", googleUser.name);
 		} catch (fetchError: any) {
@@ -146,12 +152,16 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 		const redirectUrl = sanitizeRedirectTarget(
 			cookies.get("login_redirect")?.value,
 		);
-		// Clean up the cookie
+		cookies.delete("google_oauth_state", { path: "/" });
+		cookies.delete("google_code_verifier", { path: "/" });
 		cookies.delete("login_redirect", { path: "/" });
 
 		return redirect(redirectUrl);
 	} catch (e: any) {
 		console.error(e);
+		cookies.delete("google_oauth_state", { path: "/" });
+		cookies.delete("google_code_verifier", { path: "/" });
+		cookies.delete("login_redirect", { path: "/" });
 		return new Response("Login failed", { status: 500 });
 	}
 };

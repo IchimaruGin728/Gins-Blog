@@ -12,9 +12,11 @@ export const getGithub = (env: Env) => {
 	const clientSecret = (
 		env.GITHUB_CLIENT_SECRET ?? import.meta.env.GITHUB_CLIENT_SECRET
 	)?.trim();
-	const redirectUri =
-		(env.GITHUB_REDIRECT_URI ?? import.meta.env.GITHUB_REDIRECT_URI)?.trim() ||
-		null;
+	const redirectUri = (
+		env.GITHUB_REDIRECT_URI ??
+		import.meta.env.GITHUB_REDIRECT_URI ??
+		"http://localhost:4321/login/github/callback"
+	)?.trim();
 
 	if (!clientId || !clientSecret) {
 		throw new Error("Missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET");

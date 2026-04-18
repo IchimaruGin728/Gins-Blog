@@ -1,14 +1,18 @@
 import { generateCodeVerifier, generateState } from "arctic";
 import type { APIRoute } from "astro";
 import { getDiscord } from "../../../lib/auth";
+import { sanitizeRedirectTarget } from "../../../lib/redirect";
 
-export const GET: APIRoute = async ({ cookies, redirect, locals }) => {
+export const GET: APIRoute = async ({ cookies, redirect, locals, request }) => {
 	const state = generateState();
 	const codeVerifier = generateCodeVerifier();
 	const url = getDiscord(locals.runtime.env).createAuthorizationURL(
 		state,
 		codeVerifier,
 		["identify", "email"],
+	);
+	const redirectTo = sanitizeRedirectTarget(
+		new URL(request.url).searchParams.get("redirect_to"),
 	);
 
 	cookies.set("discord_oauth_state", state, {
@@ -19,6 +23,13 @@ export const GET: APIRoute = async ({ cookies, redirect, locals }) => {
 		sameSite: "lax",
 	});
 	cookies.set("discord_code_verifier", codeVerifier, {
+		path: "/",
+		secure: import.meta.env.PROD,
+		httpOnly: true,
+		maxAge: 60 * 10,
+		sameSite: "lax",
+	});
+	cookies.set("login_redirect", redirectTo, {
 		path: "/",
 		secure: import.meta.env.PROD,
 		httpOnly: true,

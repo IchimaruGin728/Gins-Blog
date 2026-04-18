@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { users } from "../../../../db/schema";
 import { getDiscord } from "../../../lib/auth";
 import { getDb } from "../../../lib/db";
+import { sanitizeRedirectTarget } from "../../../lib/redirect";
 import {
 	createSession,
 	generateSessionToken,
@@ -48,6 +49,12 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 					},
 				},
 			);
+			if (!discordUserResponse.ok) {
+				const errorText = await discordUserResponse.text();
+				throw new Error(
+					`Discord API returned ${discordUserResponse.status}: ${errorText.slice(0, 200)}`,
+				);
+			}
 			discordUser = await discordUserResponse.json();
 			console.log("Discord User fetched:", discordUser.username);
 		} catch (fetchError: any) {
@@ -142,9 +149,20 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 			expires: new Date(session.expiresAt),
 		});
 
-		return redirect("/");
+		const redirectUrl = sanitizeRedirectTarget(
+			cookies.get("login_redirect")?.value,
+		);
+
+		cookies.delete("discord_oauth_state", { path: "/" });
+		cookies.delete("discord_code_verifier", { path: "/" });
+		cookies.delete("login_redirect", { path: "/" });
+
+		return redirect(redirectUrl);
 	} catch (e: any) {
 		console.error(e);
+		cookies.delete("discord_oauth_state", { path: "/" });
+		cookies.delete("discord_code_verifier", { path: "/" });
+		cookies.delete("login_redirect", { path: "/" });
 		return new Response("Login failed", { status: 500 });
 	}
 };

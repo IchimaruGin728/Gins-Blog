@@ -155,12 +155,14 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 		const redirectUrl = sanitizeRedirectTarget(
 			cookies.get("login_redirect")?.value,
 		);
-		// Clean up the cookie
+		cookies.delete("github_oauth_state", { path: "/" });
 		cookies.delete("login_redirect", { path: "/" });
 
 		return redirect(redirectUrl);
 	} catch (e: any) {
 		console.error(e);
+		cookies.delete("github_oauth_state", { path: "/" });
+		cookies.delete("login_redirect", { path: "/" });
 		return new Response("Login failed", { status: 500 });
 	}
 };
