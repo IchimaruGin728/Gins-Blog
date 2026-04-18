@@ -13,7 +13,7 @@
 		"deploy:agent": "node scripts/setup.js",
 		"start": "astro dev",
 		"build": "astro build",
-		"deploy": "astro build && wrangler deploy ./dist/_worker.js/index.js",
+		"deploy": "astro build && wrangler deploy",
 		"preview": "astro preview",
 		"astro": "astro",
 		"check:astro": "astro check",
