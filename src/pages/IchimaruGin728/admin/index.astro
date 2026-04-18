@@ -1297,24 +1297,15 @@ const COLO_LOCATIONS: Record<
                                     </td>
                                     <td class="p-6 text-right text-gray-400 font-mono text-xs">
                                         {(() => {
-                                            const allowedOwners = [
-                                                "ichimarugin",
-                                                "ichimarugin728",
-                                                "gin ichimaru",
-                                            ];
+                                            const ownerGithubId = 181828834;
+                                            const ownerGoogleId = "";
+                                            const ownerDiscordId = "";
                                             const isOwner =
-                                                (u.github_username &&
-                                                    allowedOwners.includes(
-                                                        u.github_username.toLowerCase(),
-                                                    )) ||
-                                                (u.google_username &&
-                                                    allowedOwners.includes(
-                                                        u.google_username.toLowerCase(),
-                                                    )) ||
-                                                (u.discord_username &&
-                                                    allowedOwners.includes(
-                                                        u.discord_username.toLowerCase(),
-                                                    ));
+                                                u.github_id === ownerGithubId ||
+                                                (ownerGoogleId !== "" &&
+                                                    u.google_id === ownerGoogleId) ||
+                                                (ownerDiscordId !== "" &&
+                                                    u.discord_id === ownerDiscordId);
 
                                             if (isOwner) {
                                                 return (
