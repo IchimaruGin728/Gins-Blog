@@ -1,3 +1,5 @@
+import { sha256 } from "@oslojs/crypto/sha2";
+import { encodeHexLowerCase } from "@oslojs/encoding";
 import type { APIRoute } from "astro";
 import { eq } from "drizzle-orm";
 import { type Session, sessions } from "../../../db/schema";
@@ -24,16 +26,10 @@ export const GET: APIRoute = async ({ locals, request, cookies }) => {
 	// Get current session ID from cookie
 	const sessionCookie = cookies.get("session");
 	const currentSessionId = sessionCookie?.value
-		? import("@oslojs/encoding").then((m) =>
-				import("@oslojs/crypto/sha2").then((c) =>
-					m.encodeHexLowerCase(
-						c.sha256(new TextEncoder().encode(sessionCookie.value)),
-					),
-				),
-			)
+		? encodeHexLowerCase(sha256(new TextEncoder().encode(sessionCookie.value)))
 		: null;
 
-	const currentId = await currentSessionId;
+	const currentId = currentSessionId;
 
 	// Parse user agents for display
 	const sessionsWithInfo = userSessions.map((session: Session) => {
@@ -119,8 +115,6 @@ export const DELETE: APIRoute = async ({ locals, request, cookies }) => {
 	// Don't allow deleting current session
 	const sessionCookie = cookies.get("session");
 	if (sessionCookie?.value) {
-		const { encodeHexLowerCase } = await import("@oslojs/encoding");
-		const { sha256 } = await import("@oslojs/crypto/sha2");
 		const currentSessionId = encodeHexLowerCase(
 			sha256(new TextEncoder().encode(sessionCookie.value)),
 		);

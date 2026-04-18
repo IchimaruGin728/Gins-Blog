@@ -1,11 +1,10 @@
 ---
+import { env as workerEnv } from "cloudflare:workers";
 import Layout from "../../../layouts/Layout.astro";
 import AdminDashboardOverview from "../../../components/admin/AdminDashboardOverview.astro";
 import AdminSignalLog from "../../../components/admin/AdminSignalLog.astro";
 
-// Access Cloudflare bindings from locals
-const runtime = Astro.locals.runtime;
-const env: Env | null = runtime?.env ?? null;
+const env: Env = workerEnv as Env;
 
 // Helper for safe DB queries
 async function safeFetch<T>(promise: Promise<T>, fallback: T): Promise<T> {
@@ -1567,6 +1566,7 @@ const COLO_LOCATIONS: Record<
     </div>
 
     <script>
+        // @ts-nocheck
         import { hc } from "hono/client";
         import type { AppType } from "../../api/[...path]";
         import { UAParser } from "ua-parser-js";
@@ -1820,6 +1820,18 @@ const COLO_LOCATIONS: Record<
 
         const getErrorMessage = (error: unknown) =>
             error instanceof Error ? error.message : "Unknown error";
+        const escapeHtml = (value: unknown) =>
+            String(value ?? "").replace(/[&<>"']/g, (char) => {
+                const entities: Record<string, string> = {
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;",
+                };
+
+                return entities[char] ?? char;
+            });
 
         window.openInspector = (type: InspectorType) => {
             document.body.style.overflow = "hidden"; // Lock scroll
@@ -2257,7 +2269,9 @@ const COLO_LOCATIONS: Record<
                 const result = (await res.json()) as QuickPublishResponse;
 
                 if (res.ok) {
-                    quickPublishStatus!.innerHTML = `<span class="text-green-400">✓ Signal Live: <a href="/blog/${result.slug}" target="_blank" class="underline hover:text-white">${result.slug}</a></span>`;
+                    const safeSlug = encodeURIComponent(result.slug || "");
+                    const safeSlugLabel = escapeHtml(result.slug || "");
+                    quickPublishStatus!.innerHTML = `<span class="text-green-400">✓ Signal Live: <a href="/blog/${safeSlug}" target="_blank" class="underline hover:text-white">${safeSlugLabel}</a></span>`;
                     quickPublishStatus!.classList.remove("hidden");
                     quickPublishFile.value = "";
 
@@ -2268,7 +2282,7 @@ const COLO_LOCATIONS: Record<
                 }
             } catch (e) {
                 console.error(e);
-                quickPublishStatus!.innerHTML = `<span class="text-red-400">⚠ Transmission Error: ${getErrorMessage(e)}</span>`;
+                quickPublishStatus!.innerHTML = `<span class="text-red-400">⚠ Transmission Error: ${escapeHtml(getErrorMessage(e))}</span>`;
                 quickPublishStatus!.classList.remove("hidden");
             } finally {
                 quickPublishBtn.innerHTML =
@@ -2517,14 +2531,21 @@ const COLO_LOCATIONS: Record<
 
                         if (matches.length > 0) {
                             resultsContainer.innerHTML = matches
-                                .map(
-                                    (match) => `
-                          <div data-slug="${match.metadata.slug}" class="search-result-item block p-3 hover:bg-white/10 rounded-xl transition-colors cursor-pointer">
-                              <div class="font-bold text-white text-sm">${match.metadata.title}</div>
+                                .map((match) => {
+                                    const safeSlug = escapeHtml(
+                                        match.metadata.slug,
+                                    );
+                                    const safeTitle = escapeHtml(
+                                        match.metadata.title,
+                                    );
+
+                                    return `
+                          <div data-slug="${safeSlug}" class="search-result-item block p-3 hover:bg-white/10 rounded-xl transition-colors cursor-pointer">
+                              <div class="font-bold text-white text-sm">${safeTitle}</div>
                               <div class="text-xs text-brand-accent mt-1">${(match.score * 100).toFixed(1)}% Match • Click to Edit</div>
                           </div>
-                      `,
-                                )
+                      `;
+                                })
                                 .join("");
                             resultsContainer.classList.remove("hidden");
 
@@ -2594,13 +2615,15 @@ const COLO_LOCATIONS: Record<
                                 const dateStr = new Date(
                                     publishedAt || createdAt || 0,
                                 ).toLocaleDateString();
+                                const safeTitle = escapeHtml(post.title);
+                                const safeSlug = escapeHtml(post.slug);
 
                                 return `
                     <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
                       <td class="py-4">
                         <span class="inline-block w-2 h-2 rounded-full ${isPublished ? "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]" : "bg-yellow-400"}"></span>
                       </td>
-                      <td class="py-4 font-medium text-white">${post.title}</td>
+                      <td class="py-4 font-medium text-white">${safeTitle}</td>
                       <td class="py-4 text-gray-400 font-mono text-xs">${dateStr}</td>
                       <td class="py-4 text-gray-400 font-mono text-xs text-right">
                           <span class="inline-flex items-center gap-1 bg-white/5 px-2 py-1 rounded">
@@ -2608,13 +2631,13 @@ const COLO_LOCATIONS: Record<
                           </span>
                       </td>
                       <td class="py-4 text-right flex items-center justify-end gap-2">
-                        <button class="edit-post-btn px-3 py-1 rounded-lg bg-white/5 hover:bg-brand-primary/20 text-gray-300 hover:text-brand-accent border border-white/10 hover:border-brand-primary/50 transition-all text-xs" data-slug="${post.slug}" title="Edit Post">
+                        <button class="edit-post-btn px-3 py-1 rounded-lg bg-white/5 hover:bg-brand-primary/20 text-gray-300 hover:text-brand-accent border border-white/10 hover:border-brand-primary/50 transition-all text-xs" data-slug="${safeSlug}" title="Edit Post">
                           <span class="i-heroicons-pencil-square w-4 h-4"></span>
                         </button>
-                        <button class="toggle-status-btn px-3 py-1 rounded-lg bg-white/5 hover:bg-yellow-500/20 text-gray-300 hover:text-yellow-400 border border-white/10 hover:border-yellow-500/50 transition-all text-xs" data-slug="${post.slug}" data-status="${isPublished ? "published" : "draft"}" title="${isPublished ? "Unpublish (Hide)" : "Publish (Show)"}">
+                        <button class="toggle-status-btn px-3 py-1 rounded-lg bg-white/5 hover:bg-yellow-500/20 text-gray-300 hover:text-yellow-400 border border-white/10 hover:border-yellow-500/50 transition-all text-xs" data-slug="${safeSlug}" data-status="${isPublished ? "published" : "draft"}" title="${isPublished ? "Unpublish (Hide)" : "Publish (Show)"}">
                           <span class="${isPublished ? "i-heroicons-eye-slash w-4 h-4" : "i-heroicons-eye w-4 h-4"}"></span>
                         </button>
-                        <button class="delete-post-btn px-3 py-1 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-300 hover:text-red-400 border border-white/10 hover:border-red-500/50 transition-all text-xs" data-slug="${post.slug}" title="Delete Post">
+                        <button class="delete-post-btn px-3 py-1 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-300 hover:text-red-400 border border-white/10 hover:border-red-500/50 transition-all text-xs" data-slug="${safeSlug}" title="Delete Post">
                           <span class="i-heroicons-trash w-4 h-4"></span>
                         </button>
                       </td>

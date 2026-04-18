@@ -1,6 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import type { APIRoute } from "astro";
-import { and, desc, eq, isNotNull, like, or } from "drizzle-orm";
+import { and, desc, eq, isNotNull, like, lte, or } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import * as schema from "../../../db/schema";
@@ -9,6 +9,10 @@ import { getDb } from "../../lib/db";
 import { deletePostVector, insertPostVector } from "../../lib/vectorize";
 
 const app = new Hono().basePath("/api");
+
+function isAdminRequest(c: any) {
+	return c.req.header("X-Admin-Access") === "true";
+}
 
 app.post(
 	"/posts",
@@ -25,7 +29,9 @@ app.post(
 	),
 	async (c) => {
 		const userId = c.req.header("X-User-Id");
-		if (!userId) return c.json({ error: "Unauthorized" }, 401);
+		if (!userId || !isAdminRequest(c)) {
+			return c.json({ error: "Forbidden" }, 403);
+		}
 
 		const {
 			id: existingId,
@@ -96,7 +102,17 @@ app.post(
 app.get("/posts/:slug", async (c) => {
 	const db = getDb(c.env as Env);
 	const slug = c.req.param("slug");
-	const post = await db.select().from(posts).where(eq(posts.slug, slug)).get();
+	const post = await db
+		.select()
+		.from(posts)
+		.where(
+			and(
+				eq(posts.slug, slug),
+				isNotNull(posts.publishedAt),
+				lte(posts.publishedAt, Date.now()),
+			),
+		)
+		.get();
 
 	if (!post) return c.json({ error: "Post not found" }, 404);
 	return c.json(post);
@@ -115,6 +131,9 @@ app.get("/posts", async (c) => {
 			updatedAt: posts.updatedAt,
 		})
 		.from(posts)
+		.where(
+			and(isNotNull(posts.publishedAt), lte(posts.publishedAt, Date.now())),
+		)
 		.orderBy(desc(posts.publishedAt));
 
 	const allPosts =
@@ -145,6 +164,7 @@ app.get("/search", async (c) => {
 		.where(
 			and(
 				isNotNull(posts.publishedAt),
+				lte(posts.publishedAt, Date.now()),
 				or(
 					like(posts.title, wildcardQuery),
 					like(posts.content, wildcardQuery),
@@ -171,7 +191,9 @@ app.patch(
 	),
 	async (c) => {
 		const userId = c.req.header("X-User-Id");
-		if (!userId) return c.json({ error: "Unauthorized" }, 401);
+		if (!userId || !isAdminRequest(c)) {
+			return c.json({ error: "Forbidden" }, 403);
+		}
 
 		const db = getDb(c.env as Env);
 		const slug = c.req.param("slug");
@@ -195,7 +217,9 @@ app.patch(
 
 app.delete("/posts/:slug", async (c) => {
 	const userId = c.req.header("X-User-Id");
-	if (!userId) return c.json({ error: "Unauthorized" }, 401);
+	if (!userId || !isAdminRequest(c)) {
+		return c.json({ error: "Forbidden" }, 403);
+	}
 
 	const db = getDb(c.env as Env);
 	const slug = c.req.param("slug");
@@ -240,7 +264,9 @@ app.post(
 	),
 	async (c) => {
 		const userId = c.req.header("X-User-Id");
-		if (!userId) return c.json({ error: "Unauthorized" }, 401);
+		if (!userId || !isAdminRequest(c)) {
+			return c.json({ error: "Forbidden" }, 403);
+		}
 
 		const { title, artist, url, cover } = c.req.valid("form");
 		const db = getDb(c.env as Env);
@@ -276,12 +302,15 @@ import { getZeroTrustUser } from "../../lib/zerotrust";
 export const ALL: APIRoute = async (context) => {
 	const env = context.locals.runtime.env;
 	const request = new Request(context.request);
+	const ztUser = getZeroTrustUser(context.request);
 
 	if (context.locals.user) {
 		request.headers.set("X-User-Id", context.locals.user.id);
-	} else {
-		const ztUser = getZeroTrustUser(context.request);
-		if (ztUser) {
+	}
+
+	if (ztUser) {
+		request.headers.set("X-Admin-Access", "true");
+		if (!context.locals.user) {
 			request.headers.set("X-User-Id", ztUser.id);
 		}
 	}

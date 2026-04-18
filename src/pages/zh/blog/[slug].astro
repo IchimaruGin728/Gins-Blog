@@ -1,4 +1,5 @@
 ---
+import { env as workerEnv } from "cloudflare:workers";
 import Layout from "../../../layouts/Layout.astro";
 import ShareButtons from "../../../components/ShareButtons.astro";
 import Comments from "../../../components/Comments.tsx";
@@ -16,7 +17,7 @@ if (!slug) {
   return Astro.redirect("/404");
 }
 
-const { env } = Astro.locals.runtime;
+const env = workerEnv as Env;
 // CACHE LIFT: Check KV Layer first (Speed optimization)
 const CACHE_KEY = `post:${slug}`;
 let result: typeof posts.$inferSelect | null | undefined = null;
@@ -164,7 +165,7 @@ Astro.response.headers.set(
         class="flex items-center justify-center gap-2 text-gray-500 text-sm font-mono mb-4"
       >
         <span class="i-heroicons-eye w-4 h-4"></span>
-        <span>{result.views} views</span>
+        <span>{result.views} 次阅读</span>
       </div>
       <h1
         class="text-5xl font-display font-bold mb-6 leading-tight"
@@ -233,6 +234,7 @@ Astro.response.headers.set(
       <Comments
         client:visible
         postId={result.id}
+        lang="zh"
         currentUser={Astro.locals.user || undefined}
       />
     </div>

@@ -1,18 +1,25 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { APIRoute } from "astro";
+import { lte } from "drizzle-orm";
 import { posts } from "../../db/schema";
 import { getDb } from "../lib/db";
 
-export const GET: APIRoute = async ({ locals }) => {
-	const db = getDb(locals.runtime.env);
+export const GET: APIRoute = async () => {
+	const db = getDb(workerEnv as Env);
 
-	// Fetch all published posts
-	const allPosts = await db
-		.select({
-			slug: posts.slug,
-			updatedAt: posts.updatedAt,
-		})
-		.from(posts)
-		.all();
+	let allPosts: { slug: string; updatedAt: number }[] = [];
+	try {
+		allPosts = await db
+			.select({
+				slug: posts.slug,
+				updatedAt: posts.updatedAt,
+			})
+			.from(posts)
+			.where(lte(posts.publishedAt, Date.now()))
+			.all();
+	} catch (error) {
+		console.error("Failed to build sitemap:", error);
+	}
 
 	const baseUrl = "https://blog.ichimarugin728.com";
 

@@ -14,17 +14,46 @@ interface Comment {
 
 interface CommentsProps {
 	postId: string; // Or slug
+	lang?: "en-SG" | "zh";
 	currentUser?: {
 		username: string;
 		avatar: string | null | undefined;
 	};
 }
 
-export default function Comments({ postId, currentUser }: CommentsProps) {
+const messages = {
+	"en-SG": {
+		title: "Transmissions",
+		loginToLike: "Please login to like",
+		placeholder: "Broadcast a response...",
+		sending: "Sending...",
+		submit: "Transmit",
+		loginPrompt: "Identify yourself to join the frequency.",
+		loginButton: "Login to Comment",
+		loading: "Scanning frequencies...",
+	},
+	zh: {
+		title: "评论",
+		loginToLike: "请先登录后点赞",
+		placeholder: "写点什么吧...",
+		sending: "发送中...",
+		submit: "发送",
+		loginPrompt: "登录后即可参与评论。",
+		loginButton: "登录后评论",
+		loading: "正在加载评论...",
+	},
+} as const;
+
+export default function Comments({
+	postId,
+	lang = "en-SG",
+	currentUser,
+}: CommentsProps) {
 	const [comments, setComments] = useState<Comment[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [newComment, setNewComment] = useState("");
 	const [submitting, setSubmitting] = useState(false);
+	const copy = messages[lang];
 
 	useEffect(() => {
 		fetchComments();
@@ -65,7 +94,7 @@ export default function Comments({ postId, currentUser }: CommentsProps) {
 	}
 
 	async function handleLike(commentId: string, currentLiked: boolean) {
-		if (!currentUser) return alert("Please login to like");
+		if (!currentUser) return alert(copy.loginToLike);
 
 		// Optimistic UI
 		setComments(
@@ -96,7 +125,7 @@ export default function Comments({ postId, currentUser }: CommentsProps) {
 	return (
 		<div class="mt-12 border-t border-white/10 pt-8">
 			<h3 class="text-2xl font-bold font-display mb-6">
-				Transmissions ({comments.length})
+				{copy.title} ({comments.length})
 			</h3>
 
 			{/* Comment Form */}
@@ -119,7 +148,7 @@ export default function Comments({ postId, currentUser }: CommentsProps) {
 								}
 								class="w-full bg-black/40 border border-white/10 rounded-xl p-4 focus:outline-none focus:border-brand-accent text-white resize-none"
 								rows={3}
-								placeholder="Broadcast a response..."
+								placeholder={copy.placeholder}
 							/>
 							<div class="flex justify-end mt-2">
 								<button
@@ -127,7 +156,7 @@ export default function Comments({ postId, currentUser }: CommentsProps) {
 									disabled={submitting || !newComment.trim()}
 									class="px-6 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-sm transition-colors disabled:opacity-50"
 								>
-									{submitting ? "Sending..." : "Transmit"}
+									{submitting ? copy.sending : copy.submit}
 								</button>
 							</div>
 						</div>
@@ -135,23 +164,19 @@ export default function Comments({ postId, currentUser }: CommentsProps) {
 				</form>
 			) : (
 				<div class="bg-white/5 rounded-xl p-6 text-center mb-8">
-					<p class="text-gray-400 mb-4">
-						Identify yourself to join the frequency.
-					</p>
+					<p class="text-gray-400 mb-4">{copy.loginPrompt}</p>
 					<a
-						href="/login"
+						href={lang === "zh" ? "/zh/login" : "/login"}
 						class="px-6 py-2 rounded-full bg-white text-black font-bold text-sm hover:bg-gray-200 transition-colors"
 					>
-						Login to Comment
+						{copy.loginButton}
 					</a>
 				</div>
 			)}
 
 			{/* Comment List */}
 			{loading ? (
-				<div class="text-center text-gray-500 py-8">
-					Scanning frequencies...
-				</div>
+				<div class="text-center text-gray-500 py-8">{copy.loading}</div>
 			) : (
 				<div class="space-y-6">
 					{comments.map((comment) => (
@@ -195,12 +220,6 @@ export default function Comments({ postId, currentUser }: CommentsProps) {
 												}
 											></span>
 											{comment.likes}
-										</button>
-										<button
-											type="button"
-											class="text-xs text-gray-500 hover:text-white transition-colors"
-										>
-											Reply
 										</button>
 									</div>
 								</div>

@@ -4,7 +4,7 @@ export { languages };
 
 export function getLangFromUrl(url: URL) {
 	const [, lang] = url.pathname.split("/");
-	if (lang === "zh") return "zh-SG";
+	if (lang === "zh") return "zh";
 	if (lang in ui) return lang as keyof typeof ui;
 	return defaultLang;
 }
@@ -20,9 +20,7 @@ export function getRouteFromUrl(url: URL, targetLang: string) {
 	let path = url.pathname;
 	const search = url.search;
 
-	// Remove current lang prefix
-	// Handle Special Case: zh-SG internal -> zh URL
-	if (currentLang === "zh-SG") {
+	if (currentLang === "zh") {
 		path = path.replace(/^\/zh/, "") || "/";
 	} else if (currentLang !== defaultLang) {
 		path = path.replace(`/${currentLang}`, "") || "/";
@@ -38,9 +36,5 @@ export function getRouteFromUrl(url: URL, targetLang: string) {
 		return path + search;
 	}
 
-	// Otherwise prepend target lang
-	// Handle Special Case: zh-SG internal -> zh URL
-	const prefix = targetLang === "zh-SG" ? "zh" : targetLang;
-
-	return `/${prefix}${path === "/" ? "" : path}${search}`;
+	return `/zh${path === "/" ? "" : path}${search}`;
 }

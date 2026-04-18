@@ -1,7 +1,9 @@
 import type { APIRoute } from "astro";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, lte, sql } from "drizzle-orm";
 import { comments, likes, posts, users } from "../../../db/schema";
 import { getDb } from "../../lib/db";
+
+const MAX_COMMENT_LENGTH = 2000;
 
 export const GET: APIRoute = async ({ request, locals }) => {
 	const url = new URL(request.url);
@@ -26,15 +28,17 @@ export const GET: APIRoute = async ({ request, locals }) => {
 			postId,
 		);
 
-	if (!isUuid) {
-		const p = await db
-			.select({ id: posts.id })
-			.from(posts)
-			.where(eq(posts.slug, postId))
-			.get();
-		if (p) targetPostId = p.id;
-		else return new Response(JSON.stringify([]), { status: 200 });
-	}
+	const postRecord = await db
+		.select({ id: posts.id })
+		.from(posts)
+		.where(
+			isUuid
+				? and(eq(posts.id, postId), lte(posts.publishedAt, Date.now()))
+				: and(eq(posts.slug, postId), lte(posts.publishedAt, Date.now())),
+		)
+		.get();
+	if (!postRecord) return new Response(JSON.stringify([]), { status: 200 });
+	targetPostId = postRecord.id;
 
 	const allComments = await db
 		.select({
@@ -91,10 +95,18 @@ export const POST: APIRoute = async ({ request, locals }) => {
 	try {
 		const body = (await request.json()) as any;
 		const { postId, content } = body;
+		const trimmedContent = typeof content === "string" ? content.trim() : "";
 
-		if (!postId || typeof content !== "string" || content.trim().length === 0) {
+		if (!postId || !trimmedContent) {
 			return new Response(
 				JSON.stringify({ error: "postId and non-empty content are required" }),
+				{ status: 400 },
+			);
+		}
+
+		if (trimmedContent.length > MAX_COMMENT_LENGTH) {
+			return new Response(
+				JSON.stringify({ error: "Comment exceeds length limit" }),
 				{ status: 400 },
 			);
 		}
@@ -106,24 +118,26 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
 				postId,
 			);
-		if (!isUuid) {
-			const p = await db
-				.select({ id: posts.id })
-				.from(posts)
-				.where(eq(posts.slug, postId))
-				.get();
-			if (!p)
-				return new Response(JSON.stringify({ error: "Post not found " }), {
-					status: 404,
-				});
-			targetPostId = p.id;
-		}
+		const postRecord = await db
+			.select({ id: posts.id })
+			.from(posts)
+			.where(
+				isUuid
+					? and(eq(posts.id, postId), lte(posts.publishedAt, Date.now()))
+					: and(eq(posts.slug, postId), lte(posts.publishedAt, Date.now())),
+			)
+			.get();
+		if (!postRecord)
+			return new Response(JSON.stringify({ error: "Post not found" }), {
+				status: 404,
+			});
+		targetPostId = postRecord.id;
 
 		await db.insert(comments).values({
 			id: crypto.randomUUID(),
 			userId: user.id,
 			postId: targetPostId,
-			content,
+			content: trimmedContent,
 			createdAt: Date.now(),
 		});
 

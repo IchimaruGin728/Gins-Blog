@@ -1,4 +1,6 @@
 import type { APIRoute } from "astro";
+import { validateVideoFile } from "../../../lib/uploads";
+import { getZeroTrustUser } from "../../../lib/zerotrust";
 
 interface CloudflareStreamUploadResponse {
 	success: boolean;
@@ -15,10 +17,9 @@ function getErrorMessage(error: unknown) {
 }
 
 export const POST: APIRoute = async ({ request, locals }) => {
-	// Admin Authorization check
-	if (!locals.user) {
-		return new Response(JSON.stringify({ error: "Unauthorized" }), {
-			status: 401,
+	if (!getZeroTrustUser(request)) {
+		return new Response(JSON.stringify({ error: "Forbidden" }), {
+			status: 403,
 			headers: { "Content-Type": "application/json" },
 		});
 	}
@@ -45,6 +46,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 		if (!file) {
 			return new Response(JSON.stringify({ error: "No file provided" }), {
+				status: 400,
+				headers: { "Content-Type": "application/json" },
+			});
+		}
+
+		const validationError = validateVideoFile(file);
+		if (validationError) {
+			return new Response(JSON.stringify({ error: validationError }), {
 				status: 400,
 				headers: { "Content-Type": "application/json" },
 			});

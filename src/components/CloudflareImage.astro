@@ -1,4 +1,6 @@
 ---
+import { env as workerEnv } from "cloudflare:workers";
+
 interface Props {
   imageId: string;
   variant?: string; // 'public', 'avatar', 'hero', etc. defaults to 'public'
@@ -21,16 +23,18 @@ const {
   fetchpriority = "auto",
 } = Astro.props;
 
+const env = workerEnv as Env;
+
 // Read configuration from environment variables
 const accountHash =
   import.meta.env.CLOUDFLARE_ACCOUNT_HASH ||
-  Astro.locals.runtime?.env?.CLOUDFLARE_ACCOUNT_HASH ||
+  env.CLOUDFLARE_ACCOUNT_HASH ||
   process.env.CLOUDFLARE_ACCOUNT_HASH ||
   "MISSING_HASH";
 
 const assetsDomain =
   import.meta.env.PUBLIC_ASSETS_DOMAIN ||
-  Astro.locals.runtime?.env?.PUBLIC_ASSETS_DOMAIN ||
+  env.PUBLIC_ASSETS_DOMAIN ||
   process.env.PUBLIC_ASSETS_DOMAIN;
 
 // Construct the URL

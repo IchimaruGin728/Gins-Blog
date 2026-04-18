@@ -1,8 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "gins-blog",
-	"account_id": "cd4ce461acea5097153abf9e2deb26ec",
-	"main": "./dist/_worker.js/index.js",
 	"compatibility_date": "2026-04-06",
 	"compatibility_flags": ["nodejs_compat"],
 	"routes": [
@@ -66,10 +64,12 @@
 	"vectorize": [
 		{
 			"binding": "VECTOR_INDEX",
-			"index_name": "gins-vector"
+			"index_name": "gins-vector",
+			"remote": true
 		}
 	],
 	"ai": {
-		"binding": "AI"
+		"binding": "AI",
+		"remote": true
 	}
 }

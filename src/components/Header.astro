@@ -14,7 +14,7 @@ const t = useTranslations(lang);
     class="max-w-7xl mx-auto glass-panel rounded-full px-6 py-3 min-h-[3.5rem] flex justify-between items-center"
   >
     <a
-      href={lang === "en-SG" ? "/" : `/${lang === "zh-SG" ? "zh" : lang}/`}
+      href={lang === "en-SG" ? "/" : `/${lang}/`}
       class="text-xl md:text-xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-primary z-50 relative leading-none flex items-center"
     >
       Gin's Blog
@@ -27,7 +27,7 @@ const t = useTranslations(lang);
         class="flex items-center gap-1 px-2 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/search:opacity-50 group-hover/search:scale-95 group-hover/search:blur-[1px]"
       >
         <a
-          href={lang === "en-SG" ? "/" : `/${lang === "zh-SG" ? "zh" : lang}/`}
+          href={lang === "en-SG" ? "/" : `/${lang}/`}
           data-astro-prefetch
           class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-full transition-all"
           >{t("nav.home")}</a
@@ -35,7 +35,7 @@ const t = useTranslations(lang);
         <a
           href={lang === "en-SG"
             ? "/blog"
-            : `/${lang === "zh-SG" ? "zh" : lang}/blog/`}
+            : `/${lang}/blog/`}
           data-astro-prefetch
           class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-full transition-all"
           >{t("nav.blog")}</a
@@ -43,15 +43,15 @@ const t = useTranslations(lang);
         <a
           href={lang === "en-SG"
             ? "/docs"
-            : `/${lang === "zh-SG" ? "zh" : lang}/docs/`}
+            : `/${lang}/docs/`}
           data-astro-prefetch
           class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-full transition-all"
-          >{lang === "zh-SG" ? "文档" : "Docs"}</a
+          >{lang === "zh" ? "文档" : "Docs"}</a
         >
         <a
           href={lang === "en-SG"
             ? "/about"
-            : `/${lang === "zh-SG" ? "zh" : lang}/about/`}
+            : `/${lang}/about/`}
           data-astro-prefetch
           class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-full transition-all"
           >{t("nav.about")}</a
@@ -126,7 +126,7 @@ const t = useTranslations(lang);
       <a
         href={lang === "en-SG"
           ? "/rss.xml"
-          : `/${lang === "zh-SG" ? "zh" : lang}/rss.xml`}
+          : `/${lang}/rss.xml`}
         target="_blank"
         class="hidden md:flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/10 text-gray-400 hover:text-brand-accent transition-all border border-transparent hover:border-white/10"
         title="RSS Feed"
@@ -139,7 +139,7 @@ const t = useTranslations(lang);
             href={
               lang === "en-SG"
                 ? "/profile"
-                : `/${lang === "zh-SG" ? "zh" : lang}/profile`
+                : `/${lang}/profile`
             }
             data-astro-prefetch
             class="flex items-center gap-3 hover:opacity-80 transition-opacity"
@@ -161,7 +161,7 @@ const t = useTranslations(lang);
             href={
               lang === "en-SG"
                 ? "/login"
-                : `/${lang === "zh-SG" ? "zh" : lang}/login`
+                : `/${lang}/login`
             }
             data-astro-prefetch
             class="px-4 md:px-5 py-2.5 md:py-2 rounded-full bg-white/5 hover:bg-white/10 text-xs md:text-xs font-bold tracking-wide transition-all border border-white/10 hover:border-white/20 hover:scale-105 active:scale-95 flex items-center leading-none"

@@ -2,29 +2,18 @@ import type { APIRoute } from "astro";
 import { eq } from "drizzle-orm";
 import { sessions } from "../../../../db/schema";
 import { getDb } from "../../../lib/db";
-import { validateSessionToken } from "../../../lib/session";
 
 export const POST: APIRoute = async ({ request, locals }) => {
 	try {
-		const env = locals.runtime.env;
-		const db = getDb(env);
-
-		// 1. Validate Session
-		const cookieHeader = request.headers.get("Cookie");
-		const sessionId = parseCookie(cookieHeader, "auth_session");
-
-		if (!sessionId) {
+		if (!locals.user || !locals.session) {
 			return new Response(JSON.stringify({ error: "Unauthorized" }), {
 				status: 401,
 			});
 		}
 
-		const validation = await validateSessionToken(sessionId, db, env);
-		if (!validation.session) {
-			return new Response(JSON.stringify({ error: "Invalid session" }), {
-				status: 401,
-			});
-		}
+		const env = locals.runtime.env;
+		const db = getDb(env);
+		const currentSession = locals.session;
 
 		// 2. Parse Body
 		const body = (await request.json()) as {
@@ -47,12 +36,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
 				connectionType: connectionType || null,
 				osVerified: os || null,
 			})
-			.where(eq(sessions.id, validation.session.id));
+			.where(eq(sessions.id, currentSession.id));
 
 		// 4. Update KV Cache (important to keep consistent)
 		// We need to re-fetch or patch the session object
 		const updatedSession = {
-			...validation.session,
+			...currentSession,
 			screenResolution: screenResolution || null,
 			deviceMemory: deviceMemory ? parseInt(deviceMemory, 10) : null,
 			cpuCores: cpuCores ? parseInt(cpuCores, 10) : null,
@@ -61,10 +50,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		};
 
 		await env.GIN_KV.put(
-			`session:${validation.session.id}`,
+			`session:${currentSession.id}`,
 			JSON.stringify(updatedSession),
 			{
-				expiration: Math.floor(validation.session.expiresAt / 1000),
+				expiration: Math.floor(currentSession.expiresAt / 1000),
 			},
 		);
 
@@ -76,13 +65,3 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		});
 	}
 };
-
-function parseCookie(header: string | null, name: string): string | null {
-	if (!header) return null;
-	const parts = header.split(";");
-	for (const part of parts) {
-		const [key, value] = part.trim().split("=");
-		if (key === name) return value;
-	}
-	return null;
-}

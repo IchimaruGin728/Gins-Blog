@@ -2,23 +2,26 @@
 	"name": "gins-blog",
 	"type": "module",
 	"version": "1.0.0",
+	"packageManager": "pnpm@10.33.0",
 	"engines": {
-		"node": ">=24"
+		"node": ">=25.9.0"
 	},
 	"scripts": {
 		"dev": "astro dev",
+		"bootstrap": "pnpm install && pnpm run setup",
 		"setup": "node scripts/setup.js",
 		"deploy:agent": "node scripts/setup.js",
 		"start": "astro dev",
 		"build": "astro build",
-		"deploy": "astro build && wrangler deploy",
+		"deploy": "astro build && wrangler deploy ./dist/_worker.js/index.js",
 		"preview": "astro preview",
 		"astro": "astro",
+		"check:astro": "astro check",
 		"db:push": "drizzle-kit push --config=drizzle.config.ts",
 		"lint": "biome check .",
 		"lint:fix": "biome check . --write",
 		"format": "biome format . --write",
-		"check": "astro check && biome check ."
+		"check": "biome check . && astro build"
 	},
 	"dependencies": {
 		"@astrojs/check": "latest",
@@ -30,7 +33,7 @@
 		"@fontsource-variable/inter": "latest",
 		"@fontsource-variable/jetbrains-mono": "latest",
 		"@fontsource-variable/outfit": "latest",
-		"@hono/zod-validator": "npm:@jsr/hono__zod-validator@^0.7.6",
+		"@hono/zod-validator": "jsr:@hono/zod-validator@^0.7.6",
 		"@oslojs/crypto": "latest",
 		"@oslojs/encoding": "latest",
 		"@resvg/resvg-wasm": "latest",
@@ -39,23 +42,23 @@
 		"astro-loading-indicator": "latest",
 		"astro-remote": "latest",
 		"drizzle-orm": "latest",
-		"hono": "npm:@jsr/hono__hono@^4.12.5",
+		"hono": "jsr:@hono/hono@^4.12.12",
 		"marked": "latest",
 		"minimist": "latest",
 		"oslo": "latest",
 		"preact": "latest",
 		"satori": "latest",
-		"typescript": "latest",
+		"typescript": "5.9.3",
 		"ua-parser-js": "latest",
-		"zod": "^3.23.8"
+		"zod": "^4.3.6"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "latest",
+		"@cloudflare/workers-types": "latest",
 		"@iconify-json/heroicons": "latest",
 		"@iconify-json/logos": "latest",
 		"@iconify-json/simple-icons": "latest",
 		"@types/node": "latest",
-		"@cloudflare/workers-types": "latest",
 		"@unocss/astro": "latest",
 		"@unocss/reset": "latest",
 		"dotenv": "latest",

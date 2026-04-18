@@ -43,11 +43,27 @@ function upsertEnvVar(content, key, value) {
 	return `${content}${line}\n`;
 }
 
+function normalizeSiteUrl(input) {
+	const trimmed = input?.trim();
+	if (!trimmed) {
+		throw new Error("Site URL is required.");
+	}
+
+	const url = new URL(trimmed);
+	return url.origin;
+}
+
+function isWorkersDevUrl(siteUrl) {
+	return new URL(siteUrl).hostname.endsWith(".workers.dev");
+}
+
 async function main() {
 	console.log("\x1b[36m%s\x1b[0m", "🚀 Starting Gins Blog Setup...");
 
 	const args = minimist(process.argv.slice(2));
-	const isInteractive = args._.length === 0 && Object.keys(args).filter((k) => k !== "_").length === 0;
+	const isInteractive =
+		args._.length === 0 &&
+		Object.keys(args).filter((k) => k !== "_").length === 0;
 
 	// 1. Check for wrangler
 	try {
@@ -91,6 +107,7 @@ async function main() {
 			kvSession: args["kv-session"] || `gins-session-${suffix}`,
 			kvGeneral: args["kv-general"] || `gins-kv-${suffix}`,
 			r2Bucket: args["r2-bucket"] || `gins-media-${suffix}`,
+			siteUrl: args["site-url"] || `https://gins-blog-${suffix}.workers.dev`,
 			setupAi: args["setup-ai"] === true || args["setup-ai"] === "true",
 			vectorIndex: args["vector-index"] || `gins-vector-${suffix}`,
 			setupMedia:
@@ -145,6 +162,20 @@ async function main() {
 				message: "R2 Media Bucket Name:",
 				default: (answers) => `gins-media-${answers.suffix}`,
 				validate: validateName,
+			},
+			{
+				type: "input",
+				name: "siteUrl",
+				message: "Primary site URL (custom domain or workers.dev URL):",
+				default: (answers) => `https://gins-blog-${answers.suffix}.workers.dev`,
+				validate: (input) => {
+					try {
+						normalizeSiteUrl(input);
+						return true;
+					} catch (error) {
+						return error.message;
+					}
+				},
 			},
 			{
 				type: "confirm",
@@ -220,6 +251,7 @@ async function main() {
 		console.log(`KV (Session): \x1b[32m${answers.kvSession}\x1b[0m`);
 		console.log(`KV (General): \x1b[32m${answers.kvGeneral}\x1b[0m`);
 		console.log(`R2 Bucket:    \x1b[32m${answers.r2Bucket}\x1b[0m`);
+		console.log(`Site URL:     \x1b[32m${answers.siteUrl}\x1b[0m`);
 		console.log(
 			`AI Search:    \x1b[32m${answers.setupAi ? `Enabled (${answers.vectorIndex})` : "Disabled"}\x1b[0m`,
 		);
@@ -246,6 +278,13 @@ async function main() {
 	console.log("\n⚙️  Applying configuration...");
 	if (!isInteractive) {
 		console.log(JSON.stringify(answers, null, 2));
+	}
+
+	try {
+		answers.siteUrl = normalizeSiteUrl(answers.siteUrl);
+	} catch (error) {
+		console.error(`❌ ${error.message}`);
+		process.exit(1);
 	}
 
 	if (answers.setupMedia) {
@@ -367,65 +406,40 @@ async function main() {
 			`$1${answers.r2Bucket}"`,
 		);
 
-		// Handle AI/Vectorize Uncommenting
+		// Update URL-dependent vars
+		content = content.replace(
+			/("GITHUB_REDIRECT_URI":\s*")[^"]+"/,
+			`$1${answers.siteUrl}/login/github/callback"`,
+		);
+		content = content.replace(
+			/("GOOGLE_REDIRECT_URI":\s*")[^"]+"/,
+			`$1${answers.siteUrl}/login/google/callback"`,
+		);
+		content = content.replace(
+			/("DISCORD_REDIRECT_URI":\s*")[^"]+"/,
+			`$1${answers.siteUrl}/login/discord/callback"`,
+		);
+
+		const hostname = new URL(answers.siteUrl).hostname;
+		const routeBlock = isWorkersDevUrl(answers.siteUrl)
+			? '\t"workers_dev": true,\n'
+			: `\t"routes": [\n\t\t{\n\t\t\t"pattern": "${hostname}",\n\t\t\t"custom_domain": true\n\t\t}\n\t],\n`;
+
+		content = content.replace(/\t"routes": \[[\s\S]*?\n\t],\n/, "");
+		content = content.replace(/\t"workers_dev": (true|false),\n/, "");
+		content = content.replace(
+			/("compatibility_flags": \[[^\]]+\],\n)/,
+			`$1${routeBlock}`,
+		);
+
+		// Sync AI blocks to current setup choice
+		content = content.replace(/\t"vectorize": \[[\s\S]*?\n\t],\n/, "");
+		content = content.replace(/\t"ai": {\n\t\t"binding": "AI"\n\t}\n?/, "");
 		if (answers.setupAi) {
-			const lines = content.split("\n");
-			const newLines = [];
-
-			// Flags to track if we are inside commented blocks
-			let insideVectorize = false;
-			let insideAi = false;
-
-			for (let line of lines) {
-				const trimmed = line.trim();
-
-				// Vectorize Block Start
-				if (trimmed.startsWith('// "vectorize":')) {
-					line = line.replace("// ", ""); // Uncomment start
-					insideVectorize = true;
-					newLines.push(line);
-					continue;
-				}
-
-				if (insideVectorize) {
-					if (trimmed.startsWith("//")) {
-						// Uncomment lines inside by stripping leading '// '
-						line = line.replace(/^(\s*)\/\/\s?/, "$1");
-
-						// Update index_name specifically
-						if (line.includes('"index_name":')) {
-							const indent = line.substring(0, line.indexOf('"'));
-							line = `${indent}"index_name": "${answers.vectorIndex}"`;
-						}
-					}
-
-					if (trimmed.includes("],")) {
-						insideVectorize = false;
-					}
-				}
-
-				// AI Block Start
-				if (trimmed.startsWith('// "ai":')) {
-					line = line.replace("// ", "");
-					insideAi = true;
-					newLines.push(line);
-					continue;
-				}
-
-				if (insideAi) {
-					if (trimmed.startsWith("//")) {
-						line = line.replace(/\s*\/\/\s?/, (match) =>
-							match.replace(/\/\/\s?/, ""),
-						);
-					}
-					if (trimmed.includes("}")) {
-						insideAi = false;
-					}
-				}
-
-				newLines.push(line);
-			}
-			content = newLines.join("\n");
+			content = content.replace(
+				/(\t"r2_buckets": \[[\s\S]*?\n\t],\n)/,
+				`$1\t"vectorize": [\n\t\t{\n\t\t\t"binding": "VECTOR_INDEX",\n\t\t\t"index_name": "${answers.vectorIndex}",\n\t\t\t"remote": true\n\t\t}\n\t],\n\t"ai": {\n\t\t"binding": "AI",\n\t\t"remote": true\n\t},\n`,
+			);
 		}
 
 		fs.writeFileSync(wranglerPath, content);
@@ -444,6 +458,36 @@ async function main() {
 	}
 
 	// 10. Handle Secrets & Config
+	try {
+		let envContent = "";
+		const envPath = path.resolve(process.cwd(), ".env");
+		if (fs.existsSync(envPath)) {
+			envContent = fs.readFileSync(envPath, "utf8");
+		}
+		envContent = upsertEnvVar(envContent, "SITE_URL", answers.siteUrl);
+		fs.writeFileSync(envPath, envContent);
+		console.log("✅ SITE_URL saved to .env");
+	} catch (_error) {
+		console.warn("⚠️  Could not save SITE_URL automatically.");
+	}
+
+	try {
+		const openclawPath = path.resolve(process.cwd(), "openclaw.json");
+		if (fs.existsSync(openclawPath)) {
+			const openclaw = JSON.parse(fs.readFileSync(openclawPath, "utf8"));
+			if (openclaw?.mcpServers?.["gins-blog"]?.env) {
+				openclaw.mcpServers["gins-blog"].env.BLOG_URL = answers.siteUrl;
+				fs.writeFileSync(
+					openclawPath,
+					`${JSON.stringify(openclaw, null, "\t")}\n`,
+				);
+				console.log("✅ openclaw.json updated!");
+			}
+		}
+	} catch (_error) {
+		console.warn("⚠️  Could not update openclaw.json.");
+	}
+
 	if (answers.setupMedia) {
 		console.log("🔐 Designing secrets for the optional media add-on...");
 		// We append/update .dev.vars for local dev
@@ -503,11 +547,12 @@ async function main() {
 	console.log("\n🎉 Setup Complete!");
 	console.log("👉 Next Steps:");
 	console.log("1. Configure OAuth secrets in .dev.vars");
+	console.log(`2. Confirm SITE_URL in .env (${answers.siteUrl})`);
 	if (answers.setupAi) {
-		console.log("2. (AI Enabled) Ensure your account has Workers AI enabled.");
+		console.log("3. (AI Enabled) Ensure your account has Workers AI enabled.");
 	}
 	if (answers.setupMedia) {
-		console.log("3. (Media Enabled) Configure these in production:");
+		console.log("4. (Media Enabled) Configure these in production:");
 		console.log(
 			`   Worker secret: CLOUDFLARE_MEDIA_API_TOKEN (Value: ${answers.cfMediaApiToken.substring(0, 5)}...)`,
 		);

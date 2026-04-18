@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import { defineMiddleware } from "astro/middleware";
 import { getDb } from "./lib/db";
 import { validateSessionToken } from "./lib/session";
@@ -20,8 +21,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
 	// Access env from locals.runtime (populated by Adapter)
 	// Safety check for dev mode without wrangler or weird states
-	const runtime = context.locals.runtime;
-	const env: Env | null = runtime?.env ?? null;
+	const env = workerEnv as Env;
 
 	// NUCLEAR BYPASS: Privacy pages (static) should strictly skip all middleware logic to prevent 500s
 	if (pathname.includes("/privacy")) {

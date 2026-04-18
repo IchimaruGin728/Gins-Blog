@@ -38,7 +38,7 @@ void isActive;
             <a
                 href={lang === "en-SG"
                     ? "/"
-                    : `/${lang === "zh-SG" ? "zh" : lang}/`}
+                    : `/${lang}/`}
                 data-astro-prefetch
                 class={`group relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-out ${
                     isActive("/")
@@ -84,7 +84,7 @@ void isActive;
             <a
                 href={lang === "en-SG"
                     ? "/blog"
-                    : `/${lang === "zh-SG" ? "zh" : lang}/blog/`}
+                    : `/${lang}/blog/`}
                 data-astro-prefetch
                 class={`group relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-out ${
                     isActive("/blog")
@@ -130,7 +130,7 @@ void isActive;
             <a
                 href={lang === "en-SG"
                     ? "/docs"
-                    : `/${lang === "zh-SG" ? "zh" : lang}/docs/`}
+                    : `/${lang}/docs/`}
                 data-astro-prefetch
                 class={`group relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-out ${
                     isActive("/docs")
@@ -163,7 +163,7 @@ void isActive;
                     }`}
                     style="white-space: nowrap;"
                 >
-                    {lang === "zh-SG" ? "文档" : "Docs"}
+                    {lang === "zh" ? "文档" : "Docs"}
                 </span>
                 {
                     isActive("/docs") && (
@@ -201,7 +201,7 @@ void isActive;
             <a
                 href={lang === "en-SG"
                     ? "/about"
-                    : `/${lang === "zh-SG" ? "zh" : lang}/about/`}
+                    : `/${lang}/about/`}
                 data-astro-prefetch
                 class={`group relative flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-out ${
                     isActive("/about")

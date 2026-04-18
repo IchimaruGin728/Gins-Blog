@@ -7,11 +7,7 @@ export function getZeroTrustUser(request: Request) {
 	const token = request.headers.get("Cf-Access-Jwt-Assertion");
 	const email = request.headers.get("Cf-Access-Authenticated-User-Email");
 
-	// For browser-side fetch requests, check the cookie instead
-	const cookieHeader = request.headers.get("Cookie");
-	const hasCFAuthCookie = cookieHeader?.includes("CF_Authorization=");
-
-	if (!token && !email && !hasCFAuthCookie) {
+	if (!token && !email) {
 		// Fallback for local dev if needed, or strictly return null
 		// If PROD, strict. If DEV, maybe allow?
 		if (import.meta.env.DEV) {

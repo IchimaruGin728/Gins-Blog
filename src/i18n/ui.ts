@@ -1,6 +1,6 @@
 export const languages = {
 	"en-SG": "English",
-	"zh-SG": "中文（简体）",
+	zh: "中文（简体）",
 };
 
 export const defaultLang = "en-SG";
@@ -92,12 +92,14 @@ export const ui = {
 		"profile.sessions_none": "No active sessions found",
 		"profile.sessions_revoke": "Revoke",
 		"profile.sessions_current": "Current",
+		"profile.sessions_first_login": "First login",
+		"profile.sessions_last_active": "Last active",
 		"profile.sessions_confirm_revoke":
 			"Are you sure you want to revoke this session? You will be logged out on that device.",
 		"profile.sessions_error_load": "Failed to load sessions",
 		"profile.sessions_error_revoke": "Failed to revoke session",
 	},
-	"zh-SG": {
+	zh: {
 		"nav.home": "首页",
 		"nav.blog": "博客",
 		"nav.about": "关于",
@@ -180,6 +182,8 @@ export const ui = {
 		"profile.sessions_none": "暂无活跃会话",
 		"profile.sessions_revoke": "注销",
 		"profile.sessions_current": "当前设备",
+		"profile.sessions_first_login": "首次登录",
+		"profile.sessions_last_active": "最近活跃",
 		"profile.sessions_confirm_revoke":
 			"您确定要注销此会话吗？您将在该设备上退出登录。",
 		"profile.sessions_error_load": "加载会话失败",

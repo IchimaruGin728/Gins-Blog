@@ -6,10 +6,10 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) 
 ![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-blue.svg)
-![Astro](https://img.shields.io/badge/Astro-5.0%2B-orange.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)
+![Astro](https://img.shields.io/badge/Astro-6.1-orange.svg)
 ![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020.svg)
-![Deno](https://img.shields.io/badge/Deno-000000?style=flat&logo=deno&logoColor=white)
+![pnpm](https://img.shields.io/badge/pnpm-10.33-F69220.svg)
 ![JSR](https://img.shields.io/badge/JSR-F7DF1E?style=flat&logo=jsr&logoColor=black)
 ![OpenClaw](https://img.shields.io/badge/%F0%9F%A6%9E_OpenClaw-Compatible-00CDAC)
 ![MCP](https://img.shields.io/badge/MCP-Ready-7D56F4)
@@ -163,10 +163,10 @@
 ### **前端**
 | 技术 | 用途 | 版本 |
 |------|------|------|
-| [Astro](https://astro.build) | 支持服务端渲染的静态站点生成器 | `v5.18.0` |
-| [Preact](https://preactjs.com) | 用于交互组件的轻量级 React 替代品 | Latest |
-| [UnoCSS](https://unocss.dev) | 即时按需原子化 CSS 引擎 | Latest |
-| [Satori](https://github.com/vercel/satori) | 基于 SVG 的 OG 图片生成 | ^0.19.2 |
+| [Astro](https://astro.build) | Cloudflare 原生服务端输出的站点框架 | `v6.1.x` |
+| [Preact](https://preactjs.com) | 用于交互组件的轻量级 React 替代品 | `v10.29.x` |
+| [UnoCSS](https://unocss.dev) | 即时按需原子化 CSS 引擎 | `v66.6.x` |
+| [Satori](https://github.com/vercel/satori) | 基于 SVG 的 OG 图片生成 | `v0.26.x` |
 
 | [Arctic](https://arctic.js.org) | OAuth 2.0 客户端库 | Latest |
 | [Oslo](https://oslo.js.org) | 认证工具（会话、PKCE 等）| Latest |
@@ -174,11 +174,12 @@
 ### **工具与运行时**
 | 技术 | 用途 | 版本 |
 |------|------|------|
-| [Deno](https://deno.com) | 高性能安全运行时 (替代 Node.js) | `v2.x` |
+| [Node.js](https://nodejs.org) | 运行时 | `v25.9.0+` |
+| [pnpm](https://pnpm.io) | 包管理器 | `v10.33+` |
 | [JSR](https://jsr.io) | 现代开源包注册中心 | Latest |
-| [Marked](https://marked.js.org) | 内容的 Markdown 解析器 | ^17.0.3 |
+| [Marked](https://marked.js.org) | 内容的 Markdown 解析器 | `v18.x` |
 | [Zod](https://zod.dev) | TypeScript 优先的模式验证 | ^4.3.6 |
-| [TypeScript](https://www.typescriptlang.org) | 类型安全的 JavaScript | ^5.9.3 |
+| [TypeScript](https://www.typescriptlang.org) | 类型安全的 JavaScript | `v5.9.x` |
 
 ---
 
@@ -188,12 +189,21 @@
 
 开始之前，请确保已安装以下内容：
 
-- **Deno** `2.x+` ([下载](https://deno.com))
+- **Node.js** `25.9.0+`
+- **pnpm** `10.33+`
 - **Cloudflare 账户** ([免费注册](https://dash.cloudflare.com/sign-up))
 - **Wrangler CLI**（Cloudflare 的命令行工具）
 
 ```bash
-deno install -g wrangler
+corepack enable
+corepack prepare pnpm@10.33.0 --activate
+pnpm add -g wrangler
+```
+
+如果你使用 `nvm`，仓库已包含 `.nvmrc`：
+
+```bash
+nvm use
 ```
 
 ---
@@ -203,7 +213,7 @@ deno install -g wrangler
 ```bash
 git clone https://github.com/your-username/gins-blog.git
 cd gins-blog
-deno install
+pnpm install
 ```
 
 ---
@@ -212,59 +222,53 @@ deno install
 请选择适合您的部署方式：
 
 #### **方式 A：交互式引导安装脚本 (✨ 强烈推荐)**
-最快、最简单的零门槛部署方式。只需运行该引导脚本，高度人性化的向导环境将帮您自动配置好 Cloudflare 的数据库、存储、并在部署末尾以交互方式提问是否启动**边缘图片/视频高级托管**。
+最快的首次部署方式。它会自动创建 D1、KV、R2，回写 `wrangler.jsonc`，写入 `.env` / `.dev.vars`，并推送数据库结构。
 ```bash
-deno task setup
+pnpm run bootstrap
+```
+
+如果你已经装好依赖，只想初始化 Cloudflare 资源：
+
+```bash
+pnpm run setup
 ```
 
 #### **方式 B：AI / CI Agent 模式**
-适合 OpenClaw、Cursor 等 AI 代理或流水线。
+适合 OpenClaw、Cursor 或 CI：
+
 ```bash
-node scripts/setup.js --suffix=prod --setup-ai=false
+pnpm run setup -- --suffix=prod --setup-ai=false
 ```
 
 #### **方式 C：手动模式**
-适合高级用户。请参考 `scripts/setup.js` 中的逻辑手动执行 `wrangler` 命令并更新 `wrangler.jsonc`。
+如果你要自己控制资源命名和 Wrangler 操作，可以参考 `scripts/setup.js` 里的逻辑手动执行。
 
----
+设置脚本会自动完成：
 
-自动脚本将执行：
-1. **验证环境** - 检查 Wrangler 登录状态。
-2. **创建资源** - 自动创建 D1 数据库、KV 命名空间和 R2 存储桶。
-3. **配置项目** - 自动更新 `wrangler.jsonc`。
-4. **初始化数据库** - 推送最新的数据库架构。
-5. **媒体配置** - 仅当您额外购买了 Images/Stream 时才需要启用；脚本会单独写入 `CLOUDFLARE_MEDIA_API_TOKEN`，不再与部署 token 混用。
+1. 环境检查
+2. 创建 D1 / KV / R2
+3. 回写 `wrangler.jsonc` 中的资源 ID、路由模式和 OAuth 回调地址
+4. 写入 `.env` 中的 `SITE_URL`
+5. 执行 `pnpm run db:push`
 
-### **步骤 2.1：(可选) 配置 AI 搜索**
+### **步骤 3：配置 OAuth**
 
-如果您需要启用 AI 搜索功能（Semantic Search）：
-
-1. 创建 Vectorize 索引：
-   ```bash
-   wrangler vectorize create gins-vector --dimensions=768 --metric=cosine
-   ```
-2. 在 `wrangler.jsonc` 中取消 `vectorize` 和 `ai` 部分的注释，并更新 `index_name`（如果使用了自定义名称）。
-
-### **步骤 3：配置 OAuth 提供商**
-
-在根目录创建 `.dev.vars` 文件：
+在项目根目录创建 `.env` 和 `.dev.vars`：
 
 ```env
-# GitHub OAuth (https://github.com/settings/developers)
+SITE_URL=https://blog.example.com
+
 GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
 
-# Google OAuth (https://console.cloud.google.com/apis/credentials)
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 GOOGLE_REDIRECT_URI=http://localhost:4321/login/google/callback
 
-# Discord OAuth (https://discord.com/developers/applications)
 DISCORD_CLIENT_ID=your_discord_client_id
 DISCORD_CLIENT_SECRET=your_discord_client_secret
 DISCORD_REDIRECT_URI=http://localhost:4321/login/discord/callback
 
-# 仅在您额外购买了 Cloudflare Images + Stream 时才需要
 CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
 CLOUDFLARE_ACCOUNT_HASH=your_cloudflare_account_hash
 CLOUDFLARE_MEDIA_API_TOKEN=your_media_api_token
@@ -272,62 +276,45 @@ PUBLIC_CF_AVATAR_ID=your_avatar_image_id_or_r2_path
 PUBLIC_ASSETS_DOMAIN=assets.yourdomain.com
 ```
 
-> **⚠️ 重要提示：** 将 `.dev.vars` 添加到您的 `.gitignore` 以防止提交机密信息！
+说明：
 
----
+- `SITE_URL` 放在 `.env`
+- OAuth / 媒体相关敏感信息放在 `.dev.vars`
+- `.env` 与 `.dev.vars` 都不应该提交到仓库
 
-### **步骤 4：保护您的管理面板**
-
-管理面板当前位于 `/IchimaruGin728/admin`。**您必须将此文件夹重命名**为唯一的名称：
-
-```bash
-mv src/pages/IchimaruGin728 src/pages/YOUR_SECRET_ROUTE
-```
-
-例如：
-```bash
-mv src/pages/IchimaruGin728 src/pages/my-secret-admin-panel
-```
-
-> **🔒 专业提示：** 为您的管理路由启用 [Cloudflare Access（零信任）](https://developers.cloudflare.com/cloudflare-one/applications/)以获得最大安全性。
-
----
-
-### **步骤 5：本地运行**
+### **步骤 4：本地运行**
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
-访问 `http://localhost:4321` 🎉
-
----
+访问 `http://localhost:4321`
 
 ## 📦 部署
 
-### **部署到 Cloudflare Workers**
-
-1. **设置 GitHub Actions Secrets：**
-
-- `CLOUDFLARE_API_TOKEN`：仅用于部署的 token
-- `CLOUDFLARE_ACCOUNT_ID`：Cloudflare Account ID
-
-2. **设置 Worker 运行时变量：**
-
-前往 Cloudflare Worker 设置页面：
-- Secret：`CLOUDFLARE_MEDIA_API_TOKEN`
-- Variables：`CLOUDFLARE_ACCOUNT_ID`、`CLOUDFLARE_ACCOUNT_HASH`、`PUBLIC_CF_AVATAR_ID`
-- Variable：`PUBLIC_ASSETS_DOMAIN`（如果您用了 R2 自定义域名）
-
-部署 token 和媒体 token 需要分开保存，不要复用。
-
-3. **部署：**
+推荐生产流程：
 
 ```bash
-npm run deploy
+pnpm install
+pnpm run setup -- --suffix=prod
+pnpm run build
+pnpm run deploy
 ```
 
-或将您的 GitHub 仓库连接到 Cloudflare Pages 以在推送时自动部署。
+运行时 secret 用 `wrangler secret put` 单独配置：
+
+```bash
+wrangler secret put GITHUB_CLIENT_SECRET
+wrangler secret put GOOGLE_CLIENT_SECRET
+wrangler secret put DISCORD_CLIENT_SECRET
+wrangler secret put CLOUDFLARE_MEDIA_API_TOKEN
+```
+
+如果使用 GitHub Actions，再添加：
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- `SITE_URL`（Repository Variable）
 
 ---
 
@@ -335,20 +322,17 @@ npm run deploy
 
 ### **更新个人信息**
 
-编辑 `src/pages/about.astro` 和 `src/pages/zh-SG/about.astro` 以更新：
+编辑 `src/pages/about.astro` 和 `src/pages/zh/about.astro` 以更新：
 - 简介和时间轴
 - 社交链接
 - Cloudflare 图片 ID 与账户哈希 (Account Hash)
 
 ### **更改站点配置**
 
-更新 `astro.config.mjs`：
+更新 `.env` 或 CI 里的 `SITE_URL` 变量：
 
-```js
-export default defineConfig({
-  site: 'https://your-domain.com', // 您的生产 URL
-  // ...
-});
+```bash
+SITE_URL=https://your-domain.com
 ```
 
 ### **自定义品牌**

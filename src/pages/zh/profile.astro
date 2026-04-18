@@ -1,4 +1,5 @@
 ---
+import { env as workerEnv } from "cloudflare:workers";
 import Layout from "../../layouts/Layout.astro";
 import { getLangFromUrl, useTranslations } from "../../i18n/utils";
 
@@ -8,7 +9,7 @@ const t = useTranslations(lang);
 const user = Astro.locals.user;
 if (!user) return Astro.redirect("/login");
 
-const env = Astro.locals.runtime.env;
+const env = workerEnv as Env;
 
 import { eq } from "drizzle-orm";
 import { users } from "../../../db/schema";
@@ -549,6 +550,8 @@ try {
   define:vars={{
     tSessionsNone: t("profile.sessions_none"),
     tSessionsCurrent: t("profile.sessions_current"),
+    tSessionsFirstLogin: t("profile.sessions_first_login"),
+    tSessionsLastActive: t("profile.sessions_last_active"),
     tSessionsRevoke: t("profile.sessions_revoke"),
     tSessionsConfirmRevoke: t("profile.sessions_confirm_revoke"),
     tSessionsErrorLoad: t("profile.sessions_error_load"),
@@ -556,6 +559,30 @@ try {
   }}
 >
   const sessionsList = document.getElementById("sessions-list");
+
+  const escapeHtml = (value) =>
+    String(value ?? "").replace(/[&<>"']/g, (char) => {
+      const entities = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      };
+
+      return entities[char] ?? char;
+    });
+
+  function bindRevokeButtons() {
+    document.querySelectorAll("[data-revoke-session-id]").forEach((button) => {
+      button.addEventListener("click", async (event) => {
+        const sessionId = event.currentTarget?.getAttribute("data-revoke-session-id");
+        if (sessionId) {
+          await window.revokeSession(sessionId);
+        }
+      });
+    });
+  }
 
   // Load sessions on page load
   async function loadSessions() {
@@ -583,6 +610,10 @@ try {
           const lastActive = session.lastActive
             ? new Date(session.lastActive).toLocaleDateString()
             : "Unknown";
+          const browser = escapeHtml(session.browser || "Unknown Browser");
+          const rawOs = typeof session.os === "string" ? session.os : "Unknown OS";
+          const safeCreatedDate = escapeHtml(createdDate);
+          const safeLastActive = escapeHtml(lastActive);
 
           return `
           <div class="p-4 bg-white/5 rounded-lg border border-white/10 flex items-center justify-between ${session.isCurrent ? "ring-2 ring-brand-accent/50" : ""}">
@@ -593,7 +624,7 @@ try {
               <div>
                 <div class="font-medium text-white">
                   ${(() => {
-                    let os = session.os;
+                    let os = rawOs;
                     if (session.isCurrent) {
                       const ua = navigator.userAgent;
                       const isTouch =
@@ -607,12 +638,12 @@ try {
                         os = "iOS";
                       }
                     }
-                    return `${session.browser} on ${os}`;
+                    return `${browser} on ${escapeHtml(os)}`;
                   })()}
                   ${session.isCurrent ? `<span class="ml-2 text-xs px-2 py-0.5 bg-brand-accent/20 text-brand-accent rounded-full">${tSessionsCurrent}</span>` : ""}
                 </div>
                 <div class="text-xs text-gray-400">
-                  First login: ${createdDate} • Last active: ${lastActive}
+                  ${tSessionsFirstLogin}: ${safeCreatedDate} • ${tSessionsLastActive}: ${safeLastActive}
                 </div>
               </div>
             </div>
@@ -620,7 +651,7 @@ try {
               !session.isCurrent
                 ? `
               <button 
-                onclick="revokeSession('${session.id}')"
+                data-revoke-session-id="${encodeURIComponent(session.id)}"
                 class="px-3 py-1.5 text-xs font-medium text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors"
               >
                 ${tSessionsRevoke}
@@ -632,6 +663,7 @@ try {
         `;
         })
         .join("");
+      bindRevokeButtons();
     } catch (error) {
       console.error("Error loading sessions:", error);
       sessionsList.innerHTML = `

@@ -177,16 +177,16 @@ Built with an Edge-First MCP Server, you can connect **Claude Desktop**, **OpenC
 ### **Frontend**
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| [Astro](https://astro.build) | `v5.18.0` | Static site generator with Server Actions & Server Islands |
-| [Preact](https://preactjs.com) | Latest | Lightweight React alternative for interactive components |
-| [UnoCSS](https://unocss.dev) | Latest | Instant on-demand atomic CSS engine (Replaces Tailwind) |
-| [Satori](https://github.com/vercel/satori) | ^0.19.2 | SVG-based OG image generation |
-| [Biome](https://biomejs.dev) | ^2.4.4 | Fast All-in-One Formatter & Linter (Replaces ESLint/Prettier) |
+| [Astro](https://astro.build) | `v6.1.x` | Static site generator with Cloudflare-native server output |
+| [Preact](https://preactjs.com) | `v10.29.x` | Lightweight React alternative for interactive components |
+| [UnoCSS](https://unocss.dev) | `v66.6.x` | Instant on-demand atomic CSS engine (Replaces Tailwind) |
+| [Satori](https://github.com/vercel/satori) | `v0.26.x` | SVG-based OG image generation |
+| [Biome](https://biomejs.dev) | `v2.4.x` | Fast All-in-One Formatter & Linter (Replaces ESLint/Prettier) |
 
 ### **Backend & Edge**
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| [pnpm](https://pnpm.io) | `v9.x` | Fast, disk space efficient package manager |
+| [pnpm](https://pnpm.io) | `v10.33+` | Fast, disk space efficient package manager |
 | [JSR](https://jsr.io) | Latest | Modern open-source package registry |
 | [Cloudflare Workers](https://workers.cloudflare.com) | - | Serverless edge compute platform |
 | [GitHub Actions](https://github.com/features/actions) | - | Automated CI/CD deployment pipeline |
@@ -218,9 +218,9 @@ Built with an Edge-First MCP Server, you can connect **Claude Desktop**, **OpenC
 ### **Utilities**
 | Technology | Purpose | Version |
 |------------|---------|---------|
-| [Marked](https://marked.js.org) | Markdown parser for content | ^17.0.3 |
-| [Zod](https://zod.dev) | TypeScript-first schema validation | ^4.3.6 |
-| [TypeScript](https://www.typescriptlang.org) | Type-safe JavaScript | ^5.9.3 |
+| [Marked](https://marked.js.org) | Markdown parser for content | `v18.x` |
+| [Zod](https://zod.dev) | TypeScript-first schema validation | `v4.3.x` |
+| [TypeScript](https://www.typescriptlang.org) | Type-safe JavaScript | `v5.9.x` |
 
 ---
 
@@ -230,13 +230,21 @@ Built with an Edge-First MCP Server, you can connect **Claude Desktop**, **OpenC
 
 Before you begin, ensure you have the following installed:
 
-- **Node.js** `>=24.0.0`
-- **pnpm** `9.x+` ([Install](https://pnpm.io/installation))
+- **Node.js** `25.9.0+`
+- **pnpm** `10.33+` ([Install](https://pnpm.io/installation))
 - **Cloudflare Account** ([Sign up for free](https://dash.cloudflare.com/sign-up))
 - **Wrangler CLI** (Cloudflare's command-line tool)
 
 ```bash
-npm install -g pnpm wrangler
+corepack enable
+corepack prepare pnpm@10.33.0 --activate
+pnpm add -g wrangler
+```
+
+If you use `nvm`, this repo already ships with `.nvmrc`:
+
+```bash
+nvm use
 ```
 
 ---
@@ -255,7 +263,13 @@ pnpm install
 Select the method that best suits your workflow:
 
 #### **Method A: Interactive Setup Script (✨ Highly Recommended)**
-The fastest way to get started. Just run the command below and the interactive wizard will guide you through connecting your Cloudflare DB and Storage. If you separately purchased Cloudflare Images + Stream, it will also offer an optional media step using a dedicated media token that stays separate from your deploy token.
+The fastest path for a fresh account. It provisions D1, KV, R2, rewrites `wrangler.jsonc`, writes `.env` / `.dev.vars`, updates `openclaw.json`, and pushes the schema.
+```bash
+pnpm run bootstrap
+```
+
+If you already installed dependencies and only want to provision Cloudflare resources:
+
 ```bash
 pnpm run setup
 ```
@@ -263,7 +277,7 @@ pnpm run setup
 #### **Method B: AI / CI Agent Mode**
 For OpenClaw, Cursor, or CI pipelines.
 ```bash
-node scripts/setup.js --suffix=prod --setup-ai=false
+pnpm run setup -- --suffix=prod --setup-ai=false
 ```
 
 #### **Method C: Manual Mode**
@@ -272,10 +286,11 @@ For advanced users. Refer to `scripts/setup.js` logic to execute `wrangler` comm
 ---
 
 The setup script handles:
-1. **Environment Check** - Verifies Wrangler login status.
-2. **Resource Creation** - Creates D1 Database, KV Namespaces, and R2 Bucket.
-3. **Configuration** - Automatically updates `wrangler.jsonc`.
-4. **Initialization** - Pushes the database schema.
+1. **Environment check** - verifies Wrangler is installed and authenticated.
+2. **Resource creation** - creates D1, KV, and R2 resources.
+3. **Config patching** - writes the generated IDs, route mode, and OAuth callback URLs back into `wrangler.jsonc`.
+4. **Site URL bootstrap** - writes `SITE_URL` into `.env` for canonical URLs, sitemap, and RSS.
+5. **Schema bootstrap** - runs `pnpm run db:push`.
 
 ### **Step 2.1: (Optional) Configure AI Search**
 
@@ -285,13 +300,15 @@ If you want to enable AI Semantic Search:
    ```bash
    wrangler vectorize create gins-vector --dimensions=768 --metric=cosine
    ```
-2. Uncomment the `vectorize` and `ai` sections in `wrangler.jsonc` and update the `index_name` if needed.
+2. Or simply rerun `pnpm run setup -- --suffix=prod --setup-ai=true`.
 
 ### **Step 3: Configure OAuth Providers**
 
-Create a `.dev.vars` file in the root directory:
+Create `.env` and `.dev.vars` files in the root directory:
 
 ```env
+SITE_URL=https://blog.example.com
+
 # GitHub OAuth (https://github.com/settings/developers)
 GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
@@ -315,6 +332,7 @@ PUBLIC_ASSETS_DOMAIN=assets.yourdomain.com
 ```
 
 > **⚠️ IMPORTANT:** Add `.dev.vars` to your `.gitignore` to prevent committing secrets!
+> `SITE_URL` belongs in `.env`, while credentials belong in `.dev.vars`.
 
 ---
 
@@ -347,30 +365,47 @@ Visit `http://localhost:4321` 🎉
 
 ## 📦 Deployment
 
-### **Deploy to Cloudflare Workers via GitHub Actions**
+### **Recommended Manual Deploy**
 
-1. **Set up GitHub Secrets:**
-
-Go to your GitHub Repository → Settings → Secrets and variables → Actions. Add the following secrets:
-- `CLOUDFLARE_API_TOKEN`: Your Cloudflare API Token (with Workers deployment permissions)
-- `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare Account ID
-
-2. **Configure Environment Variables:**
-
-Set production runtime values on the Worker itself:
-- Secret: `CLOUDFLARE_MEDIA_API_TOKEN` for Images/Stream uploads
-- Variables: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ACCOUNT_HASH`, `PUBLIC_CF_AVATAR_ID`
-- Variable: `PUBLIC_ASSETS_DOMAIN` if you use an R2 custom domain
-
-Keep the deploy token and media token separate. `CLOUDFLARE_API_TOKEN` is for GitHub Actions deployment, while `CLOUDFLARE_MEDIA_API_TOKEN` is only for runtime media uploads.
-
-3. **Automatic Deployment:**
-
-Pushing to the `main` branch will automatically trigger the GitHub Action defined in `.github/workflows/deploy.yml` to build and deploy your blog.
+This is the shortest reliable production path:
 
 ```bash
-git push origin main
+pnpm install
+pnpm run setup -- --suffix=prod
+pnpm run build
+pnpm run deploy
 ```
+
+`pnpm run deploy` builds the site and deploys the generated Worker entry at `dist/_worker.js/index.js`.
+
+### **Production Secrets**
+
+Set runtime secrets directly on the Worker:
+
+```bash
+wrangler secret put GITHUB_CLIENT_SECRET
+wrangler secret put GOOGLE_CLIENT_SECRET
+wrangler secret put DISCORD_CLIENT_SECRET
+wrangler secret put CLOUDFLARE_MEDIA_API_TOKEN
+```
+
+Set non-secret runtime vars in `wrangler.jsonc`:
+- `GITHUB_REDIRECT_URI`
+- `GOOGLE_REDIRECT_URI`
+- `DISCORD_REDIRECT_URI`
+- `PUBLIC_CF_AVATAR_ID`
+- `PUBLIC_ASSETS_DOMAIN`
+
+Keep the deploy token and media token separate. `CLOUDFLARE_API_TOKEN` is for deployment, while `CLOUDFLARE_MEDIA_API_TOKEN` is only for runtime uploads.
+
+### **GitHub Actions Deploy**
+
+If you deploy from GitHub Actions, add:
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- Repository variable `SITE_URL`
+
+Then push to `main` to trigger `.github/workflows/deploy.yml`.
 
 ---
 
@@ -378,20 +413,17 @@ git push origin main
 
 ### **Update Personal Information**
 
-Edit `src/pages/about.astro` and `src/pages/zh-SG/about.astro` to update:
+Edit `src/pages/about.astro` and `src/pages/zh/about.astro` to update:
 - Bio and timeline
 - Social links
 - Cloudflare Image ID & Account Hash
 
 ### **Change Site Configuration**
 
-Update `astro.config.mjs`:
+Update `.env` or your CI variable:
 
-```js
-export default defineConfig({
-  site: 'https://your-domain.com', // Your production URL
-  // ...
-});
+```bash
+SITE_URL=https://your-domain.com
 ```
 
 ### **Customize Branding**

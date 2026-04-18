@@ -1,13 +1,15 @@
 import { generateState } from "arctic";
 import type { APIRoute } from "astro";
 import { getGithub } from "../../../lib/auth";
+import { sanitizeRedirectTarget } from "../../../lib/redirect";
 
 export const GET: APIRoute = async ({ cookies, redirect, locals, request }) => {
 	const state = generateState();
 	const url = getGithub(locals.runtime.env).createAuthorizationURL(state, []);
 
-	const redirectTo =
-		new URL(request.url).searchParams.get("redirect_to") ?? "/";
+	const redirectTo = sanitizeRedirectTarget(
+		new URL(request.url).searchParams.get("redirect_to"),
+	);
 
 	cookies.set("github_oauth_state", state, {
 		path: "/",

@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import rss from "@astrojs/rss";
 import type { APIContext } from "astro";
 import { desc, lte } from "drizzle-orm";
@@ -5,15 +6,19 @@ import { posts } from "../../db/schema";
 import { getDb } from "../lib/db";
 
 export async function GET(context: APIContext) {
-	const db = getDb(context.locals.runtime.env);
+	const db = getDb(workerEnv as Env);
 
-	// Fetch published posts
-	const blogPosts = await db
-		.select()
-		.from(posts)
-		.where(lte(posts.publishedAt, Date.now()))
-		.orderBy(desc(posts.publishedAt))
-		.all();
+	let blogPosts: (typeof posts.$inferSelect)[] = [];
+	try {
+		blogPosts = await db
+			.select()
+			.from(posts)
+			.where(lte(posts.publishedAt, Date.now()))
+			.orderBy(desc(posts.publishedAt))
+			.all();
+	} catch (error) {
+		console.error("Failed to build RSS feed:", error);
+	}
 
 	return rss({
 		title: "Gin's Blog",

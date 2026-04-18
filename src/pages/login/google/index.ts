@@ -1,6 +1,7 @@
 import { generateCodeVerifier, generateState } from "arctic";
 import type { APIRoute } from "astro";
 import { getGoogle } from "../../../lib/auth";
+import { sanitizeRedirectTarget } from "../../../lib/redirect";
 
 export const GET: APIRoute = async ({ cookies, redirect, locals, request }) => {
 	const state = generateState();
@@ -11,8 +12,9 @@ export const GET: APIRoute = async ({ cookies, redirect, locals, request }) => {
 		["profile", "email"],
 	);
 
-	const redirectTo =
-		new URL(request.url).searchParams.get("redirect_to") ?? "/";
+	const redirectTo = sanitizeRedirectTarget(
+		new URL(request.url).searchParams.get("redirect_to"),
+	);
 
 	cookies.set("google_oauth_state", state, {
 		path: "/",

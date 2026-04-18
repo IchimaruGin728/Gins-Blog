@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import rss from "@astrojs/rss";
 import type { APIContext } from "astro";
 import { desc, lte } from "drizzle-orm";
@@ -5,16 +6,19 @@ import { posts } from "../../../db/schema";
 import { getDb } from "../../lib/db";
 
 export async function GET(context: APIContext) {
-	const db = getDb(context.locals.runtime.env);
+	const db = getDb(workerEnv as Env);
 
-	// Fetch published posts
-	const blogPosts = await db
-		.select()
-		.from(posts)
-		.where(lte(posts.publishedAt, Date.now()))
-
-		.orderBy(desc(posts.publishedAt))
-		.all();
+	let blogPosts: (typeof posts.$inferSelect)[] = [];
+	try {
+		blogPosts = await db
+			.select()
+			.from(posts)
+			.where(lte(posts.publishedAt, Date.now()))
+			.orderBy(desc(posts.publishedAt))
+			.all();
+	} catch (error) {
+		console.error("Failed to build ZH RSS feed:", error);
+	}
 
 	return rss({
 		title: "Gin的博客",
@@ -22,11 +26,10 @@ export async function GET(context: APIContext) {
 		site: context.site!,
 		items: blogPosts.map((post) => ({
 			title: post.title,
-
 			pubDate: new Date(post.publishedAt || post.createdAt),
 			description: post.content ? `${post.content.substring(0, 200)}...` : "",
 			link: `/zh/blog/${post.slug}`,
 		})),
-		customData: `<language>zh-SG</language>`,
+		customData: `<language>zh</language>`,
 	});
 }

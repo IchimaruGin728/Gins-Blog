@@ -22,7 +22,7 @@ const docs = defineCollection({
 	schema: z.object({
 		title: z.string(),
 		description: z.string().optional(),
-		order: z.number().optional(), // For sorting sidebar items
+		order: z.number().optional(),
 	}),
 });
 
@@ -35,7 +35,7 @@ const docsZh = defineCollection({
 	schema: z.object({
 		title: z.string(),
 		description: z.string().optional(),
-		order: z.number().optional(), // For sorting sidebar items
+		order: z.number().optional(),
 	}),
 });
 

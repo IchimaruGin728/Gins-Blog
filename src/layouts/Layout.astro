@@ -129,7 +129,7 @@ const fullTitle =
             rel="alternate"
             hreflang="zh"
             href={new URL(
-                getRouteFromUrl(Astro.url, "zh-SG"),
+                getRouteFromUrl(Astro.url, "zh"),
                 Astro.site || Astro.url.origin,
             ).href}
         />
@@ -180,6 +180,7 @@ const fullTitle =
 
         <!-- Device Info Collector (Runs once per session) -->
         <script>
+            // @ts-nocheck
             // Only run if user is logged in (we check for a session indicator or just try the API)
             // To save requests, we check sessionStorage first
             const collectDeviceInfo = async () => {

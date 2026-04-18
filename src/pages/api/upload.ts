@@ -1,9 +1,10 @@
 import type { APIRoute } from "astro";
+import { sanitizeFilename, validateGenericUpload } from "../../lib/uploads";
+import { getZeroTrustUser } from "../../lib/zerotrust";
 
 export const PUT: APIRoute = async ({ request, locals }) => {
-	// Check Auth
-	if (!locals.user) {
-		return new Response("Unauthorized", { status: 401 });
+	if (!getZeroTrustUser(request)) {
+		return new Response("Forbidden", { status: 403 });
 	}
 
 	const env = locals.runtime.env;
@@ -14,11 +15,29 @@ export const PUT: APIRoute = async ({ request, locals }) => {
 		return new Response("Missing filename", { status: 400 });
 	}
 
+	const validationError = validateGenericUpload(
+		filename,
+		request.headers.get("Content-Type"),
+		request.headers.get("Content-Length"),
+	);
+	if (validationError) {
+		return new Response(validationError, { status: 400 });
+	}
+
 	try {
-		const uniqueFilename = `${Date.now()}-${filename}`;
+		const safeFilename = sanitizeFilename(filename);
+		if (!safeFilename) {
+			return new Response("Invalid filename", { status: 400 });
+		}
+
+		const uniqueFilename = `${Date.now()}-${safeFilename}`;
 
 		// Use R2 Binding to put the file
 		// request.body is a ReadableStream which put() accepts directly
+		if (!request.body) {
+			return new Response("Missing request body", { status: 400 });
+		}
+
 		await env.BUCKET.put(uniqueFilename, request.body as any);
 
 		// Assuming pure worker with assets, we might need a custom domain or worker route to serve these.

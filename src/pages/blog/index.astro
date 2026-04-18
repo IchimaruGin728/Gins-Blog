@@ -1,12 +1,11 @@
 ---
+import { env as workerEnv } from "cloudflare:workers";
 import Layout from "../../layouts/Layout.astro";
 import { desc, lte } from "drizzle-orm";
 import { posts } from "../../../db/schema";
 import { getDb } from "../../lib/db";
 
-// Access Cloudflare bindings from locals
-const runtime = Astro.locals.runtime;
-const env = runtime?.env || ({} as any);
+const env = workerEnv as Env;
 
 let allPosts: (typeof posts.$inferSelect)[] = [];
 let error = null;

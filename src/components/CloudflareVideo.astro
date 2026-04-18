@@ -1,4 +1,6 @@
 ---
+import { env as workerEnv } from "cloudflare:workers";
+
 interface Props {
   videoId: string;
   title?: string;
@@ -21,7 +23,7 @@ const {
   class: className = "w-full aspect-video rounded-xl overflow-hidden",
 } = Astro.props;
 
-const { env } = Astro.locals.runtime || { env: process.env };
+const env = workerEnv as Env;
 const customerId =
   env.CLOUDFLARE_STREAM_CUSTOMER_ID ||
   env.CLOUDFLARE_ACCOUNT_HASH ||
