@@ -1,12 +1,13 @@
+import { env as workerEnv } from "cloudflare:workers";
 import { generateCodeVerifier, generateState } from "arctic";
 import type { APIRoute } from "astro";
 import { getDiscord } from "../../../lib/auth";
 import { sanitizeRedirectTarget } from "../../../lib/redirect";
 
-export const GET: APIRoute = async ({ cookies, redirect, locals, request }) => {
+export const GET: APIRoute = async ({ cookies, redirect, request }) => {
 	const state = generateState();
 	const codeVerifier = generateCodeVerifier();
-	const url = getDiscord(locals.runtime.env).createAuthorizationURL(
+	const url = getDiscord(workerEnv as Env).createAuthorizationURL(
 		state,
 		codeVerifier,
 		["identify", "email"],

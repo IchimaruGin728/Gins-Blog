@@ -1,11 +1,12 @@
+import { env as workerEnv } from "cloudflare:workers";
 import { generateState } from "arctic";
 import type { APIRoute } from "astro";
 import { getGithub } from "../../../lib/auth";
 import { sanitizeRedirectTarget } from "../../../lib/redirect";
 
-export const GET: APIRoute = async ({ cookies, redirect, locals, request }) => {
+export const GET: APIRoute = async ({ cookies, redirect, request }) => {
 	const state = generateState();
-	const url = getGithub(locals.runtime.env).createAuthorizationURL(state, []);
+	const url = getGithub(workerEnv as Env).createAuthorizationURL(state, []);
 
 	const redirectTo = sanitizeRedirectTarget(
 		new URL(request.url).searchParams.get("redirect_to"),

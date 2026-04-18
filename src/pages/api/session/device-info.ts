@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { eq } from "drizzle-orm";
 import { sessions } from "../../../../db/schema";
@@ -11,7 +12,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 			});
 		}
 
-		const env = locals.runtime.env;
+		const env = workerEnv as Env;
 		const db = getDb(env);
 		const currentSession = locals.session;
 

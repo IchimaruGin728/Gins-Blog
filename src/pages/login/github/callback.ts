@@ -1,3 +1,4 @@
+import { env as workerEnv } from "cloudflare:workers";
 import type { OAuth2Tokens } from "arctic";
 import type { APIRoute } from "astro";
 import { eq } from "drizzle-orm";
@@ -11,7 +12,8 @@ import {
 	validateSessionToken,
 } from "../../../lib/session";
 
-export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
+export const GET: APIRoute = async ({ request, cookies, redirect }) => {
+	const env = workerEnv as Env;
 	const url = new URL(request.url);
 	const code = url.searchParams.get("code");
 	const state = url.searchParams.get("state");
@@ -25,9 +27,8 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 
 	try {
 		console.log("Validating GitHub code...");
-		const tokens: OAuth2Tokens = await getGithub(
-			locals.runtime.env,
-		).validateAuthorizationCode(code);
+		const tokens: OAuth2Tokens =
+			await getGithub(env).validateAuthorizationCode(code);
 		const accessToken = tokens.accessToken();
 		console.log("Tokens received:", accessToken ? "Present" : "Missing");
 
@@ -65,7 +66,7 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 			throw new Error(`Failed to fetch GitHub user: ${fetchError.message}`);
 		}
 
-		const db = getDb(locals.runtime.env);
+		const db = getDb(env);
 
 		// Check if user is already logged in (linking a new provider)
 		const existingSessionToken = cookies.get("session")?.value;
@@ -75,7 +76,7 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 			const sessionResult = await validateSessionToken(
 				existingSessionToken,
 				db,
-				locals.runtime.env,
+				env,
 			);
 			if (sessionResult.session && sessionResult.user) {
 				currentUserId = sessionResult.user.id;
@@ -135,13 +136,7 @@ export const GET: APIRoute = async ({ request, cookies, locals, redirect }) => {
 
 		console.log("Creating session, userId:", userId);
 		const token = generateSessionToken();
-		const session = await createSession(
-			token,
-			userId,
-			db,
-			locals.runtime.env,
-			request,
-		);
+		const session = await createSession(token, userId, db, env, request);
 
 		console.log("Setting session cookie...");
 		cookies.set("session", token, {
