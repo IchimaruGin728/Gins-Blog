@@ -5,7 +5,7 @@ import { posts } from "../../../db/schema";
 import { getDb } from "../../lib/db";
 import { querySimilarPosts } from "../../lib/vectorize";
 
-export const GET: APIRoute = async ({ request, locals }) => {
+export const GET: APIRoute = async ({ request }) => {
 	const env = workerEnv as Env;
 	const url = new URL(request.url);
 	const q = url.searchParams.get("q");

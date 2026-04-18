@@ -7,7 +7,7 @@ import { getDb } from "../../../lib/db";
 // Note: This route is already protected by Zero Trust middleware at /api/admin level
 export const prerender = false;
 
-export const DELETE: APIRoute = async ({ locals }) => {
+export const DELETE: APIRoute = async () => {
 	// No need to verify ZT here - middleware already enforces it for /api/admin/*
 	const env = workerEnv as Env;
 	const db = getDb(env);

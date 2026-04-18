@@ -3,7 +3,7 @@ import type { APIRoute } from "astro";
 import { sessions, users } from "../../../../db/schema";
 import { getDb } from "../../../lib/db";
 
-export const POST: APIRoute = async ({ locals }) => {
+export const POST: APIRoute = async () => {
 	// Protected by Zero Trust middleware at /api/admin level (see src/middleware.ts)
 	const db = getDb(workerEnv as Env);
 

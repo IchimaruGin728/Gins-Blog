@@ -38,14 +38,14 @@
 		{
 			// Sessions + general KV storage (session:*, oauth:* keys)
 			"binding": "GIN_KV",
-			"id": "d749e0c6642747248d4db6d3393573db",
-			"preview_id": "171ef5dabf7e4c83ad560b8cd85cacb9"
+			"id": "bc7fc9d25c7f44858885f472d58cc6f1",
+			"preview_id": "bc7fc9d25c7f44858885f472d58cc6f1"
 		},
 		{
 			// Page & post cache (post:*, <url> keys)
 			"binding": "GINS_CACHE",
 			"id": "2f7f0068e7a347f8809e3c91f94acb40",
-			"preview_id": "171ef5dabf7e4c83ad560b8cd85cacb9"
+			"preview_id": "2f7f0068e7a347f8809e3c91f94acb40"
 		}
 	],
 	"d1_databases": [

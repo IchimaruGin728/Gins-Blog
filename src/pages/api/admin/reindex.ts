@@ -4,7 +4,7 @@ import { posts } from "../../../../db/schema";
 import { getDb } from "../../../lib/db";
 // import { eq } from 'drizzle-orm';
 
-export const POST: APIRoute = async ({ locals }) => {
+export const POST: APIRoute = async () => {
 	const env = workerEnv as Env;
 	const db = getDb(env);
 
