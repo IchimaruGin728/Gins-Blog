@@ -1,7 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "gins-blog",
-	"compatibility_date": "2026-04-06",
+	"compatibility_date": "2026-05-14",
 	"compatibility_flags": ["nodejs_compat"],
 	"routes": [
 		{
