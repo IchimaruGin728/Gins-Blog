@@ -1,5 +1,5 @@
 import { defineAction } from "astro:actions";
-import { z } from "astro:schema";
+import { z } from "zod";
 
 export const server = {
 	getGreeting: defineAction({
